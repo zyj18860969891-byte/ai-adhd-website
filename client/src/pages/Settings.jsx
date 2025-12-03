@@ -33,11 +33,24 @@ export default function Settings() {
 
   const loadServiceStatus = async () => {
     try {
+      // Get the correct API base URL
+      const getApiBase = () => {
+        const base = import.meta.env.VITE_API_BASE_URL
+        if (base) {
+          const normalized = base.replace(/\/+$/, '')
+          if (normalized.endsWith('/api')) {
+            return normalized
+          }
+          return `${normalized}/api`
+        }
+        return '/api'
+      }
+
       const [health, aiHealth, dbHealth, notificationHealth] = await Promise.all([
         taskService.getHealth(),
-        fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/services/ai/health`).then(r => r.json()),
-        fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/services/db/health`).then(r => r.json()),
-        fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/services/notification/health`).then(r => r.json())
+        fetch(`${getApiBase()}/services/ai/health`).then(r => r.json()),
+        fetch(`${getApiBase()}/services/db/health`).then(r => r.json()),
+        fetch(`${getApiBase()}/services/notification/health`).then(r => r.json())
       ])
       
       setServices({
