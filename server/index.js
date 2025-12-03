@@ -126,7 +126,7 @@ app.post('/api/services/:serviceId/status', (req, res) => {
 
 // Microservices proxy endpoints
 app.get('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:3001';
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
   const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
   
   fetch(targetUrl)
@@ -139,7 +139,7 @@ app.get('/api/services/ai/*', (req, res) => {
 });
 
 app.get('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:3002';
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -158,7 +158,7 @@ app.get('/api/services/db/*', (req, res) => {
 });
 
 app.get('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3003';
+  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   

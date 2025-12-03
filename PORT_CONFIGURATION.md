@@ -52,9 +52,22 @@ JWT_SECRET=your_strong_jwt_secret_here
 
 主服务器将请求代理到各个微服务：
 
-- `/api/services/ai/*` → AI 服务 (3001)
-- `/api/services/db/*` → 数据库服务 (3002)
-- `/api/services/notification/*` → 通知服务 (3003)
+- `/api/services/ai/*` → AI 服务 (8190)
+- `/api/services/db/*` → 数据库服务 (8280)
+- `/api/services/notification/*` → 通知服务 (8380)
+
+### 2. 环境变量配置
+
+在 Railway 环境中，需要设置以下环境变量：
+
+```bash
+# 微服务 URL（内部通信）
+AI_SERVICE_URL=http://localhost:8190
+DB_SERVICE_URL=http://localhost:8280
+NOTIFICATION_SERVICE_URL=http://localhost:8380
+```
+
+如果未设置环境变量，主服务器将使用默认的本地端口配置。
 
 ### 2. 前端代理配置
 
