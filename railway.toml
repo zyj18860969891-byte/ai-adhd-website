@@ -1,57 +1,43 @@
-# Railway configuration for ADHD Task Manager PWA
+# Railway Multi-Service Monorepo Configuration for ADHD Task Manager PWA
 
 [build]
-builder = "docker"
-startCommand = "npm run dev"
-
-[deploy]
-startCommand = "npm run start:production"
+builder = "nixpacks"
 
 [env]
-# Node.js 环境
 NODE_ENV = "production"
-
-# 主服务器端口
-PORT = "3000"
-
-# 微服务端口配置
-GATEWAY_PORT = "3000"
-AI_SERVICE_PORT = "3001"
-DB_SERVICE_PORT = "3002"
-NOTIFICATION_SERVICE_PORT = "3003"
-
-# AI 配置
 OPENROUTER_API_KEY = "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"
 OPENROUTER_MODEL = "qwen/qwen3-235b-a22b-2507"
-
-# CORS 配置
-CORS_ORIGIN = "https://your-adhd-task-manager.vercel.app"
-
-# JWT 密钥（需要在 Railway 中设置为 Secret）
-JWT_SECRET = "your_strong_jwt_secret_here"
-
-# 数据库路径
+JWT_SECRET = "your_strong_jwt_secret_here_change_this"
 DB_PATH = "./data/tasks.db"
 
-[healthcheck]
-path = "/api/health"
-interval = 30
-timeout = 5
-retries = 3
-gracePeriod = 10
-
-[services]
-# 主服务器（API 网关）
-gateway = { port = 3000, protocol = "http" }
+# 主服务器 (Gateway/API Gateway)
+[[services]]
+name = "gateway"
+root = "."
+command = "npm start"
+port = 3000
+max_procs = 1
 
 # AI 服务
-ai-service = { port = 3001, protocol = "http" }
+[[services]]
+name = "ai-service"
+root = "services/ai-service"
+command = "node index.js"
+port = 3001
+max_procs = 1
 
 # 数据库服务
-db-service = { port = 3002, protocol = "http" }
+[[services]]
+name = "db-service"
+root = "services/db-service"
+command = "node index.js"
+port = 3002
+max_procs = 1
 
 # 通知服务
-notification-service = { port = 3003, protocol = "http" }
-
-# 前端服务（可选，如果需要单独部署）
-# client = { port = 5173, protocol = "http" }
+[[services]]
+name = "notification-service"
+root = "services/notification-service"
+command = "node index.js"
+port = 3003
+max_procs = 1
