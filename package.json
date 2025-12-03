@@ -8,7 +8,7 @@
     "dev:server": "nodemon server/index.js",
     "dev:client": "cd client && npm run dev",
     "build": "cd client && npm run build",
-    "start": "concurrently \"cross-env PORT=8080 node server/index.js\" \"cross-env PORT=8180 node services/ai-service/index.js\" \"cross-env PORT=8280 node services/db-service/index.js\" \"cross-env PORT=8380 node services/notification-service/index.js\"",
+    "start": "concurrently \"cross-env PORT=8080 node server/index.js\" \"cross-env PORT=8190 node services/ai-service/index.js\" \"cross-env PORT=8280 node services/db-service/index.js\" \"cross-env PORT=8380 node services/notification-service/index.js\"",
     "start:production": "npm run build && npm start",
     "test": "jest",
     "lint": "eslint client/src server",
