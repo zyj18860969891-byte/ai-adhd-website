@@ -176,18 +176,21 @@ app.get('/api/services/notification/*', (req, res) => {
     });
 });
 
-// WebSocket for real-time updates
-const wss = new WebSocket.Server({ port: PORT + 100 });
-wss.on('connection', (ws) => {
-  console.log('WebSocket client connected');
-  
-  // Send current task progress
-  ws.send(JSON.stringify({ type: 'taskProgress', data: taskProgress }));
-  
-  ws.on('close', () => {
-    console.log('WebSocket client disconnected');
+// WebSocket for real-time updates (disabled in production)
+let wss;
+if (process.env.NODE_ENV !== 'production') {
+  wss = new WebSocket.Server({ port: parseInt(process.env.PORT || '3000') + 100 });
+  wss.on('connection', (ws) => {
+    console.log('WebSocket client connected');
+    
+    // Send current task progress
+    ws.send(JSON.stringify({ type: 'taskProgress', data: taskProgress }));
+    
+    ws.on('close', () => {
+      console.log('WebSocket client disconnected');
+    });
   });
-});
+}
 
 // Background tasks
 cron.schedule('*/5 * * * * *', () => {
