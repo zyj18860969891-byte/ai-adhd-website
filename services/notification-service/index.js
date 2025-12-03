@@ -23,7 +23,7 @@ const clients = new Set();
 
 // WebSocket for notifications (disabled in production)
 if (process.env.NODE_ENV !== 'production') {
-  const wsPort = parseInt(process.env.PORT || '3003') + 100;
+  const wsPort = parseInt(process.env.PORT || PORT, 10) + 100;
   const wss = new WebSocket.Server({ port: wsPort });
   wss.on('connection', (ws) => {
     console.log('Notification WebSocket client connected');
@@ -230,6 +230,6 @@ function scheduleReminder(reminder) {
 app.listen(PORT, () => {
   console.log(`Notification Service running on port ${PORT}`);
   if (process.env.NODE_ENV !== 'production') {
-    console.log(`WebSocket running on port ${PORT + 100}`);
+    console.log(`WebSocket running on port ${parseInt(PORT, 10) + 100}`);
   }
 });

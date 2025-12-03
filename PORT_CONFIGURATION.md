@@ -99,6 +99,26 @@ services:
 
 ## WebSocket 端口
 
-- 主服务器：3100 (PORT + 100)
-- AI 服务：3101 (PORT + 100)
-- 通知服务：3103 (PORT + 100)
+所有 WebSocket 服务使用 `parseInt(PORT, 10) + 100` 计算端口号，确保正确的数值加法而不是字符串拼接。
+
+- 主服务器：3100 (parseInt(PORT, 10) + 100)
+- AI 服务：3101 (parseInt(PORT, 10) + 100)
+- 通知服务：3103 (parseInt(PORT, 10) + 100)
+
+### 修复说明
+
+在 Railway 生产环境中，`process.env.PORT` 是字符串类型。使用 `parseInt(PORT, 10)` 确保：
+
+1. **正确的数值计算**：避免字符串拼接（如 "8080" + 100 = "8080100"）
+2. **明确的进制**：使用十进制解析
+3. **生产环境兼容性**：在生产环境中正确计算 WebSocket 端口
+
+### 代码示例
+
+```javascript
+// 正确的做法
+const wsPort = parseInt(process.env.PORT || PORT, 10) + 100;
+
+// 错误的做法（会导致字符串拼接）
+const wsPort = process.env.PORT + 100; // "8080" + 100 = "8080100"
+```
