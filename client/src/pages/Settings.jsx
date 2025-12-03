@@ -35,9 +35,9 @@ export default function Settings() {
     try {
       const [health, aiHealth, dbHealth, notificationHealth] = await Promise.all([
         taskService.getHealth(),
-        fetch('/api/services/ai/health').then(r => r.json()),
-        fetch('/api/services/db/health').then(r => r.json()),
-        fetch('/api/services/notification/health').then(r => r.json())
+        fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/services/ai/health`).then(r => r.json()),
+        fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/services/db/health`).then(r => r.json()),
+        fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/services/notification/health`).then(r => r.json())
       ])
       
       setServices({
@@ -64,7 +64,7 @@ export default function Settings() {
   const backupData = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/services/db/backup', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/services/db/backup`, {
         method: 'POST'
       })
       
