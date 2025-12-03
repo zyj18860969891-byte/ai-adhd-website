@@ -176,10 +176,10 @@ app.get('/api/services/notification/*', (req, res) => {
     });
 });
 
-// WebSocket for real-time updates (disabled in production)
-let wss;
+// WebSocket for real-time updates
 if (process.env.NODE_ENV !== 'production') {
-  wss = new WebSocket.Server({ port: parseInt(process.env.PORT || '3000') + 100 });
+  const wsPort = parseInt(process.env.PORT || '3000') + 100;
+  const wss = new WebSocket.Server({ port: wsPort });
   wss.on('connection', (ws) => {
     console.log('WebSocket client connected');
     
@@ -190,6 +190,9 @@ if (process.env.NODE_ENV !== 'production') {
       console.log('WebSocket client disconnected');
     });
   });
+  console.log(`WebSocket running on port ${wsPort}`);
+} else {
+  console.log('WebSocket disabled in production');
 }
 
 // Background tasks
@@ -230,7 +233,9 @@ app.use((error, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`WebSocket running on port ${PORT + 100}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`WebSocket running on port ${PORT + 100}`);
+  }
   
   // Update task progress
   taskProgress.deployment.status = 'running';

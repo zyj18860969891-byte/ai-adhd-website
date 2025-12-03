@@ -114,33 +114,36 @@ app.get('/api/health', (req, res) => {
   res.json(healthStatus);
 });
 
-// WebSocket for real-time AI processing
-const wss = new WebSocket.Server({ port: PORT + 100 });
+// WebSocket for AI requests
+if (process.env.NODE_ENV !== 'production') {
+  const wsPort = parseInt(process.env.PORT || '3001') + 100;
+  const wss = new WebSocket.Server({ port: wsPort });
 
-wss.on('connection', (ws) => {
-  console.log('AI WebSocket client connected');
-  
-  ws.on('message', async (message) => {
-    try {
-      const data = JSON.parse(message);
-      
-      if (data.type === 'classify') {
-        const result = await classifyTask(data.text, data.context);
-        ws.send(JSON.stringify({ type: 'classification', result }));
-      } else if (data.type === 'transcribe') {
-        const result = await transcribeAudio(data.audioData, data.language);
-        ws.send(JSON.stringify({ type: 'transcription', result }));
+  wss.on('connection', (ws) => {
+    console.log('AI WebSocket client connected');
+    
+    ws.on('message', async (message) => {
+      try {
+        const data = JSON.parse(message);
+        
+        if (data.type === 'classify') {
+          const result = await classifyTask(data.text, data.context);
+          ws.send(JSON.stringify({ type: 'classification', result }));
+        } else if (data.type === 'transcribe') {
+          const result = await transcribeAudio(data.audioData, data.language);
+          ws.send(JSON.stringify({ type: 'transcription', result }));
+        }
+      } catch (error) {
+        console.error('WebSocket Error:', error);
+        ws.send(JSON.stringify({ type: 'error', error: error.message }));
       }
-    } catch (error) {
-      console.error('WebSocket Error:', error);
-      ws.send(JSON.stringify({ type: 'error', error: error.message }));
-    }
+    });
+    
+    ws.on('close', () => {
+      console.log('AI WebSocket client disconnected');
+    });
   });
-  
-  ws.on('close', () => {
-    console.log('AI WebSocket client disconnected');
-  });
-});
+}
 
 // AI Functions
 async function classifyTask(text, context = {}) {
@@ -267,5 +270,7 @@ async function extractTasks(text) {
 // Start server
 app.listen(PORT, () => {
   console.log(`AI Service running on port ${PORT}`);
-  console.log(`WebSocket running on port ${PORT + 100}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`WebSocket running on port ${PORT + 100}`);
+  }
 });

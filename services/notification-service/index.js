@@ -19,43 +19,46 @@ const notifications = new Map();
 let notificationIdCounter = 1;
 
 // WebSocket server for real-time notifications
-const wss = new WebSocket.Server({ port: PORT + 100 });
 const clients = new Set();
 
-wss.on('connection', (ws) => {
-  console.log('Notification WebSocket client connected');
-  clients.add(ws);
-  
-  // Send pending notifications
-  const pendingNotifications = Array.from(notifications.values())
-    .filter(n => n.status === 'pending' && n.userId === ws.userId)
-    .slice(0, 10);
-  
-  pendingNotifications.forEach(notification => {
-    ws.send(JSON.stringify({ type: 'notification', data: notification }));
-  });
-  
-  ws.on('message', (message) => {
-    try {
-      const data = JSON.parse(message);
-      
-      if (data.type === 'subscribe') {
-        ws.userId = data.userId;
-        ws.send(JSON.stringify({ type: 'subscribed', userId: data.userId }));
-      } else if (data.type === 'acknowledge') {
-        acknowledgeNotification(data.notificationId);
-        ws.send(JSON.stringify({ type: 'acknowledged', notificationId: data.notificationId }));
+// WebSocket for notifications (disabled in production)
+if (process.env.NODE_ENV !== 'production') {
+  const wsPort = parseInt(process.env.PORT || '3003') + 100;
+  const wss = new WebSocket.Server({ port: wsPort });
+  wss.on('connection', (ws) => {
+    console.log('Notification WebSocket client connected');
+    clients.add(ws);
+    
+    // Send pending notifications
+    const pendingNotifications = Array.from(notifications.values())
+      .filter(n => n.status === 'pending' && n.userId === ws.userId)
+      .slice(0, 10);
+    
+    pendingNotifications.forEach(notification => {
+      ws.send(JSON.stringify({ type: 'notification', data: notification }));
+    });
+    
+    ws.on('message', (message) => {
+      try {
+        const data = JSON.parse(message);
+        
+        if (data.type === 'subscribe') {
+          ws.userId = data.userId;
+          ws.send(JSON.stringify({ type: 'subscribed', userId: data.userId }));
+        } else if (data.type === 'acknowledge') {
+          acknowledgeNotification(data.notificationId);
+          ws.send(JSON.stringify({ type: 'acknowledged', notificationId: data.notificationId }));
+        }
+      } catch (error) {
+        console.error('WebSocket message error:', error);
       }
-    } catch (error) {
-      console.error('WebSocket message error:', error);
-    }
+    });
+    
+    ws.on('close', () => {
+      clients.delete(ws);
+    });
   });
-  
-  ws.on('close', () => {
-    console.log('Notification WebSocket client disconnected');
-    clients.delete(ws);
-  });
-});
+}
 
 // Health check
 let healthStatus = {
@@ -226,5 +229,7 @@ function scheduleReminder(reminder) {
 // Start server
 app.listen(PORT, () => {
   console.log(`Notification Service running on port ${PORT}`);
-  console.log(`WebSocket running on port ${PORT + 100}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`WebSocket running on port ${PORT + 100}`);
+  }
 });
