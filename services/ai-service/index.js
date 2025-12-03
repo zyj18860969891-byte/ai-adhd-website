@@ -114,7 +114,7 @@ app.get('/api/health', (req, res) => {
   res.json(healthStatus);
 });
 
-// WebSocket for AI requests
+// WebSocket for AI requests (disabled in production)
 if (process.env.NODE_ENV !== 'production') {
   const wsPort = parseInt(process.env.PORT || '3001') + 100;
   const wss = new WebSocket.Server({ port: wsPort });

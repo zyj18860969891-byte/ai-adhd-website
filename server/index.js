@@ -176,7 +176,7 @@ app.get('/api/services/notification/*', (req, res) => {
     });
 });
 
-// WebSocket for real-time updates
+// WebSocket for real-time updates (disabled in production)
 if (process.env.NODE_ENV !== 'production') {
   const wsPort = parseInt(process.env.PORT || '3000') + 100;
   const wss = new WebSocket.Server({ port: wsPort });
