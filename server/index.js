@@ -14,6 +14,9 @@ const PORT = process.env.PORT || 3000;
 // Load environment variables
 require('dotenv').config();
 
+// Trust proxy (required for Railway and other cloud platforms)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
