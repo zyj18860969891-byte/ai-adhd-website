@@ -8,7 +8,7 @@
     "dev:server": "nodemon server/index.js",
     "dev:client": "cd client && npm run dev",
     "build": "cd client && npm run build",
-    "start": "node server/index.js",
+    "start": "concurrently \"node server/index.js\" \"cd services/ai-service && node index.js\" \"cd services/db-service && node index.js\" \"cd services/notification-service && node index.js\"",
     "start:production": "npm run build && npm start",
     "test": "jest",
     "lint": "eslint client/src server",
