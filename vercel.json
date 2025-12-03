@@ -17,19 +17,19 @@
     },
     {
       "src": "/sw.js",
-      "dest": "/sw.js"
+      "dest": "/client/dist/sw.js"
     },
     {
       "src": "/manifest.json",
-      "dest": "/manifest.json"
+      "dest": "/client/dist/manifest.json"
     },
     {
       "src": "/service-worker.js",
-      "dest": "/service-worker.js"
+      "dest": "/client/dist/service-worker.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/client/dist/index.html"
     }
   ],
   "env": {
