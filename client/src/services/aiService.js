@@ -2,11 +2,22 @@ import axios from 'axios'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api'
 
+// Ensure API_BASE ends with /api for backward compatibility
+const getApiBase = () => {
+  const base = import.meta.env.VITE_API_BASE_URL
+  if (base) {
+    // If VITE_API_BASE_URL is set, use it as-is
+    return base
+  }
+  // For development, use relative path
+  return '/api'
+}
+
 const aiService = {
   // Task classification
   async classifyTask(text, context = {}) {
     try {
-      const response = await axios.post(`${API_BASE}/services/ai/classify-task`, {
+      const response = await axios.post(`${getApiBase()}/services/ai/classify-task`, {
         text,
         context
       })
@@ -20,7 +31,7 @@ const aiService = {
   // Voice transcription
   async transcribeAudio(audioData, language = 'zh-CN') {
     try {
-      const response = await axios.post(`${API_BASE}/services/ai/transcribe`, {
+      const response = await axios.post(`${getApiBase()}/services/ai/transcribe`, {
         audioData,
         language
       })
@@ -34,7 +45,7 @@ const aiService = {
   // Priority suggestion
   async suggestPriority(task, context = {}) {
     try {
-      const response = await axios.post(`${API_BASE}/services/ai/suggest-priority`, {
+      const response = await axios.post(`${getApiBase()}/services/ai/suggest-priority`, {
         task,
         context
       })
@@ -48,7 +59,7 @@ const aiService = {
   // Task extraction
   async extractTasks(text) {
     try {
-      const response = await axios.post(`${API_BASE}/services/ai/extract-tasks`, {
+      const response = await axios.post(`${getApiBase()}/services/ai/extract-tasks`, {
         text
       })
       return response.data
@@ -61,7 +72,7 @@ const aiService = {
   // Health check
   async getHealth() {
     try {
-      const response = await axios.get(`${API_BASE}/services/ai/health`)
+      const response = await axios.get(`${getApiBase()}/services/ai/health`)
       return response.data
     } catch (error) {
       console.error('Failed to fetch AI service health:', error)

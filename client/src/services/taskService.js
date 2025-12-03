@@ -2,11 +2,22 @@ import axios from 'axios'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api'
 
+// Ensure API_BASE ends with /api for backward compatibility
+const getApiBase = () => {
+  const base = import.meta.env.VITE_API_BASE_URL
+  if (base) {
+    // If VITE_API_BASE_URL is set, use it as-is
+    return base
+  }
+  // For development, use relative path
+  return '/api'
+}
+
 const taskService = {
   // Task operations
   async getTasks(params = {}) {
     try {
-      const response = await axios.get(`${API_BASE}/services/db/tasks`, { params })
+      const response = await axios.get(`${getApiBase()}/services/db/tasks`, { params })
       return response.data
     } catch (error) {
       console.error('Failed to fetch tasks:', error)
@@ -16,7 +27,7 @@ const taskService = {
 
   async getTask(id) {
     try {
-      const response = await axios.get(`${API_BASE}/services/db/tasks/${id}`)
+      const response = await axios.get(`${getApiBase()}/services/db/tasks/${id}`)
       return response.data
     } catch (error) {
       console.error('Failed to fetch task:', error)
@@ -26,7 +37,7 @@ const taskService = {
 
   async createTask(task) {
     try {
-      const response = await axios.post(`${API_BASE}/services/db/tasks`, task)
+      const response = await axios.post(`${getApiBase()}/services/db/tasks`, task)
       return response.data
     } catch (error) {
       console.error('Failed to create task:', error)
@@ -36,7 +47,7 @@ const taskService = {
 
   async updateTask(id, updates) {
     try {
-      const response = await axios.put(`${API_BASE}/services/db/tasks/${id}`, updates)
+      const response = await axios.put(`${getApiBase()}/services/db/tasks/${id}`, updates)
       return response.data
     } catch (error) {
       console.error('Failed to update task:', error)
@@ -46,7 +57,7 @@ const taskService = {
 
   async deleteTask(id) {
     try {
-      const response = await axios.delete(`${API_BASE}/services/db/tasks/${id}`)
+      const response = await axios.delete(`${getApiBase()}/services/db/tasks/${id}`)
       return response.data
     } catch (error) {
       console.error('Failed to delete task:', error)
@@ -56,7 +67,7 @@ const taskService = {
 
   async getTaskHistory(id) {
     try {
-      const response = await axios.get(`${API_BASE}/services/db/tasks/${id}/history`)
+      const response = await axios.get(`${getApiBase()}/services/db/tasks/${id}/history`)
       return response.data
     } catch (error) {
       console.error('Failed to fetch task history:', error)
@@ -67,7 +78,7 @@ const taskService = {
   // Statistics
   async getStats() {
     try {
-      const response = await axios.get(`${API_BASE}/services/db/stats`)
+      const response = await axios.get(`${getApiBase()}/services/db/stats`)
       return response.data
     } catch (error) {
       console.error('Failed to fetch stats:', error)
@@ -78,7 +89,7 @@ const taskService = {
   // Task progress tracking
   async getTaskProgress() {
     try {
-      const response = await axios.get(`${API_BASE}/task-progress`)
+      const response = await axios.get(`${getApiBase()}/task-progress`)
       return response.data
     } catch (error) {
       console.error('Failed to fetch task progress:', error)
@@ -88,7 +99,7 @@ const taskService = {
 
   async updateTaskProgress(progress) {
     try {
-      const response = await axios.post(`${API_BASE}/task-progress`, progress)
+      const response = await axios.post(`${getApiBase()}/task-progress`, progress)
       return response.data
     } catch (error) {
       console.error('Failed to update task progress:', error)
@@ -99,7 +110,7 @@ const taskService = {
   // Service status
   async getServiceStatus(serviceId) {
     try {
-      const response = await axios.get(`${API_BASE}/services/${serviceId}/status`)
+      const response = await axios.get(`${getApiBase()}/services/${serviceId}/status`)
       return response.data
     } catch (error) {
       console.error('Failed to fetch service status:', error)
@@ -109,7 +120,7 @@ const taskService = {
 
   async updateServiceStatus(serviceId, status) {
     try {
-      const response = await axios.post(`${API_BASE}/services/${serviceId}/status`, status)
+      const response = await axios.post(`${getApiBase()}/services/${serviceId}/status`, status)
       return response.data
     } catch (error) {
       console.error('Failed to update service status:', error)
@@ -120,7 +131,7 @@ const taskService = {
   // Health check
   async getHealth() {
     try {
-      const response = await axios.get(`${API_BASE}/health`)
+      const response = await axios.get(`${getApiBase()}/health`)
       return response.data
     } catch (error) {
       console.error('Failed to fetch health status:', error)
