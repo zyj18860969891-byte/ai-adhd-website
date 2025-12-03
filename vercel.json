@@ -13,7 +13,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "https://your-adhd-task-manager-production.up.railway.app/api/$1"
+      "dest": "https://ai-adhd-website-production.up.railway.app/api/$1"
     },
     {
       "src": "/sw.js",
@@ -33,8 +33,8 @@
     }
   ],
   "env": {
-    "REACT_APP_API_BASE_URL": "https://your-adhd-task-manager-production.up.railway.app",
-    "REACT_APP_WS_URL": "wss://your-adhd-task-manager-production.up.railway.app"
+    "VITE_API_BASE_URL": "https://ai-adhd-website-production.up.railway.app",
+    "VITE_WS_URL": "wss://ai-adhd-website-production.up.railway.app"
   },
   "headers": [
     {
