@@ -1,0 +1,50 @@
+{
+  "name": "adhd-task-manager-pwa",
+  "version": "1.0.0",
+  "description": "ADHD-friendly Task Management PWA with Microservices Architecture",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "nodemon server/index.js",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "start": "node server/index.js",
+    "start:production": "npm run build && npm start",
+    "test": "jest",
+    "lint": "eslint client/src server",
+    "clean": "rimraf dist node_modules client/node_modules",
+    "setup": "npm install && cd client && npm install",
+    "deploy": "npm run build && npm start",
+    "start:services": "concurrently \"cd services/ai-service && node index.js\" \"cd services/db-service && node index.js\" \"cd services/notification-service && node index.js\""
+  },
+  "keywords": [
+    "adhd",
+    "task-manager",
+    "pwa",
+    "microservices",
+    "productivity"
+  ],
+  "author": "AI Team",
+  "license": "MIT",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "node-cron": "^3.0.3",
+    "sqlite3": "^5.1.7",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

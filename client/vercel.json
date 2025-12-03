@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://your-adhd-task-manager.up.railway.app/api/$1"
+    },
+    {
+      "src": "/api/services/(.*)",
+      "dest": "https://your-adhd-task-manager.up.railway.app/api/services/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "REACT_APP_API_BASE_URL": "https://your-adhd-task-manager.up.railway.app/api"
+  },
+  "build": {
+    "env": {
+      "GENERATE_SOURCEMAP": "false"
+    }
+  },
+  "functions": {
+    "src/**/*.js": {
+      "maxDuration": 30
+    }
+  }
+}

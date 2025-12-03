@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # Main Server
+  main-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_PATH=/app/data/tasks.db
+      - AI_SERVICE_URL=http://ai-service:3001
+      - DB_SERVICE_URL=http://db-service:3002
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3003
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - ai-service
+      - db-service
+      - notification-service
+    restart: unless-stopped
+
+  # AI Service
+  ai-service:
+    build:
+      context: ./services/ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - OPENROUTER_API_KEY=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
+      - OPENROUTER_MODEL=qwen/qwen3-235b-a22b-2507
+    restart: unless-stopped
+
+  # Database Service
+  db-service:
+    build:
+      context: ./services/db-service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - DB_PATH=/app/data/tasks.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+    restart: unless-stopped
+
+  # Frontend (if using separate container)
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE=http://localhost:3000/api
+    depends_on:
+      - main-server
+    restart: unless-stopped

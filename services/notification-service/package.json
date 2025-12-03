@@ -1,0 +1,22 @@
+{
+  "name": "notification-service",
+  "version": "1.0.0",
+  "description": "Notification service for ADHD Task Manager",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.1",
+    "node-cron": "^3.0.3",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2"
+  }
+}

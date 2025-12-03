@@ -1,0 +1,121 @@
+{
+  "mcp": {
+    "version": "1.0.0",
+    "protocol": "stdio/stdout",
+    "services": {
+      "ai-service": {
+        "name": "ADHD Task Manager AI Service",
+        "description": "AI service for task classification, priority suggestion, and voice recognition",
+        "port": 3001,
+        "tools": [
+          {
+            "name": "classify-task",
+            "description": "Classify task into categories based on content",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Task description text"
+                },
+                "context": {
+                  "type": "object",
+                  "description": "Additional context for classification"
+                }
+              },
+              "required": ["text"]
+            }
+          },
+          {
+            "name": "transcribe-audio",
+            "description": "Transcribe audio to text",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "audioData": {
+                  "type": "string",
+                  "description": "Base64 encoded audio data"
+                },
+                "language": {
+                  "type": "string",
+                  "description": "Language code (e.g., 'zh-CN', 'en-US')",
+                  "default": "zh-CN"
+                }
+              },
+              "required": ["audioData"]
+            }
+          },
+          {
+            "name": "suggest-priority",
+            "description": "Suggest priority for a task",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "task": {
+                  "type": "string",
+                  "description": "Task description"
+                },
+                "context": {
+                  "type": "object",
+                  "description": "Additional context for priority suggestion"
+                }
+              },
+              "required": ["task"]
+            }
+          },
+          {
+            "name": "extract-tasks",
+            "description": "Extract multiple tasks from natural language",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Natural language text containing tasks"
+                }
+              },
+              "required": ["text"]
+            }
+          }
+        ],
+        "aiProvider": "OpenRouter",
+        "model": "qwen/qwen3-235b-a22b-2507",
+        "sessionManagement": {
+          "enabled": true,
+          "contextRetention": "enhanced",
+          "sessionId": "required"
+        }
+      }
+    },
+    "gateway": {
+      "port": 3000,
+      "routes": {
+        "/api/services/ai/*": {
+          "target": "http://localhost:3001",
+          "proxy": true
+        }
+      },
+      "healthCheck": {
+        "interval": "30s",
+        "timeout": "5s",
+        "retries": 3
+      }
+    },
+    "deployment": {
+      "platforms": {
+        "docker": {
+          "composeFile": "docker-compose.yml",
+          "services": ["gateway", "ai-service", "db-service", "notification-service", "frontend"]
+        },
+        "vercel": {
+          "frontendOnly": true,
+          "apiProxy": "https://your-backend.up.railway.app/api"
+        },
+        "railway": {
+          "backendServices": true,
+          "environment": "production"
+        }
+      }
+    }
+  }
+}
