@@ -6,8 +6,12 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api'
 const getApiBase = () => {
   const base = import.meta.env.VITE_API_BASE_URL
   if (base) {
-    // If VITE_API_BASE_URL is set, use it as-is
-    return base
+    // If VITE_API_BASE_URL is set, ensure it ends with /api
+    const normalized = base.replace(/\/+$/, '') // Remove trailing slashes
+    if (normalized.endsWith('/api')) {
+      return normalized
+    }
+    return `${normalized}/api`
   }
   // For development, use relative path
   return '/api'
