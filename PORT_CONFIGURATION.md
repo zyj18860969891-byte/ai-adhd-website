@@ -135,3 +135,46 @@ const wsPort = parseInt(process.env.PORT || PORT, 10) + 100;
 // 错误的做法（会导致字符串拼接）
 const wsPort = process.env.PORT + 100; // "8080" + 100 = "8080100"
 ```
+
+## 前端 PWA 配置
+
+### 前端环境变量
+
+在 Vercel 环境中，需要设置以下环境变量：
+
+```bash
+# API 基础 URL
+VITE_API_BASE_URL=https://your-adhd-task-manager-production.up.railway.app
+
+# WebSocket URL
+VITE_WS_URL=wss://your-adhd-task-manager-production.up.railway.app
+```
+
+### 前端代理配置
+
+在 `client/vite.config.js` 中：
+
+```javascript
+server: {
+  port: 5173,
+  proxy: {
+    '/api': {
+      target: 'http://localhost:3000',
+      changeOrigin: true,
+      secure: false
+    }
+  }
+}
+```
+
+在生产环境中，前端将通过构建后的静态文件提供服务，不再使用 Vite 开发服务器。
+
+### CLIENT_PORT 环境变量
+
+`CLIENT_PORT: 5173` 这个环境变量本身不会直接影响后端服务，因为：
+
+1. 后端代码中没有使用 `CLIENT_PORT` 环境变量
+2. 前端在生产环境中通过静态文件提供服务，不使用 Vite 开发服务器
+3. 前端的 `5173` 端口仅在本地开发时使用
+
+因此，`CLIENT_PORT: 5173` 在 Railway 生产环境中不会产生影响。
