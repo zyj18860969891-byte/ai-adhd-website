@@ -35,6 +35,13 @@ export default defineConfig({
             })
             console.log(`Copied ${icons.length} icons to dist directory`)
           }
+          
+          // Copy manifest.json to dist root
+          copyFileSync(
+            join(__dirname, 'manifest.json'),
+            join(distDir, 'manifest.json')
+          )
+          console.log('Copied manifest.json to dist directory')
         } catch (error) {
           console.warn('Failed to copy static files:', error.message)
         }

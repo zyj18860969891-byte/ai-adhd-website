@@ -69325,7 +69325,7 @@ _**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
 
 ---
 
-_**User (2025-12-04 19:20Z)**_
+_**User (2025-12-04 19:21Z)**_
 
 新的部署后返回：“2025-12-04T19:19:13.000000000Z [inf]  Starting Container
 2025-12-04T19:19:15.183284803Z [inf]  
@@ -69572,6 +69572,73 @@ _**User (2025-12-04 19:20Z)**_
 
 _**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
 
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • 正在读取 [](file:///e%3A/MultiModel/ai-adhd-website/services/ai-service/index.js#1-1)，行 1 到 51</summary>
+
+```javascript
+// Add error handling for OpenAI client
+// Note: The openai.on('error') method may not be available in this version of the SDK
+// We'll handle errors in the API calls instead
+
+// Validate required environment variables
+if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
+  console.warn('Warning: No API key found. AI service will use fallback responses.');
+  console.warn('Please set OPENROUTER_API_KEY or OPENAI_API_KEY environment variable.');
+}
+```
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • 正在读取 [](file:///e%3A/MultiModel/ai-adhd-website/services/ai-service/index.js#600-600)，行 600 到 619</summary>
+
+
+读取 [](file:///e%3A/MultiModel/ai-adhd-website/services/ai-service/index.js#600-600)，行 600 到 619
+
+</details>
+</tool-use>
+
+---
+
 根据新的部署日志，我发现了几个关键问题：
 
 ## 主要问题分析
@@ -69586,7 +69653,252 @@ _**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
 
 让我修复AI服务代码中的问题：
 
- 
+ 让我先查看当前文件的开头部分，然后进行修复：
+
+ 现在让我修复文件末尾的代码，确保服务能够正确启动：
+
+ 现在我已经修复了AI服务中的关键问题。主要问题在于OpenAI SDK的错误处理方式不兼容，以及服务启动时的环境变量处理。
+
+## 问题总结
+
+1. **OpenAI SDK错误处理方式不兼容**：代码中使用了 `openai.on('error')`，但这个方法在当前版本的SDK中可能不存在，导致服务启动失败。
+
+2. **服务未正确启动**：由于启动错误，AI服务无法监听端口，导致前端无法连接。
+
+## 已完成的修复
+
+1. **移除了不兼容的错误处理代码**：
+   - 移除了 `openai.on('error')` 相关代码
+   - 保留了必要的API密钥验证
+
+2. **保持了完整的健康检查端点**：
+   - 确保 `/api/health` 端点正常工作
+   - 添加了详细的健康检查信息
+
+3. **保留了所有API端点**：
+   - `/api/classify-task`
+   - `/api/suggest-priority`
+   - `/api/extract-tasks`
+   - `/api/improve-task`
+   - `/api/estimate-time`
+
+## 下一步操作
+
+1. **重新提交代码**：
+   ```bash
+   git add .
+   git commit -m "Fix AI service OpenAI SDK compatibility issue"
+   git push origin main
+   ```
+
+2. **等待Railway自动部署**：
+   - 提交代码后，Railway会自动重新部署
+   - 查看新的部署日志确认服务是否正常启动
+
+3. **验证服务状态**：
+   - 访问 `/api/health` 端点检查服务状态
+   - 测试 `/api/classify-task` 端点是否能正常工作
+
+这些修复应该能解决服务启动失败的问题，让AI服务能够正常运行。
+
+---
+
+_**User (2025-12-04 19:24Z)**_
+
+新的部署后：“2025-12-04T19:23:25.000000000Z [inf]  Starting Container
+2025-12-04T19:23:27.046605310Z [inf]  
+2025-12-04T19:23:27.046614713Z [inf]  > adhd-task-manager-pwa@1.0.0 start
+2025-12-04T19:23:27.046622614Z [inf]  > concurrently "cross-env PORT=8080 node server/index.js" "cross-env PORT=8190 node services/ai-service/index.js" "cross-env PORT=8280 node services/db-service/index.js" "cross-env PORT=8380 node services/notification-service/index.js"
+2025-12-04T19:23:27.046630718Z [inf]  
+2025-12-04T19:23:27.447239749Z [inf]  [2] Database Service running on port 8280
+2025-12-04T19:23:27.447245020Z [inf]  [2] Connected to SQLite database
+2025-12-04T19:23:27.447250578Z [inf]  [3] Notification Service running on port 8380
+2025-12-04T19:23:27.447256082Z [inf]  [0] Failed to load task progress: Error: ENOENT: no such file or directory, open '/app/task-progress.json'
+2025-12-04T19:23:27.447260644Z [inf]  [0]     at Object.openSync (node:fs:596:3)
+2025-12-04T19:23:27.447272750Z [inf]  [0]     at Object.readFileSync (node:fs:464:35)
+2025-12-04T19:23:27.447278265Z [inf]  [0]     at loadTaskProgress (/app/server/index.js:57:21)
+2025-12-04T19:23:27.447286923Z [inf]  [0]     at Object.<anonymous> (/app/server/index.js:53:20)
+2025-12-04T19:23:27.447292622Z [inf]  [0]     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+2025-12-04T19:23:27.447297161Z [inf]  [0]     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+2025-12-04T19:23:27.447301857Z [inf]  [0]     at Module.load (node:internal/modules/cjs/loader:1203:32)
+2025-12-04T19:23:27.447306532Z [inf]  [0]     at Module._load (node:internal/modules/cjs/loader:1019:12)
+2025-12-04T19:23:27.447312371Z [inf]  [0]     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+2025-12-04T19:23:27.447317747Z [inf]  [0]     at node:internal/main/run_main_module:28:49 {
+2025-12-04T19:23:27.447323267Z [inf]  [0]   errno: -2,
+2025-12-04T19:23:27.447328645Z [inf]  [0]   syscall: 'open',
+2025-12-04T19:23:27.447333048Z [inf]  [0]   code: 'ENOENT',
+2025-12-04T19:23:27.447338018Z [inf]  [0]   path: '/app/task-progress.json'
+2025-12-04T19:23:27.447343744Z [inf]  [0] }
+2025-12-04T19:23:27.447348124Z [inf]  [0] WebSocket disabled in production
+2025-12-04T19:23:27.449452758Z [inf]  [0] Server running on port 8080
+2025-12-04T19:23:27.449464971Z [inf]  [0] NODE_ENV: production
+2025-12-04T19:23:27.449471672Z [inf]  [0] WebSocket enabled: false
+2025-12-04T19:23:27.449478618Z [inf]  [0] Environment variables:
+2025-12-04T19:23:27.449487852Z [inf]  [0]   AI_SERVICE_URL: Not set
+2025-12-04T19:23:27.449494698Z [inf]  [0]   DB_SERVICE_URL: Not set
+2025-12-04T19:23:27.449501206Z [inf]  [0]   NOTIFICATION_SERVICE_URL: Not set
+2025-12-04T19:23:27.449507731Z [inf]  [2] Database initialized successfully
+2025-12-04T19:23:27.469185108Z [inf]  [1]   POST /api/extract-tasks
+2025-12-04T19:23:27.469198735Z [inf]  [1]   POST /api/improve-task
+2025-12-04T19:23:27.469202194Z [inf]  [1] API Key configured: OPENROUTER_API_KEY
+2025-12-04T19:23:27.469207589Z [inf]  [1]   POST /api/estimate-time
+2025-12-04T19:23:27.469216994Z [inf]  [1] API Key length: 73
+2025-12-04T19:23:27.469225596Z [inf]  [1] AI Service running on port 8190
+2025-12-04T19:23:27.469233821Z [inf]  [1] NODE_ENV is: production
+2025-12-04T19:23:27.469241525Z [inf]  [1] Model: qwen/qwen3-235b-a22b-2507
+2025-12-04T19:23:27.469249327Z [inf]  [1] API Key: Set
+2025-12-04T19:23:27.469264249Z [inf]  [1] Environment variables: {
+2025-12-04T19:23:27.469272388Z [inf]  [1]   NODE_ENV: 'production',
+2025-12-04T19:23:27.469283769Z [inf]  [1]   OPENROUTER_MODEL: 'qwen/qwen3-235b-a22b-2507',
+2025-12-04T19:23:27.469291422Z [inf]  [1]   OPENROUTER_API_KEY: 'Set',
+2025-12-04T19:23:27.469297919Z [inf]  [1]   OPENAI_API_KEY: 'Set'
+2025-12-04T19:23:27.469305159Z [inf]  [1] }
+2025-12-04T19:23:27.469312857Z [inf]  [1]   GET  /api/health
+2025-12-04T19:23:27.469314770Z [inf]  [1] Service initialized successfully
+2025-12-04T19:23:27.469323985Z [inf]  [1]   GET  /health (legacy)
+2025-12-04T19:23:27.469329939Z [inf]  [1] Available endpoints:
+2025-12-04T19:23:27.469332874Z [inf]  [1] Running in production mode
+2025-12-04T19:23:27.469338649Z [inf]  [1]   POST /api/classify-task
+2025-12-04T19:23:27.469340701Z [inf]  [1] All environment variables:
+2025-12-04T19:23:27.469346808Z [inf]  [1]   OPENROUTER_API_KEY: Set
+2025-12-04T19:23:27.469349767Z [inf]  [1]   POST /api/suggest-priority
+2025-12-04T19:23:27.469354023Z [inf]  [1]   OPENAI_API_KEY: Set
+2025-12-04T19:23:27.470115477Z [inf]  [1]   OPENROUTER_MODEL: Set
+2025-12-04T19:23:27.470124849Z [inf]  [1]   OPENAI_MODEL: Set
+2025-12-04T19:23:27.470132204Z [inf]  [1]   NODE_ENV: Set
+2025-12-04T19:23:33.455880471Z [inf]  [0] Proxying AI request to: http://localhost:8190/health
+2025-12-04T19:23:33.455893458Z [inf]  [0] AI Service URL: http://localhost:8190
+2025-12-04T19:23:33.455902818Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-04T19:23:33.494304934Z [inf]  [0] Proxying DB request to: http://localhost:8280/api/health
+2025-12-04T19:23:33.494309767Z [inf]  [0] DB Service URL: http://localhost:8280
+2025-12-04T19:23:33.494314156Z [inf]  [0] Request path: /api/services/db/health
+2025-12-04T19:23:33.494318394Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/health
+2025-12-04T19:23:33.494322631Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-04T19:23:33.494326942Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-04T19:23:33.508827564Z [inf]  [1]     NODE_ENV: 'production',
+2025-12-04T19:23:33.508839336Z [inf]  [1]     OPENROUTER_MODEL: 'qwen/qwen3-235b-a22b-2507',
+2025-12-04T19:23:33.508841017Z [inf]  [1] Health check requested: {
+2025-12-04T19:23:33.508847369Z [inf]  [1]     OPENROUTER_API_KEY: 'Set',
+2025-12-04T19:23:33.508853815Z [inf]  [1]     OPENAI_API_KEY: 'Set'
+2025-12-04T19:23:33.508856958Z [inf]  [1]   status: 'healthy',
+2025-12-04T19:23:33.508860489Z [inf]  [1]   }
+2025-12-04T19:23:33.508866937Z [inf]  [1]   version: '1.0.0',
+2025-12-04T19:23:33.508870103Z [inf]  [1] }
+2025-12-04T19:23:33.508875943Z [inf]  [1]   timestamp: '2025-12-04T19:23:33.504Z',
+2025-12-04T19:23:33.508883391Z [inf]  [1]   model: 'qwen/qwen3-235b-a22b-2507',
+2025-12-04T19:23:33.508892992Z [inf]  [1]   environment: 'production',
+2025-12-04T19:23:33.508900220Z [inf]  [1]   api_key_set: true,
+2025-12-04T19:23:33.508907200Z [inf]  [1]   node_version: 'v18.20.8',
+2025-12-04T19:23:33.508915762Z [inf]  [1]   api_key_status: 'Available',
+2025-12-04T19:23:33.508922451Z [inf]  [1]   api_key_length: 73,
+2025-12-04T19:23:33.508929431Z [inf]  [1]   environment_details: {
+2025-12-04T19:23:33.519127095Z [inf]  [0] Notification Service response status: 200
+2025-12-04T19:23:33.524601933Z [inf]  [0] Notification Service response data: {
+2025-12-04T19:23:33.524608068Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:23:33.524612385Z [inf]  [0]   "lastCheck": "2025-12-04T19:23:33.504Z",
+2025-12-04T19:23:33.524616679Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:23:33.524620946Z [inf]  [0]   "activeClients": 0
+2025-12-04T19:23:33.524624990Z [inf]  [0] }
+2025-12-04T19:23:33.526596674Z [inf]  [0] AI Service response status: 200
+2025-12-04T19:23:33.528492111Z [inf]  [0]   }
+2025-12-04T19:23:33.528493468Z [inf]  [0] AI Service response data: {
+2025-12-04T19:23:33.528503694Z [inf]  [0] }
+2025-12-04T19:23:33.528505446Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:23:33.528513262Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:23:33.528519924Z [inf]  [0]   "timestamp": "2025-12-04T19:23:33.504Z",
+2025-12-04T19:23:33.528525034Z [inf]  [0]   "model": "qwen/qwen3-235b-a22b-2507",
+2025-12-04T19:23:33.528530826Z [inf]  [0]   "environment": "production",
+2025-12-04T19:23:33.528537393Z [inf]  [0]   "api_key_set": true,
+2025-12-04T19:23:33.528543903Z [inf]  [0]   "node_version": "v18.20.8",
+2025-12-04T19:23:33.528550813Z [inf]  [0]   "api_key_status": "Available",
+2025-12-04T19:23:33.528557832Z [inf]  [0]   "api_key_length": 73,
+2025-12-04T19:23:33.528563428Z [inf]  [0]   "environment_details": {
+2025-12-04T19:23:33.528568750Z [inf]  [0]     "NODE_ENV": "production",
+2025-12-04T19:23:33.528573876Z [inf]  [0]     "OPENROUTER_MODEL": "qwen/qwen3-235b-a22b-2507",
+2025-12-04T19:23:33.528579247Z [inf]  [0]     "OPENROUTER_API_KEY": "Set",
+2025-12-04T19:23:33.528583730Z [inf]  [0]     "OPENAI_API_KEY": "Set"
+2025-12-04T19:23:33.530158473Z [inf]  [0] DB Service response status: 200
+2025-12-04T19:23:33.530164782Z [inf]  [0] DB Service response data: {
+2025-12-04T19:23:33.530170736Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:23:33.530176866Z [inf]  [0]   "lastCheck": "2025-12-04T19:23:33.504Z",
+2025-12-04T19:23:33.530182989Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:23:33.530189110Z [inf]  [0]   "dbPath": "./data/tasks.db",
+2025-12-04T19:23:33.530194992Z [inf]  [0]   "error": null
+2025-12-04T19:23:33.530200637Z [inf]  [0] }”
+
+---
+
+_**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
+
+根据最新的部署日志，AI服务现在已经成功启动并运行了！从日志中可以看到：
+
+1. **AI服务成功启动**：
+   - `AI Service running on port 8190`
+   - `NODE_ENV is: production`
+   - `API Key: Set`
+
+2. **健康检查正常工作**：
+   - `AI Service response status: 200`
+   - 响应数据包含健康状态信息
+
+3. **API密钥已正确加载**：
+   - `OPENROUTER_API_KEY: 'Set'`
+   - `OPENAI_API_KEY: 'Set'`
+   - `api_key_set: true`
+
+## 问题已解决
+
+之前的错误已经解决，AI服务现在可以正常工作了。从日志中可以看出：
+
+- 服务已成功启动并监听在端口8190
+- 健康检查端点 `/api/health` 返回200状态码
+- API密钥已正确加载
+- 所有API端点都已注册并可用
+
+## 剩余问题
+
+虽然AI服务现在可以正常工作，但还有一个小问题需要处理：
+
+**前端页面仍然显示错误**：从之前的日志可以看到前端页面仍然显示 "ai-adhd-website-production.up.railway.app/api/services/ai/health:1 Failed to load resource: the server responded with a status of 503 ()"。
+
+这可能是因为：
+1. 前端代码中调用的API路径不正确
+2. 服务端口或路径配置问题
+
+## 建议操作
+
+1. **检查前端代码中的API调用路径**：
+   - 确保前端调用的是正确的API路径
+   - 检查是否使用了正确的端口和路径
+
+2. **验证服务端点**：
+   - 直接访问 `https://ai-adhd-website-production.up.railway.app/api/services/ai/health` 确认服务正常
+   - 测试其他API端点是否正常工作
+
+3. **检查网络配置**：
+   - 确保所有服务间的网络连接正常
+   - 检查是否有防火墙或网络策略阻止了请求
+
+现在AI服务已经正常运行，应该可以解决之前提到的JSON解析错误和503错误问题。
+
+---
+
+_**User (2025-12-04 19:25Z)**_
+
+现在页面控制台只有返回：“icons/icon-144x144.png:1   Failed to load resource: the server responded with a status of 404 ()
+settings:1  Error while trying to use the following icon from the Manifest: https://ai-adhd-website.vercel.app/icons/icon-144x144.png (Download error or resource isn't a valid image)
+[新] 使用 Edge 中的 Copilot 来解释控制台错误: 单击
+         
+         以说明错误。
+        了解更多信息
+        不再显示
+”
+
+---
+
+_**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
+
+
 
 ---
 
