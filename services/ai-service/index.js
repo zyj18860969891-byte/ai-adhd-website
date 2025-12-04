@@ -165,13 +165,15 @@ async function classifyTask(text, context = {}) {
   
   try {
     console.log('Calling OpenRouter API with model:', process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507');
+    console.log('API Key:', process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set');
     const response = await openai.chat.completions.create({
       model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 500
     });
     
-    console.log('OpenRouter API Response:', response);
+    console.log('OpenRouter API Response status:', response.status);
+    console.log('OpenRouter API Response data:', JSON.stringify(response, null, 2));
     const content = response.choices[0].message.content;
     console.log('AI Response:', content.substring(0, 100));
     return JSON.parse(content);
@@ -224,13 +226,15 @@ async function suggestPriority(task, context) {
   
   try {
     console.log('Calling OpenRouter API for priority with model:', process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507');
+    console.log('API Key:', process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set');
     const response = await openai.chat.completions.create({
       model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 300
     });
     
-    console.log('Priority API Response:', response);
+    console.log('Priority API Response status:', response.status);
+    console.log('Priority API Response data:', JSON.stringify(response, null, 2));
     const content = response.choices[0].message.content;
     console.log('Priority Response:', content.substring(0, 100));
     return JSON.parse(content);
@@ -268,12 +272,16 @@ async function extractTasks(text) {
   `;
   
   try {
+    console.log('Calling OpenRouter API for task extraction with model:', process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507');
+    console.log('API Key:', process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set');
     const response = await openai.chat.completions.create({
       model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 1000
     });
     
+    console.log('Extract Tasks API Response status:', response.status);
+    console.log('Extract Tasks API Response data:', JSON.stringify(response, null, 2));
     const content = response.choices[0].message.content;
     console.log('Extract Tasks Response:', content.substring(0, 100));
     return JSON.parse(content);
