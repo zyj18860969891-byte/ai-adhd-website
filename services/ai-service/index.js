@@ -30,9 +30,8 @@ if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
 }
 
 // Add error handling for OpenAI client
-openai.on('error', (error) => {
-  console.error('OpenAI client error:', error);
-});
+// Note: The openai.on('error') method may not be available in this version of the SDK
+// We'll handle errors in the API calls instead
 
 // Validate required environment variables
 if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {

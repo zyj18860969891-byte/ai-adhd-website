@@ -68963,7 +68963,7 @@ Status: **completed**
 
 ---
 
-_**User (2025-12-04 19:07Z)**_
+_**User (2025-12-04 19:09Z)**_
 
 的确，ai服务仍然返回：“{
   "requestId": "2kd_tbRdQRmhsY96DcO5xA",
@@ -69059,6 +69059,155 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\n// Health check endpoint\r\napp.get('/api/health', (req, res) =&gt; {\r\n  const healthStatus = {\r\n    status: 'healthy', \r\n    version: '1.0.0',\r\n    timestamp: new Date().toISOString(),\r\n    model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',\r\n    environment: process.env.NODE_ENV || 'development',\r\n    api_key_set: !!process.env.OPENROUTER_API_KEY || !!process.env.OPENAI_API_KEY,\r\n    node_version: process.version,\r\n    api_key_status: process.env.OPENROUTER_API_KEY ? 'Available' : process.env.OPENAI_API_KEY ? 'Available' : 'Not set',\r\n    api_key_length: process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.length : process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : 0,\r\n    environment_details: {\r\n      NODE_ENV: process.env.NODE_ENV,\r\n      OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,\r\n      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set',\r\n      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set'\r\n    }\r\n  };\r\n  \r\n  console.log('Health check requested:', healthStatus);\r\n  res.json(healthStatus);\r\n});\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "// Health check endpoint\r\napp.get('/api/health', (req, res) =&gt; {\r\n  const healthStatus = {\r\n    status: 'healthy', \r\n    version: '1.0.0',\r\n    timestamp: new Date().toISOString(),\r\n    model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',\r\n    environment: process.env.NODE_ENV || 'development',\r\n    api_key_set: !!process.env.OPENROUTER_API_KEY || !!process.env.OPENAI_API_KEY,\r\n    node_version: process.version,\r\n    api_key_status: process.env.OPENROUTER_API_KEY ? 'Available' : process.env.OPENAI_API_KEY ? 'Available' : 'Not set',\r\n    api_key_length: process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.length : process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : 0,\r\n    environment_details: {\r\n      NODE_ENV: process.env.NODE_ENV,\r\n      OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,\r\n      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set',\r\n      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set'\r\n    }\r\n  };\r\n  \r\n  console.log('Health check requested:', healthStatus);\r\n  res.json(healthStatus);\r\n});",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "",
+  "textEditContent": "",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • 正在读取 [](file:///e%3A/MultiModel/ai-adhd-website/services/ai-service/index.js#550-550)，行 550 到 580</summary>
+
+```javascript
+    environment_details: {
+      NODE_ENV: process.env.NODE_ENV,
+      OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set',
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set'
+    }
+  });
+});
+
+// Detailed health check endpoint for debugging
+app.get('/health', (req, res) => {
+  const healthStatus = {
+    status: 'healthy', 
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
+    environment: process.env.NODE_ENV || 'development',
+    api_key_set: !!process.env.OPENROUTER_API_KEY || !!process.env.OPENAI_API_KEY,
+    node_version: process.version,
+    api_key_status: process.env.OPENROUTER_API_KEY ? 'Available' : process.env.OPENAI_API_KEY ? 'Available' : 'Not set',
+    api_key_length: process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.length : process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : 0,
+    environment_details: {
+      NODE_ENV: process.env.NODE_ENV,
+      OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set',
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set'
+    }
+  };
+  
+  console.log('Health check requested:', healthStatus);
+  res.json(healthStatus);
+});
+
+app.listen(PORT, () => {
+  console.log(`AI Service running on port ${PORT}`);
+  console.log(`NODE_ENV is: ${process.env.NODE_ENV || 'undefined'}`);
+  console.log(`Model: ${process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507'}`);
+  console.log(`API Key: ${process.env.OPENROUTER_API_KEY ? 'Set' : process.env.OPENAI_API_KEY ? 'Set' : 'Not set'}`);
+  console.log(`Environment variables:`, {
+    NODE_ENV: process.env.NODE_ENV,
+    OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set',
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set'
+  });
+  
+  // Additional logging for debugging
+  console.log('Service initialized successfully');
+  console.log('Available endpoints:');
+  console.log('  POST /api/classify-task');
+  console.log('  POST /api/suggest-priority');
+  console.log('  POST /api/extract-tasks');
+  console.log('  POST /api/improve-task');
+  console.log('  POST /api/estimate-time');
+  console.log('  GET  /api/health');
+  console.log('  GET  /health (legacy)');
+  
+  // Check if we're in production and warn about API keys
+  if (process.env.NODE_ENV === 'production') {
+    console.log('Running in production mode');
+    if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
+      console.warn('WARNING: No API key set in production! AI features will use fallback responses.');
+    }
+  }
+  
+  // Log all environment variables for debugging
+  console.log('All environment variables:');
+  Object.keys(process.env).filter(key => key.includes('OPENROUTER') || key.includes('OPENAI') || key.includes('NODE_ENV')).forEach(key => {
+    console.log(`  ${key}: ${process.env[key] ? 'Set' : 'Not set'}`);
+  });
+});
+```
+
+
+</details>
+</tool-use>
+
+---
+
 根据你提供的信息，AI服务的健康检查返回503错误，这表明服务虽然启动了，但无法正常处理请求。从错误日志来看，问题可能出在API调用或环境变量配置上。
 
 让我来检查并修复AI服务代码中的问题：
@@ -69068,6 +69217,374 @@ Status: **completed**
  根据你提供的信息和代码分析，我发现了问题所在。从部署日志和错误信息来看，AI服务虽然启动了，但健康检查返回503错误，这表明服务在处理请求时出现了问题。
 
 让我来修复AI服务中的问题：
+
+ 让我直接在文件末尾添加一个更详细的健康检查端点，这应该能帮助我们更好地诊断问题：
+
+ 让我先检查一下文件末尾的内容：
+
+ 根据你的反馈，我已经对AI服务进行了以下改进：
+
+## 问题分析
+
+从部署日志和错误信息来看，AI服务虽然启动了，但存在以下问题：
+
+1. **健康检查返回503错误**：这表明服务虽然启动，但在处理请求时出现异常
+2. **API调用可能失败**：从之前的错误日志看，可能是API调用返回了HTML而不是JSON
+3. **环境变量配置可能不正确**：虽然你确认已添加API密钥，但服务可能无法正确读取
+
+## 已做的修改
+
+1. **增强健康检查端点**：
+   - 添加了更详细的健康检查信息，包括API密钥状态、环境变量等
+   - 同时保留了 `/health` 和 `/api/health` 两个端点以兼容不同调用方式
+
+2. **改进错误处理**：
+   - 添加了更详细的错误日志，包括错误堆栈信息
+   - 增加了JSON解析失败时的详细日志输出
+
+3. **增强API调用验证**：
+   - 在API调用前后添加了更多调试信息
+   - 添加了对返回内容的验证，防止HTML内容被误认为JSON
+
+## 建议的后续操作
+
+1. **重新部署服务**：
+   - 保存所有更改后重新部署
+   - 查看新的部署日志，确认服务启动时的环境变量加载情况
+
+2. **检查服务日志**：
+   - 在Railway控制台查看AI服务的详细日志
+   - 确认API密钥是否正确加载
+   - 查看健康检查端点的返回信息
+
+3. **测试API调用**：
+   - 直接访问 `/api/health` 端点查看服务状态
+   - 测试 `/api/classify-task` 端点是否能正常工作
+
+4. **验证API密钥**：
+   - 确认Railway中的API密钥格式正确
+   - 确认API密钥有访问OpenRouter服务的权限
+
+这些修改应该能帮助我们更好地诊断问题所在。请重新部署服务并查看日志，这样我们可以更清楚地看到问题出在哪里。
+
+---
+
+_**User (2025-12-04 19:11Z)**_
+
+修改完的东西要先传到git吧，，，然后促使railway自动重新部署更新
+
+---
+
+_**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
+
+我理解您需要将修改推送到Git以触发Railway的自动重新部署。不过，我无法直接执行Git命令或文件系统操作。让我为您总结一下需要执行的操作：
+
+## 需要执行的操作
+
+1. **提交更改到Git**：
+   ```bash
+   git add .
+   git commit -m "Fix AI service health check and error handling"
+   git push origin main
+   ```
+
+2. **触发Railway重新部署**：
+   - 推送代码到Git仓库后，Railway会自动检测到更改并触发重新部署
+   - 或者您可以在Railway控制台手动触发部署
+
+## 我已经完成的修改
+
+我已经对 `index.js` 文件进行了以下改进：
+
+1. **增强健康检查端点**：
+   - 添加了更详细的健康检查信息，包括API密钥状态、环境变量等
+   - 同时保留了 `/health` 和 `/api/health` 两个端点
+
+2. **改进错误处理**：
+   - 添加了更详细的错误日志，包括错误堆栈信息
+   - 增加了JSON解析失败时的详细日志输出
+
+3. **增强API调用验证**：
+   - 在API调用前后添加了更多调试信息
+   - 添加了对返回内容的验证，防止HTML内容被误认为JSON
+
+## 部署后建议操作
+
+1. **查看部署日志**：
+   - 在Railway控制台查看AI服务的部署日志
+   - 确认服务启动时的环境变量加载情况
+
+2. **测试服务**：
+   - 访问 `/api/health` 端点查看服务状态
+   - 测试 `/api/classify-task` 端点是否能正常工作
+
+3. **检查错误日志**：
+   - 查看详细的错误日志以确认问题是否解决
+
+请执行Git提交操作以触发Railway的自动重新部署。
+
+---
+
+_**User (2025-12-04 19:20Z)**_
+
+新的部署后返回：“2025-12-04T19:19:13.000000000Z [inf]  Starting Container
+2025-12-04T19:19:15.183284803Z [inf]  
+2025-12-04T19:19:15.183298048Z [inf]  > adhd-task-manager-pwa@1.0.0 start
+2025-12-04T19:19:15.183305371Z [inf]  > concurrently "cross-env PORT=8080 node server/index.js" "cross-env PORT=8190 node services/ai-service/index.js" "cross-env PORT=8280 node services/db-service/index.js" "cross-env PORT=8380 node services/notification-service/index.js"
+2025-12-04T19:19:15.183313773Z [inf]  
+2025-12-04T19:19:15.279655913Z [inf]  [2] Database Service running on port 8280
+2025-12-04T19:19:15.279663199Z [inf]  [2] Connected to SQLite database
+2025-12-04T19:19:15.289231007Z [inf]  [0] Failed to load task progress: Error: ENOENT: no such file or directory, open '/app/task-progress.json'
+2025-12-04T19:19:15.289240180Z [inf]  [0]     at Object.openSync (node:fs:596:3)
+2025-12-04T19:19:15.289248519Z [inf]  [0]     at Object.readFileSync (node:fs:464:35)
+2025-12-04T19:19:15.289257603Z [inf]  [0]     at loadTaskProgress (/app/server/index.js:57:21)
+2025-12-04T19:19:15.289265657Z [inf]  [0]     at Object.<anonymous> (/app/server/index.js:53:20)
+2025-12-04T19:19:15.289273061Z [inf]  [0]     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+2025-12-04T19:19:15.289281501Z [inf]  [0]     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+2025-12-04T19:19:15.289291922Z [inf]  [0]     at Module.load (node:internal/modules/cjs/loader:1203:32)
+2025-12-04T19:19:15.289299251Z [inf]  [0]     at Module._load (node:internal/modules/cjs/loader:1019:12)
+2025-12-04T19:19:15.289308933Z [inf]  [0]     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+2025-12-04T19:19:15.289317480Z [inf]  [0]     at node:internal/main/run_main_module:28:49 {
+2025-12-04T19:19:15.289325369Z [inf]  [0]   errno: -2,
+2025-12-04T19:19:15.289332092Z [inf]  [0]   syscall: 'open',
+2025-12-04T19:19:15.289339812Z [inf]  [0]   code: 'ENOENT',
+2025-12-04T19:19:15.289346980Z [inf]  [0]   path: '/app/task-progress.json'
+2025-12-04T19:19:15.289354919Z [inf]  [0] }
+2025-12-04T19:19:15.289377160Z [inf]  [0] WebSocket disabled in production
+2025-12-04T19:19:15.306229856Z [inf]  [2] Database initialized successfully
+2025-12-04T19:19:15.329701008Z [inf]  [3] Notification Service running on port 8380
+2025-12-04T19:19:15.329708975Z [inf]  [0] Server running on port 8080
+2025-12-04T19:19:15.329715823Z [inf]  [0] NODE_ENV: production
+2025-12-04T19:19:15.329721897Z [inf]  [0] WebSocket enabled: false
+2025-12-04T19:19:15.329772427Z [inf]  [0] Environment variables:
+2025-12-04T19:19:15.329779497Z [inf]  [0]   AI_SERVICE_URL: Not set
+2025-12-04T19:19:15.329787766Z [inf]  [0]   DB_SERVICE_URL: Not set
+2025-12-04T19:19:15.329793771Z [inf]  [0]   NOTIFICATION_SERVICE_URL: Not set
+2025-12-04T19:19:15.416163154Z [inf]  [1] API Key configured: OPENROUTER_API_KEY
+2025-12-04T19:19:15.416173187Z [inf]  [1] API Key length: 73
+2025-12-04T19:19:15.416186962Z [inf]  [1] /app/services/ai-service/index.js:33
+2025-12-04T19:19:15.416288921Z [inf]  [1] openai.on('error', (error) => {
+2025-12-04T19:19:15.416299142Z [inf]  [1]        ^
+2025-12-04T19:19:15.416308912Z [inf]  [1] 
+2025-12-04T19:19:15.416326500Z [inf]  [1] TypeError: openai.on is not a function
+2025-12-04T19:19:15.416340218Z [inf]  [1]     at Object.<anonymous> (/app/services/ai-service/index.js:33:8)
+2025-12-04T19:19:15.416349246Z [inf]  [1]     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+2025-12-04T19:19:15.416357684Z [inf]  [1]     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+2025-12-04T19:19:15.416365706Z [inf]  [1]     at Module.load (node:internal/modules/cjs/loader:1203:32)
+2025-12-04T19:19:15.416377763Z [inf]  [1]     at Module._load (node:internal/modules/cjs/loader:1019:12)
+2025-12-04T19:19:15.416389171Z [inf]  [1]     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+2025-12-04T19:19:15.416398087Z [inf]  [1]     at node:internal/main/run_main_module:28:49
+2025-12-04T19:19:15.416405403Z [inf]  [1] 
+2025-12-04T19:19:15.416421148Z [inf]  [1] Node.js v18.20.8
+2025-12-04T19:19:15.439822760Z [inf]  [1] cross-env PORT=8190 node services/ai-service/index.js exited with code 1
+2025-12-04T19:19:17.608010191Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/health
+2025-12-04T19:19:17.608015456Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-04T19:19:17.608020398Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-04T19:19:17.643105191Z [inf]  [0] Proxying AI request to: http://localhost:8190/health
+2025-12-04T19:19:17.643111802Z [inf]  [0] AI Service URL: http://localhost:8190
+2025-12-04T19:19:17.643118977Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-04T19:19:17.643124988Z [inf]  [0] Proxying DB request to: http://localhost:8280/api/health
+2025-12-04T19:19:17.643131704Z [inf]  [0] DB Service URL: http://localhost:8280
+2025-12-04T19:19:17.643137353Z [inf]  [0] Request path: /api/services/db/health
+2025-12-04T19:19:17.653952532Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-04T19:19:17.653975161Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-04T19:19:17.653984817Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-04T19:19:17.653992657Z [inf]  [0]   cause: Error: connect ECONNREFUSED ::1:8190
+2025-12-04T19:19:17.654000615Z [inf]  [0]       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) {
+2025-12-04T19:19:17.654008758Z [inf]  [0]     errno: -111,
+2025-12-04T19:19:17.654019712Z [inf]  [0]     code: 'ECONNREFUSED',
+2025-12-04T19:19:17.654029172Z [inf]  [0]     syscall: 'connect',
+2025-12-04T19:19:17.654040967Z [inf]  [0]     address: '::1',
+2025-12-04T19:19:17.654048655Z [inf]  [0]     port: 8190
+2025-12-04T19:19:17.654055908Z [inf]  [0]   }
+2025-12-04T19:19:17.654066367Z [inf]  [0] }
+2025-12-04T19:19:18.157273533Z [inf]  [0] Notification Service response status: 200
+2025-12-04T19:19:18.157281276Z [inf]  [0] Notification Service response data: {
+2025-12-04T19:19:18.157289985Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:18.157298367Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:17.657Z",
+2025-12-04T19:19:18.157309771Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:18.157318304Z [inf]  [0]   "activeClients": 0
+2025-12-04T19:19:18.157326432Z [inf]  [0] }
+2025-12-04T19:19:18.157334542Z [inf]  [0] DB Service response status: 200
+2025-12-04T19:19:18.157343220Z [inf]  [0] DB Service response data: {
+2025-12-04T19:19:18.157351649Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:18.157382921Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:17.659Z",
+2025-12-04T19:19:18.157391487Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:18.157399788Z [inf]  [0]   "dbPath": "./data/tasks.db",
+2025-12-04T19:19:18.157407835Z [inf]  [0]   "error": null
+2025-12-04T19:19:18.157416348Z [inf]  [0] }
+2025-12-04T19:19:27.439444348Z [inf]  [0] Proxying DB request to: http://localhost:8280/api/health
+2025-12-04T19:19:27.439455717Z [inf]  [0] DB Service URL: http://localhost:8280
+2025-12-04T19:19:27.439478820Z [inf]  [0] Request path: /api/services/db/health
+2025-12-04T19:19:27.439485808Z [inf]  [0] Proxying AI request to: http://localhost:8190/health
+2025-12-04T19:19:27.439492030Z [inf]  [0] AI Service URL: http://localhost:8190
+2025-12-04T19:19:27.439500223Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-04T19:19:27.441865966Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/notifications/user-1
+2025-12-04T19:19:27.441877014Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-04T19:19:27.441883326Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-04T19:19:27.441941323Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/health
+2025-12-04T19:19:27.441947221Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-04T19:19:27.441953073Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-04T19:19:27.444420859Z [inf]  [0]   cause: Error: connect ECONNREFUSED ::1:8190
+2025-12-04T19:19:27.444432220Z [inf]  [0]       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) {
+2025-12-04T19:19:27.444443861Z [inf]  [0]     errno: -111,
+2025-12-04T19:19:27.444450641Z [inf]  [0]     code: 'ECONNREFUSED',
+2025-12-04T19:19:27.444459756Z [inf]  [0]     syscall: 'connect',
+2025-12-04T19:19:27.444461220Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-04T19:19:27.444468127Z [inf]  [0]     address: '::1',
+2025-12-04T19:19:27.444469707Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-04T19:19:27.444475446Z [inf]  [0]     port: 8190
+2025-12-04T19:19:27.444478032Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-04T19:19:27.444481919Z [inf]  [0]   }
+2025-12-04T19:19:27.444486531Z [inf]  [0] }
+2025-12-04T19:19:27.446942028Z [inf]  [0] DB Service response status: 200
+2025-12-04T19:19:27.446949549Z [inf]  [0] DB Service response data: {
+2025-12-04T19:19:27.446967836Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:27.446974192Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:27.442Z",
+2025-12-04T19:19:27.446979904Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:27.446984846Z [inf]  [0]   "dbPath": "./data/tasks.db",
+2025-12-04T19:19:27.446991614Z [inf]  [0]   "error": null
+2025-12-04T19:19:27.446997384Z [inf]  [0] }
+2025-12-04T19:19:27.449075103Z [inf]  [0] Notification Service response status: 200
+2025-12-04T19:19:27.449083754Z [inf]  [0] Notification Service response data: {
+2025-12-04T19:19:27.449093371Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:27.449100889Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:27.444Z",
+2025-12-04T19:19:27.449107500Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:27.449114180Z [inf]  [0]   "activeClients": 0
+2025-12-04T19:19:27.449121393Z [inf]  [0] }
+2025-12-04T19:19:27.453573758Z [inf]  [0] Notification Service response status: 200
+2025-12-04T19:19:27.453580039Z [inf]  [0] Notification Service response data: []
+2025-12-04T19:19:37.437203057Z [inf]  [0] Proxying DB request to: http://localhost:8280/api/health
+2025-12-04T19:19:37.437210101Z [inf]  [0] DB Service URL: http://localhost:8280
+2025-12-04T19:19:37.437217253Z [inf]  [0] Request path: /api/services/db/health
+2025-12-04T19:19:37.439446225Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/health
+2025-12-04T19:19:37.439452992Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-04T19:19:37.439459772Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-04T19:19:37.439466126Z [inf]  [0] Proxying AI request to: http://localhost:8190/health
+2025-12-04T19:19:37.439477027Z [inf]  [0] AI Service URL: http://localhost:8190
+2025-12-04T19:19:37.439483649Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-04T19:19:37.447645140Z [inf]  [0] }
+2025-12-04T19:19:37.447698935Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-04T19:19:37.447712534Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-04T19:19:37.447721794Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-04T19:19:37.447728696Z [inf]  [0]   cause: Error: connect ECONNREFUSED ::1:8190
+2025-12-04T19:19:37.447734584Z [inf]  [0]       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) {
+2025-12-04T19:19:37.447743308Z [inf]  [0]     errno: -111,
+2025-12-04T19:19:37.447748871Z [inf]  [0]     code: 'ECONNREFUSED',
+2025-12-04T19:19:37.447753810Z [inf]  [0]     syscall: 'connect',
+2025-12-04T19:19:37.447759074Z [inf]  [0]     address: '::1',
+2025-12-04T19:19:37.447765303Z [inf]  [0]     port: 8190
+2025-12-04T19:19:37.447770261Z [inf]  [0]   }
+2025-12-04T19:19:37.447775305Z [inf]  [0] }
+2025-12-04T19:19:37.447779580Z [inf]  [0] Notification Service response status: 200
+2025-12-04T19:19:37.447784700Z [inf]  [0] Notification Service response data: {
+2025-12-04T19:19:37.447791022Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:37.447795759Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:37.440Z",
+2025-12-04T19:19:37.447802618Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:37.447807726Z [inf]  [0]   "activeClients": 0
+2025-12-04T19:19:37.448781471Z [inf]  [0] DB Service response status: 200
+2025-12-04T19:19:37.448788565Z [inf]  [0] DB Service response data: {
+2025-12-04T19:19:37.448795088Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:37.448800437Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:37.440Z",
+2025-12-04T19:19:37.448804495Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:37.448810419Z [inf]  [0]   "dbPath": "./data/tasks.db",
+2025-12-04T19:19:37.448816363Z [inf]  [0]   "error": null
+2025-12-04T19:19:37.448822940Z [inf]  [0] }
+2025-12-04T19:19:47.436475803Z [inf]  [0] Proxying AI request to: http://localhost:8190/health
+2025-12-04T19:19:47.436482924Z [inf]  [0] AI Service URL: http://localhost:8190
+2025-12-04T19:19:47.436489802Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-04T19:19:47.439652637Z [inf]  [0] Proxying DB request to: http://localhost:8280/api/health
+2025-12-04T19:19:47.439658358Z [inf]  [0] DB Service URL: http://localhost:8280
+2025-12-04T19:19:47.439663683Z [inf]  [0] Request path: /api/services/db/health
+2025-12-04T19:19:47.444337868Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/health
+2025-12-04T19:19:47.444345679Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-04T19:19:47.444352177Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-04T19:19:47.444359685Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-04T19:19:47.444366388Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-04T19:19:47.444372364Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-04T19:19:47.444378865Z [inf]  [0]   cause: Error: connect ECONNREFUSED ::1:8190
+2025-12-04T19:19:47.444389032Z [inf]  [0]       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) {
+2025-12-04T19:19:47.444396263Z [inf]  [0]     errno: -111,
+2025-12-04T19:19:47.444402713Z [inf]  [0]     code: 'ECONNREFUSED',
+2025-12-04T19:19:47.444409898Z [inf]  [0]     syscall: 'connect',
+2025-12-04T19:19:47.444416526Z [inf]  [0]     address: '::1',
+2025-12-04T19:19:47.444424081Z [inf]  [0]     port: 8190
+2025-12-04T19:19:47.444430804Z [inf]  [0]   }
+2025-12-04T19:19:47.444439995Z [inf]  [0] }
+2025-12-04T19:19:47.450409895Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:47.444Z",
+2025-12-04T19:19:47.450431032Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:47.450441736Z [inf]  [0]   "activeClients": 0
+2025-12-04T19:19:47.450451606Z [inf]  [0] }
+2025-12-04T19:19:47.450516666Z [inf]  [0] Notification Service response status: 200
+2025-12-04T19:19:47.450526039Z [inf]  [0] Notification Service response data: {
+2025-12-04T19:19:47.450532396Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:47.452488070Z [inf]  [0] DB Service response status: 200
+2025-12-04T19:19:47.458056088Z [inf]  [0] DB Service response data: {
+2025-12-04T19:19:47.458060579Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:47.458077992Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:47.444Z",
+2025-12-04T19:19:47.458094598Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:47.458104724Z [inf]  [0]   "dbPath": "./data/tasks.db",
+2025-12-04T19:19:47.458116372Z [inf]  [0]   "error": null
+2025-12-04T19:19:47.458127893Z [inf]  [0] }
+2025-12-04T19:19:57.434835678Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/notifications/user-1
+2025-12-04T19:19:57.434843222Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-04T19:19:57.434848471Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-04T19:19:57.437121757Z [inf]  [0] Proxying AI request to: http://localhost:8190/health
+2025-12-04T19:19:57.437128460Z [inf]  [0] AI Service URL: http://localhost:8190
+2025-12-04T19:19:57.437133906Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-04T19:19:57.437140096Z [inf]  [0] Proxying DB request to: http://localhost:8280/api/health
+2025-12-04T19:19:57.437148762Z [inf]  [0] DB Service URL: http://localhost:8280
+2025-12-04T19:19:57.437154317Z [inf]  [0] Request path: /api/services/db/health
+2025-12-04T19:19:57.439637414Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/health
+2025-12-04T19:19:57.439642883Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-04T19:19:57.439648078Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-04T19:19:57.442141948Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-04T19:19:57.442146507Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-04T19:19:57.442150925Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-04T19:19:57.442155807Z [inf]  [0]   cause: Error: connect ECONNREFUSED ::1:8190
+2025-12-04T19:19:57.442160217Z [inf]  [0]       at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1555:16) {
+2025-12-04T19:19:57.442164827Z [inf]  [0]     errno: -111,
+2025-12-04T19:19:57.442168868Z [inf]  [0]     code: 'ECONNREFUSED',
+2025-12-04T19:19:57.442174575Z [inf]  [0]     syscall: 'connect',
+2025-12-04T19:19:57.442179531Z [inf]  [0]     address: '::1',
+2025-12-04T19:19:57.442183073Z [inf]  [0]     port: 8190
+2025-12-04T19:19:57.442186777Z [inf]  [0]   }
+2025-12-04T19:19:57.442190707Z [inf]  [0] }
+2025-12-04T19:19:57.442195274Z [inf]  [0] Notification Service response status: 200
+2025-12-04T19:19:57.442200294Z [inf]  [0] Notification Service response data: []
+2025-12-04T19:19:57.446959019Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:57.441Z",
+2025-12-04T19:19:57.446974264Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:57.446982512Z [inf]  [0]   "dbPath": "./data/tasks.db",
+2025-12-04T19:19:57.447047498Z [inf]  [0] Notification Service response status: 200
+2025-12-04T19:19:57.447055612Z [inf]  [0] Notification Service response data: {
+2025-12-04T19:19:57.447067830Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:57.447075615Z [inf]  [0]   "lastCheck": "2025-12-04T19:19:57.441Z",
+2025-12-04T19:19:57.447083879Z [inf]  [0]   "version": "1.0.0",
+2025-12-04T19:19:57.447089776Z [inf]  [0]   "activeClients": 0
+2025-12-04T19:19:57.447096728Z [inf]  [0] }
+2025-12-04T19:19:57.447105086Z [inf]  [0] DB Service response status: 200
+2025-12-04T19:19:57.447114684Z [inf]  [0] DB Service response data: {
+2025-12-04T19:19:57.447121791Z [inf]  [0]   "status": "healthy",
+2025-12-04T19:19:57.447298124Z [inf]  [0]   "error": null
+2025-12-04T19:19:57.447305786Z [inf]  [0] }”
+
+---
+
+_**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
+
+根据新的部署日志，我发现了几个关键问题：
+
+## 主要问题分析
+
+1. **AI服务启动失败**：从日志可以看到 `TypeError: openai.on is not a function` 错误，这表明OpenAI SDK的使用方式不正确。
+
+2. **服务无法连接**：日志显示 `ECONNREFUSED ::1:8190`，说明AI服务没有成功启动，因此前端无法连接到它。
+
+3. **环境变量问题**：日志显示 `AI_SERVICE_URL: Not set` 等服务URL未设置。
+
+## 解决方案
+
+让我修复AI服务代码中的问题：
 
  
 
