@@ -87,6 +87,83 @@ app.get('/api/health', (req, res) => {
   res.json(healthStatus);
 });
 
+// Add explicit API endpoints for compatibility
+app.post('/api/classify-task', async (req, res) => {
+  try {
+    const { text, context } = req.body;
+    if (!text) {
+      return res.status(400).json({ error: 'Task text is required' });
+    }
+    console.log('Classify task request:', { text: text.substring(0, 50), context });
+    const result = await classifyTask(text, context);
+    console.log('Classification result:', JSON.stringify(result, null, 2));
+    res.json(result);
+  } catch (error) {
+    console.error('Classification Error:', error);
+    res.status(500).json({ error: 'Failed to classify task' });
+  }
+});
+
+app.post('/api/suggest-priority', async (req, res) => {
+  try {
+    const { task, context } = req.body;
+    if (!task) {
+      return res.status(400).json({ error: 'Task is required' });
+    }
+    console.log('Suggest priority request:', { task: task.substring(0, 50), context });
+    const result = await suggestPriority(task, context);
+    res.json(result);
+  } catch (error) {
+    console.error('Priority Suggestion Error:', error);
+    res.status(500).json({ error: 'Failed to suggest priority' });
+  }
+});
+
+app.post('/api/extract-tasks', async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+    console.log('Extract tasks request:', { text: text.substring(0, 50) });
+    const result = await extractTasks(text);
+    res.json(result);
+  } catch (error) {
+    console.error('Task Extraction Error:', error);
+    res.status(500).json({ error: 'Failed to extract tasks' });
+  }
+});
+
+app.post('/api/improve-task', async (req, res) => {
+  try {
+    const { task, context } = req.body;
+    if (!task) {
+      return res.status(400).json({ error: 'Task is required' });
+    }
+    console.log('Improve task request:', { task: task.substring(0, 50), context });
+    const result = await improveTask(task, context);
+    res.json(result);
+  } catch (error) {
+    console.error('Task Improvement Error:', error);
+    res.status(500).json({ error: 'Failed to improve task' });
+  }
+});
+
+app.post('/api/estimate-time', async (req, res) => {
+  try {
+    const { task, context } = req.body;
+    if (!task) {
+      return res.status(400).json({ error: 'Task is required' });
+    }
+    console.log('Estimate time request:', { task: task.substring(0, 50), context });
+    const result = await estimateTime(task, context);
+    res.json(result);
+  } catch (error) {
+    console.error('Time Estimation Error:', error);
+    res.status(500).json({ error: 'Failed to estimate time' });
+  }
+});
+
 app.post('/api/classify-task', async (req, res) => {
   try {
     const { text, context } = req.body;
