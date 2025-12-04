@@ -4,9 +4,7 @@ const CACHE_NAME = 'adhd-task-manager-v1'
 const urlsToCache = [
   '/',
   '/index.html',
-  '/manifest.json',
-  '/static/js/bundle.js',
-  '/static/css/main.css'
+  '/manifest.json'
 ]
 
 // Install event - cache resources
@@ -15,6 +13,11 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         return cache.addAll(urlsToCache)
+          .catch(error => {
+            console.error('Failed to cache resources:', error);
+            // Continue installation even if caching fails
+            return Promise.resolve();
+          });
       })
   )
 })
@@ -45,11 +48,18 @@ self.addEventListener('fetch', (event) => {
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(event.request, responseToCache)
+                  .catch(error => {
+                    console.error('Failed to cache response:', error);
+                  });
               })
 
             return response
           }
-        )
+        ).catch(error => {
+          console.error('Fetch failed:', error);
+          // Return a fallback response or let it fail gracefully
+          return new Response('Service Unavailable', { status: 503 });
+        });
       })
   )
 })
