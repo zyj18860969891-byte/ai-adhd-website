@@ -117,6 +117,7 @@ app.get('/api/health', (req, res) => {
 // WebSocket for AI requests (disabled in production)
 if (process.env.NODE_ENV !== 'production') {
   const wsPort = parseInt(process.env.PORT || PORT, 10) + 400;
+  console.log(`AI WebSocket will run on port ${wsPort}`);
   const wss = new WebSocket.Server({ port: wsPort });
 
   wss.on('connection', (ws) => {
@@ -252,7 +253,7 @@ async function extractTasks(text) {
   
   try {
     const response = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+      model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 1000
     });
@@ -272,5 +273,6 @@ app.listen(PORT, () => {
   console.log(`AI Service running on port ${PORT}`);
   if (process.env.NODE_ENV !== 'production') {
     console.log(`WebSocket running on port ${parseInt(PORT, 10) + 400}`);
+    console.log(`NODE_ENV is: ${process.env.NODE_ENV}`);
   }
 });
