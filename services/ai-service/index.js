@@ -16,7 +16,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Initialize OpenRouter
 const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || "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",
+  apiKey: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || "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",
   baseURL: "https://openrouter.ai/api/v1",
   defaultHeaders: {
     "HTTP-Referer": "https://github.com/your-username/ai-adhd-website",
@@ -164,12 +164,14 @@ async function classifyTask(text, context = {}) {
   `;
   
   try {
+    console.log('Calling OpenRouter API with model:', process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507');
     const response = await openai.chat.completions.create({
       model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 500
     });
     
+    console.log('OpenRouter API Response:', response);
     const content = response.choices[0].message.content;
     console.log('AI Response:', content.substring(0, 100));
     return JSON.parse(content);
@@ -221,12 +223,14 @@ async function suggestPriority(task, context) {
   `;
   
   try {
+    console.log('Calling OpenRouter API for priority with model:', process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507');
     const response = await openai.chat.completions.create({
       model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
       messages: [{ role: 'user', content: prompt }],
       max_tokens: 300
     });
     
+    console.log('Priority API Response:', response);
     const content = response.choices[0].message.content;
     console.log('Priority Response:', content.substring(0, 100));
     return JSON.parse(content);
