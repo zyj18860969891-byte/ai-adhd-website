@@ -27,6 +27,30 @@ if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
 } else {
   console.log('API Key configured:', process.env.OPENROUTER_API_KEY ? 'OPENROUTER_API_KEY' : 'OPENAI_API_KEY');
   console.log('API Key length:', process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.length : process.env.OPENAI_API_KEY.length);
+  console.log('Environment variables loaded successfully');
+}
+
+// Add comprehensive API key validation
+function validateApiKey() {
+  const apiKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    console.error('ERROR: No API key found in environment variables');
+    return false;
+  }
+  
+  // Basic validation for API key format
+  if (apiKey.length < 10) {
+    console.error('ERROR: API key appears to be invalid (too short)');
+    return false;
+  }
+  
+  console.log('API key validation passed');
+  return true;
+}
+
+// Validate API key before starting service
+if (!validateApiKey()) {
+  console.warn('WARNING: AI service may not function properly without valid API key');
 }
 
 // Add error handling for OpenAI client
