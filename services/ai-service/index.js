@@ -171,9 +171,15 @@ async function classifyTask(text, context = {}) {
     });
     
     const content = response.choices[0].message.content;
+    console.log('AI Response:', content.substring(0, 100));
     return JSON.parse(content);
   } catch (error) {
     console.error('OpenAI API Error:', error);
+    console.error('Error details:', error.message);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
     return {
       category: '个人',
       confidence: 0.5,
@@ -222,9 +228,15 @@ async function suggestPriority(task, context) {
     });
     
     const content = response.choices[0].message.content;
+    console.log('Priority Response:', content.substring(0, 100));
     return JSON.parse(content);
   } catch (error) {
     console.error('Priority suggestion Error:', error);
+    console.error('Error details:', error.message);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
     return {
       priority: '中优先级',
       confidence: 0.5,
@@ -259,9 +271,15 @@ async function extractTasks(text) {
     });
     
     const content = response.choices[0].message.content;
+    console.log('Extract Tasks Response:', content.substring(0, 100));
     return JSON.parse(content);
   } catch (error) {
     console.error('Task extraction Error:', error);
+    console.error('Error details:', error.message);
+    if (error.response) {
+      console.error('Response status:', error.response.status);
+      console.error('Response data:', error.response.data);
+    }
     return {
       tasks: [{ text, category: '个人', priority: '中优先级' }]
     };
