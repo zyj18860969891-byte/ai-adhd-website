@@ -373,6 +373,18 @@ function addHistory(taskId, action, details) {
 // Start server
 app.listen(PORT, () => {
   console.log(`Database Service running on port ${PORT}`);
+  console.log(`Database initialized successfully`);
+  console.log(`Available endpoints:`);
+  console.log(`  GET  /api/services/db/tasks`);
+  console.log(`  GET  /api/services/db/tasks/:id`);
+  console.log(`  POST /api/services/db/tasks`);
+  console.log(`  PUT  /api/services/db/tasks/:id`);
+  console.log(`  DELETE /api/services/db/tasks/:id`);
+  console.log(`  GET  /api/services/db/tasks/:id/history`);
+  console.log(`  GET  /api/services/db/stats`);
+  console.log(`  GET  /api/services/db/health`);
+  console.log(`  POST /api/services/db/backup`);
+  
   if (process.env.NODE_ENV !== 'production') {
     console.log(`WebSocket running on port ${parseInt(PORT, 10) + 200}`);
   }
