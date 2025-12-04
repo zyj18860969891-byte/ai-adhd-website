@@ -60,7 +60,21 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        // Ensure consistent asset naming to avoid cache issues
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name.endsWith('.css')) {
+            return 'assets/css/[name].[hash].[ext]';
+          }
+          if (assetInfo.name.endsWith('.js')) {
+            return 'assets/js/[name].[hash].[ext]';
+          }
+          return 'assets/[name].[hash].[ext]';
+        }
+      }
+    }
   },
   define: {
     global: 'globalThis'
