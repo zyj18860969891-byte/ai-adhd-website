@@ -373,4 +373,7 @@ function addHistory(taskId, action, details) {
 // Start server
 app.listen(PORT, () => {
   console.log(`Database Service running on port ${PORT}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`WebSocket running on port ${parseInt(PORT, 10) + 200}`);
+  }
 });

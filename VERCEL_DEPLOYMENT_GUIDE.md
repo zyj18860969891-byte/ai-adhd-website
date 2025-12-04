@@ -16,6 +16,8 @@
 3. 选择你的GitHub仓库：`ai-adhd-website`
 4. 点击 "Import"
 
+**重要提示**：项目已删除 `vercel.json` 文件，Vercel会自动检测并配置Vite项目，避免配置冲突。
+
 ### 3. 配置环境变量
 
 在Vercel项目设置中，添加以下环境变量：
@@ -28,16 +30,21 @@ VITE_WS_URL=wss://ai-adhd-website-production.up.railway.app
 
 ### 4. 配置构建设置
 
-确保构建设置如下：
+项目已配置 `client/vercel.json` 文件，Vercel会自动应用正确配置。建议检查以下设置：
 
 ```
-Framework Preset: Other
-Root Directory: (留空)
-Build Command: cd client && npm run build
-Output Directory: client/dist
+Framework Preset: Vite (自动检测)
+Root Directory: client
+Build Command: npm run build
+Output Directory: dist
 Install Command: npm install
-Development Command: cd client && npm run dev
+Development Command: npm run dev
 ```
+
+**重要配置说明**：
+- `client/vercel.json` 已配置正确的静态文件路由
+- API请求会自动代理到Railway后端
+- 环境变量已自动配置
 
 ### 5. 部署
 
@@ -92,6 +99,34 @@ API请求 → Railway域名 (后端Gateway服务)
     ├── Database服务 (端口8280)
     └── Notification服务 (端口8380)
 ```
+
+## 快速部署步骤
+
+### 一步到位的配置
+
+1. **连接项目**：导入GitHub仓库
+2. **环境变量**：添加 `VITE_API_BASE_URL` 和 `VITE_WS_URL`
+3. **构建设置**：确认Root Directory为 `client`，Output Directory为 `dist`
+4. **部署**：点击Deploy按钮
+
+就这么简单！Vercel会自动处理其余配置。
+
+### 常见问题解决
+
+#### JavaScript模块加载错误
+**问题**：`Failed to load module script: Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of "text/html"`
+
+**解决**：已通过 `client/vercel.json` 中的静态文件路由配置修复
+
+#### Manifest文件错误
+**问题**：`Manifest: Line: 1, column: 1, Syntax error`
+
+**解决**：已通过正确的静态文件路由配置修复
+
+#### Meta标签警告
+**问题**：`<meta name="apple-mobile-web-app-capable" content="yes"> is deprecated`
+
+**解决**：这是警告，不影响功能，可以忽略
 
 ## 下一步
 

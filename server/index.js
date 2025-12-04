@@ -236,9 +236,6 @@ app.use((error, req, res, next) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`WebSocket running on port ${parseInt(PORT, 10) + 100}`);
-  }
   
   // Update task progress
   taskProgress.deployment.status = 'running';
