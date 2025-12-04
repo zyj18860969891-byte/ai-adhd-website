@@ -165,6 +165,38 @@ app.get('/api/services/ai/*', (req, res) => {
     });
 });
 
+app.post('/api/services/ai/*', (req, res) => {
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+  const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
+  
+  console.log('Proxying AI request to:', targetUrl);
+  console.log('AI Service URL:', aiServiceUrl);
+  console.log('Request path:', req.originalUrl);
+  
+  fetch(targetUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(req.body)
+  })
+    .then(response => {
+      console.log('AI Service response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`AI Service responded with status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('AI Service response data:', JSON.stringify(data, null, 2));
+      res.json(data);
+    })
+    .catch(error => {
+      console.error('AI Service Error:', error);
+      res.status(503).json({ error: 'AI Service unavailable', details: error.message });
+    });
+});
+
 app.get('/api/services/db/*', (req, res) => {
   const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
@@ -175,6 +207,39 @@ app.get('/api/services/db/*', (req, res) => {
   console.log('Request path:', req.originalUrl);
   
   fetch(targetUrl)
+    .then(response => {
+      console.log('DB Service response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`DB Service responded with status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('DB Service response data:', JSON.stringify(data, null, 2));
+      res.json(data);
+    })
+    .catch(error => {
+      console.error('Database Service Error:', error);
+      res.status(503).json({ error: 'Database Service unavailable', details: error.message });
+    });
+});
+
+app.post('/api/services/db/*', (req, res) => {
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const path = req.originalUrl.replace('/api/services/db', '/api');
+  const targetUrl = `${dbServiceUrl}${path}`;
+  
+  console.log('Proxying DB request to:', targetUrl);
+  console.log('DB Service URL:', dbServiceUrl);
+  console.log('Request path:', req.originalUrl);
+  
+  fetch(targetUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(req.body)
+  })
     .then(response => {
       console.log('DB Service response status:', response.status);
       if (!response.ok) {
