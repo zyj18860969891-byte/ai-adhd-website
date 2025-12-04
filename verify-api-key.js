@@ -11,7 +11,9 @@ const path = require('path');
 console.log('🔑 API Key 配置验证');
 console.log('===================');
 
-const expectedApiKey = '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';
+// Note: This script is for verification purposes only
+// API keys should be set in environment variables, not hardcoded
+const expectedApiKey = 'YOUR_API_KEY_HERE';
 
 // 验证结果
 const results = {

@@ -70,7 +70,7 @@ git push origin main
 
 ### Railway环境变量
 - [ ] `NODE_ENV=production`
-- [ ] `OPENROUTER_API_KEY=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`
+- [ ] `OPENROUTER_API_KEY=your_openrouter_api_key_here`
 - [ ] `OPENROUTER_MODEL=qwen/qwen3-235b-a22b-2507`
 - [ ] `JWT_SECRET=your_strong_jwt_secret_here_change_this`
 - [ ] `DB_PATH=./data/tasks.db`
