@@ -115,6 +115,17 @@ app.post('/api/classify-task', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Classification Error:', error);
+    console.error('Error message:', error.message);
+    
+    // If the error is specifically about AI service being unavailable, return 503
+    if (error.message.includes('AI Service temporarily unavailable')) {
+      res.status(503).json({ 
+        error: 'AI Service temporarily unavailable', 
+        details: 'Please try again later'
+      });
+      return;
+    }
+    
     res.status(500).json({ error: 'Failed to classify task' });
   }
 });
@@ -126,10 +137,22 @@ app.post('/api/suggest-priority', async (req, res) => {
       return res.status(400).json({ error: 'Task is required' });
     }
     console.log('Suggest priority request:', { task: task.substring(0, 50), context });
+    console.log('Full request body:', JSON.stringify(req.body, null, 2));
     const result = await suggestPriority(task, context);
     res.json(result);
   } catch (error) {
     console.error('Priority Suggestion Error:', error);
+    console.error('Error message:', error.message);
+    
+    // If the error is specifically about AI service being unavailable, return 503
+    if (error.message.includes('AI Service temporarily unavailable')) {
+      res.status(503).json({ 
+        error: 'AI Service temporarily unavailable', 
+        details: 'Please try again later'
+      });
+      return;
+    }
+    
     res.status(500).json({ error: 'Failed to suggest priority' });
   }
 });
@@ -141,10 +164,22 @@ app.post('/api/extract-tasks', async (req, res) => {
       return res.status(400).json({ error: 'Text is required' });
     }
     console.log('Extract tasks request:', { text: text.substring(0, 50) });
+    console.log('Full request body:', JSON.stringify(req.body, null, 2));
     const result = await extractTasks(text);
     res.json(result);
   } catch (error) {
     console.error('Task Extraction Error:', error);
+    console.error('Error message:', error.message);
+    
+    // If the error is specifically about AI service being unavailable, return 503
+    if (error.message.includes('AI Service temporarily unavailable')) {
+      res.status(503).json({ 
+        error: 'AI Service temporarily unavailable', 
+        details: 'Please try again later'
+      });
+      return;
+    }
+    
     res.status(500).json({ error: 'Failed to extract tasks' });
   }
 });
@@ -156,10 +191,22 @@ app.post('/api/improve-task', async (req, res) => {
       return res.status(400).json({ error: 'Task is required' });
     }
     console.log('Improve task request:', { task: task.substring(0, 50), context });
+    console.log('Full request body:', JSON.stringify(req.body, null, 2));
     const result = await improveTask(task, context);
     res.json(result);
   } catch (error) {
     console.error('Task Improvement Error:', error);
+    console.error('Error message:', error.message);
+    
+    // If the error is specifically about AI service being unavailable, return 503
+    if (error.message.includes('AI Service temporarily unavailable')) {
+      res.status(503).json({ 
+        error: 'AI Service temporarily unavailable', 
+        details: 'Please try again later'
+      });
+      return;
+    }
+    
     res.status(500).json({ error: 'Failed to improve task' });
   }
 });
@@ -171,10 +218,22 @@ app.post('/api/estimate-time', async (req, res) => {
       return res.status(400).json({ error: 'Task is required' });
     }
     console.log('Estimate time request:', { task: task.substring(0, 50), context });
+    console.log('Full request body:', JSON.stringify(req.body, null, 2));
     const result = await estimateTime(task, context);
     res.json(result);
   } catch (error) {
     console.error('Time Estimation Error:', error);
+    console.error('Error message:', error.message);
+    
+    // If the error is specifically about AI service being unavailable, return 503
+    if (error.message.includes('AI Service temporarily unavailable')) {
+      res.status(503).json({ 
+        error: 'AI Service temporarily unavailable', 
+        details: 'Please try again later'
+      });
+      return;
+    }
+    
     res.status(500).json({ error: 'Failed to estimate time' });
   }
 });
@@ -261,19 +320,9 @@ Please return JSON format:
       console.error('Response data:', error.response.data);
       console.error('Response headers:', error.response.headers);
       
-      // If the error is 503 (Service Unavailable), return a 503 response
+      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
-        res.status(503).json({ 
-          error: 'AI Service temporarily unavailable', 
-          details: 'Please try again later',
-          fallback: {
-            category: '个人',
-            confidence: 0.5,
-            reasoning: 'AI服务暂时不可用，使用默认分类',
-            suggestedTags: ['默认']
-          }
-        });
-        return;
+        throw new Error('AI Service temporarily unavailable (503)');
       }
     }
 
@@ -300,7 +349,17 @@ app.post('/api/suggest-priority', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Priority Suggestion Error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('Error message:', error.message);
+    
+    // If the error is specifically about AI service being unavailable, return 503
+    if (error.message.includes('AI Service temporarily unavailable')) {
+      res.status(503).json({ 
+        error: 'AI Service temporarily unavailable', 
+        details: 'Please try again later'
+      });
+      return;
+    }
+    
     res.status(500).json({ error: 'Failed to suggest priority' });
   }
 });
@@ -366,18 +425,9 @@ Please return JSON format:
       console.error('Response data:', error.response.data);
       console.error('Response headers:', error.response.headers);
       
-      // If the error is 503 (Service Unavailable), return a 503 response
+      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
-        res.status(503).json({ 
-          error: 'AI Service temporarily unavailable', 
-          details: 'Please try again later',
-          fallback: {
-            priority: '中优先级',
-            confidence: 0.5,
-            reasoning: 'AI服务暂时不可用，使用默认优先级'
-          }
-        });
-        return;
+        throw new Error('AI Service temporarily unavailable (503)');
       }
     }
 
@@ -403,7 +453,17 @@ app.post('/api/extract-tasks', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Task Extraction Error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('Error message:', error.message);
+    
+    // If the error is specifically about AI service being unavailable, return 503
+    if (error.message.includes('AI Service temporarily unavailable')) {
+      res.status(503).json({ 
+        error: 'AI Service temporarily unavailable', 
+        details: 'Please try again later'
+      });
+      return;
+    }
+    
     res.status(500).json({ error: 'Failed to extract tasks' });
   }
 });
@@ -472,22 +532,9 @@ async function extractTasks(text) {
       console.error('Response data:', error.response.data);
       console.error('Response headers:', error.response.headers);
       
-      // If the error is 503 (Service Unavailable), return a 503 response
+      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
-        res.status(503).json({ 
-          error: 'AI Service temporarily unavailable', 
-          details: 'Please try again later',
-          fallback: {
-            tasks: [
-              {
-                task: text,
-                category: '个人',
-                priority: '中优先级'
-              }
-            ]
-          }
-        });
-        return;
+        throw new Error('AI Service temporarily unavailable (503)');
       }
     }
 
@@ -517,7 +564,17 @@ app.post('/api/improve-task', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Task Improvement Error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('Error message:', error.message);
+    
+    // If the error is specifically about AI service being unavailable, return 503
+    if (error.message.includes('AI Service temporarily unavailable')) {
+      res.status(503).json({ 
+        error: 'AI Service temporarily unavailable', 
+        details: 'Please try again later'
+      });
+      return;
+    }
+    
     res.status(500).json({ error: 'Failed to improve task' });
   }
 });
@@ -582,18 +639,9 @@ Please return JSON format:
       console.error('Response data:', error.response.data);
       console.error('Response headers:', error.response.headers);
       
-      // If the error is 503 (Service Unavailable), return a 503 response
+      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
-        res.status(503).json({ 
-          error: 'AI Service temporarily unavailable', 
-          details: 'Please try again later',
-          fallback: {
-            improvedTask: task,
-            suggestions: ['任务描述已经很清晰'],
-            reasoning: 'AI服务暂时不可用，使用原始任务'
-          }
-        });
-        return;
+        throw new Error('AI Service temporarily unavailable (503)');
       }
     }
 
@@ -619,7 +667,17 @@ app.post('/api/estimate-time', async (req, res) => {
     res.json(result);
   } catch (error) {
     console.error('Time Estimation Error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('Error message:', error.message);
+    
+    // If the error is specifically about AI service being unavailable, return 503
+    if (error.message.includes('AI Service temporarily unavailable')) {
+      res.status(503).json({ 
+        error: 'AI Service temporarily unavailable', 
+        details: 'Please try again later'
+      });
+      return;
+    }
+    
     res.status(500).json({ error: 'Failed to estimate time' });
   }
 });
@@ -686,19 +744,9 @@ Please return JSON format:
       console.error('Response data:', error.response.data);
       console.error('Response headers:', error.response.headers);
       
-      // If the error is 503 (Service Unavailable), return a 503 response
+      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
-        res.status(503).json({ 
-          error: 'AI Service temporarily unavailable', 
-          details: 'Please try again later',
-          fallback: {
-            estimatedTime: '1小时',
-            confidence: 0.5,
-            reasoning: 'AI服务暂时不可用，使用默认估计',
-            suggestions: ['建议设置合理的时间限制']
-          }
-        });
-        return;
+        throw new Error('AI Service temporarily unavailable (503)');
       }
     }
 
