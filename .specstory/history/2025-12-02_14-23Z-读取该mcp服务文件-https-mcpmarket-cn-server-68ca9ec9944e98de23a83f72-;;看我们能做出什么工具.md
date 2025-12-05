@@ -75947,7 +75947,7 @@ git push origin main
 
 ---
 
-_**User (2025-12-05 07:31Z)**_
+_**User (2025-12-05 07:32Z)**_
 
 新的测试后返回：“2025-12-05T07:25:41.000000000Z [inf]  Starting Container
 2025-12-05T07:25:43.419954196Z [inf]  [0] 
@@ -76040,7 +76040,494 @@ _**User (2025-12-05 07:31Z)**_
 
 _**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
 
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • 正在读取 [](file:///e%3A/MultiModel/ai-adhd-website/server/index.js#1-1)，行 1 到 30</summary>
 
+
+读取 [](file:///e%3A/MultiModel/ai-adhd-website/server/index.js#1-1)，行 1 到 30
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\nconst express = require('express');\r\nconst cors = require('cors');\r\nconst helmet = require('helmet');\r\nconst compression = require('compression');\r\nconst rateLimit = require('express-rate-limit');\r\nconst path = require('path');\r\nconst fs = require('fs');\r\nconst cron = require('node-cron');\r\nconst WebSocket = require('ws');\r\n\r\nconst app = express();\r\nconst PORT = process.env.PORT || 3000;\r\n\r\n// Load environment variables\r\nconst dotenv = require('dotenv');\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "const express = require('express');\r\nconst cors = require('cors');\r\nconst helmet = require('helmet');\r\nconst compression = require('compression');\r\nconst rateLimit = require('express-rate-limit');\r\nconst path = require('path');\r\nconst fs = require('fs');\r\nconst cron = require('node-cron');\r\nconst WebSocket = require('ws');\r\n\r\nconst app = express();\r\nconst PORT = process.env.PORT || 3000;\r\n\r\n// Load environment variables\r\nconst dotenv = require('dotenv');",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+根据新的错误信息，现在主服务启动失败了，出现了 "SyntaxError: Identifier 'fs' has already been declared" 错误。这表明我在修改 `index.js` 文件时引入了重复的 require 语句。
+
+让我来修复这个问题：
+
+ 我看到问题了。在文件的开头已经声明了 `const fs = require('fs');`，然后在加载环境变量的部分又重复声明了 `const fs = require('fs');`。让我修复这个问题：
+
+ 现在我已经修复了重复声明 `fs` 模块的问题。这个错误导致主服务无法启动，从而造成所有微服务之间的通信失败。
+
+让我总结一下问题和解决方案：
+
+### 问题分析
+
+1. **初始问题**：环境变量加载不正确导致服务间通信失败
+2. **新问题**：在修改过程中引入了重复的 `fs` 模块声明，导致主服务启动失败，出现 `SyntaxError: Identifier 'fs' has already been declared` 错误
+
+### 已完成的修复
+
+1. **修复了重复的模块声明**：删除了在加载环境变量部分重复声明的 `fs` 模块
+2. **修正了微服务 URL 配置**：将服务 URL 从 `localhost` 改为服务名称，适用于 Railway 环境
+
+### 后续操作
+
+现在您需要：
+1. 将这些更改推送到 Git 仓库
+2. 在 Railway 中重新部署应用
+
+请执行以下命令：
+```bash
+cd E:\MultiModel\ai-adhd-website
+git add .
+git commit -m "Fix duplicate fs module declaration and microservice URLs"
+git push origin main
+```
+
+然后在 Railway 控制台中重新部署应用。
+
+这些修改应该能解决所有服务间的通信问题，包括数据库、AI 服务、通知服务和主服务之间的连接。
+
+---
+
+_**User (2025-12-05 07:39Z)**_
+
+新的部署日志返回：“2025-12-05T07:34:40.000000000Z [inf]  Starting Container
+2025-12-05T07:34:42.202340598Z [inf]  [0]   PORT: 8080
+2025-12-05T07:34:42.202355707Z [inf]  [0]   RAILWAY_SERVICE_NAME: ai-adhd-website
+2025-12-05T07:34:42.202355720Z [inf]  [0]     at Object.openSync (node:fs:596:3)
+2025-12-05T07:34:42.202364207Z [inf]  [0]   RAILWAY_SERVICE_ID: b2987573-fbaa-4918-86ff-9c57ff357c3b
+2025-12-05T07:34:42.202388905Z [inf]  [0]     at Module._load (node:internal/modules/cjs/loader:1019:12)
+2025-12-05T07:34:42.202396092Z [inf]  [0] Failed to load task progress: Error: ENOENT: no such file or directory, open '/app/task-progress.json'
+2025-12-05T07:34:42.202397263Z [inf]  [0]   RAILWAY_SERVICE_AI_ADHD_WEBSITE_URL: ai-adhd-website-production.up.railway.app
+2025-12-05T07:34:42.202400809Z [inf]  [0]     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+2025-12-05T07:34:42.202407914Z [inf]  [0]     at node:internal/main/run_main_module:28:49 {
+2025-12-05T07:34:42.202408630Z [inf]  [0]   NOTIFICATION_SERVICE_URL: Not set
+2025-12-05T07:34:42.202408714Z [inf]  [0]   CLIENT_PORT: 5173
+2025-12-05T07:34:42.202417064Z [inf]  [0]     at Object.readFileSync (node:fs:464:35)
+2025-12-05T07:34:42.202418621Z [inf]  [0]   NODE_ENV: production
+2025-12-05T07:34:42.202421907Z [inf]  [0] All environment variables:
+2025-12-05T07:34:42.202427010Z [inf]  [0]     at loadTaskProgress (/app/server/index.js:77:21)
+2025-12-05T07:34:42.202428055Z [inf]  [0]     at Object.<anonymous> (/app/server/index.js:73:20)
+2025-12-05T07:34:42.202436381Z [inf]  [0]     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+2025-12-05T07:34:42.202445404Z [inf]  [0]     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+2025-12-05T07:34:42.202445527Z [inf]  [0] WebSocket disabled in production
+2025-12-05T07:34:42.202451577Z [inf]  [0]     at Module.load (node:internal/modules/cjs/loader:1203:32)
+2025-12-05T07:34:42.202454660Z [inf]  [2] Database initialized successfully
+2025-12-05T07:34:42.202459974Z [inf]  [1] API Key configured: OPENROUTER_API_KEY
+2025-12-05T07:34:42.202462159Z [inf]  [0] Server running on port 8080
+2025-12-05T07:34:42.202472369Z [inf]  [0]   code: 'ENOENT',
+2025-12-05T07:34:42.202472592Z [inf]  [0] NODE_ENV: production
+2025-12-05T07:34:42.202474990Z [inf]  [1]   OPENROUTER_API_KEY: 'Set',
+2025-12-05T07:34:42.202480541Z [inf]  [0] Environment variables:
+2025-12-05T07:34:42.202485390Z [inf]  [0]   path: '/app/task-progress.json'
+2025-12-05T07:34:42.202485542Z [inf]  [0] WebSocket enabled: false
+2025-12-05T07:34:42.202486757Z [inf]  [1] NODE_ENV is: production
+2025-12-05T07:34:42.202492960Z [inf]  [1]   OPENAI_API_KEY: 'Set'
+2025-12-05T07:34:42.202495064Z [inf]  [0]   AI_SERVICE_URL: Not set
+2025-12-05T07:34:42.202495324Z [inf]  [0]   errno: -2,
+2025-12-05T07:34:42.202499473Z [inf]  [0] }
+2025-12-05T07:34:42.202501163Z [inf]  [1] Model: qwen/qwen3-235b-a22b-2507
+2025-12-05T07:34:42.202501675Z [inf]  [1] API Key length: 73
+2025-12-05T07:34:42.202507538Z [inf]  [0]   syscall: 'open',
+2025-12-05T07:34:42.202508413Z [inf]  [0]   DB_SERVICE_URL: Not set
+2025-12-05T07:34:42.202510087Z [inf]  [1] }
+2025-12-05T07:34:42.202513259Z [inf]  [1] API Key: Set
+2025-12-05T07:34:42.202517221Z [inf]  [1] Environment variables loaded successfully
+2025-12-05T07:34:42.202519392Z [inf]  [0]   NOTIFICATION_SERVICE_URL: Not set
+2025-12-05T07:34:42.202522964Z [inf]  [1] Environment variables: {
+2025-12-05T07:34:42.202526811Z [inf]  [1] API key validation passed
+2025-12-05T07:34:42.202531338Z [inf]  [1]   NODE_ENV: 'production',
+2025-12-05T07:34:42.202534486Z [inf]  [1] All API endpoints registered successfully
+2025-12-05T07:34:42.202541262Z [inf]  [1]   OPENROUTER_MODEL: 'qwen/qwen3-235b-a22b-2507',
+2025-12-05T07:34:42.202542033Z [inf]  [1] AI Service running on port 8190
+2025-12-05T07:34:42.202584438Z [inf]  
+2025-12-05T07:34:42.202589623Z [inf]  > adhd-task-manager-pwa@1.0.0 start
+2025-12-05T07:34:42.202593438Z [inf]  > concurrently "cross-env PORT=8080 node server/index.js" "cross-env PORT=8190 node services/ai-service/index.js" "cross-env PORT=8280 node services/db-service/index.js" "cross-env PORT=8380 node services/notification-service/index.js"
+2025-12-05T07:34:42.202597601Z [inf]  
+2025-12-05T07:34:42.202601945Z [inf]  [2] Database Service running on port 8280
+2025-12-05T07:34:42.202607056Z [inf]  [2] Database initialized successfully
+2025-12-05T07:34:42.202611409Z [inf]  [2] Available endpoints:
+2025-12-05T07:34:42.202615612Z [inf]  [2]   GET  /api/services/db/tasks
+2025-12-05T07:34:42.202622338Z [inf]  [2]   GET  /api/services/db/tasks/:id
+2025-12-05T07:34:42.202628892Z [inf]  [2]   POST /api/services/db/tasks
+2025-12-05T07:34:42.202635295Z [inf]  [2]   PUT  /api/services/db/tasks/:id
+2025-12-05T07:34:42.202640586Z [inf]  [2]   DELETE /api/services/db/tasks/:id
+2025-12-05T07:34:42.202645568Z [inf]  [2]   GET  /api/services/db/tasks/:id/history
+2025-12-05T07:34:42.202650796Z [inf]  [2]   GET  /api/services/db/stats
+2025-12-05T07:34:42.202655831Z [inf]  [2]   GET  /api/services/db/health
+2025-12-05T07:34:42.202660697Z [inf]  [2]   POST /api/services/db/backup
+2025-12-05T07:34:42.202665708Z [inf]  [2] Connected to SQLite database
+2025-12-05T07:34:42.202670238Z [inf]  [3] Notification Service running on port 8380
+2025-12-05T07:34:42.202675936Z [inf]  [0] No .env file found, using environment variables from process.env
+2025-12-05T07:34:42.202680250Z [inf]  [0] Environment variables loaded:
+2025-12-05T07:34:42.202684955Z [inf]  [0]   AI_SERVICE_URL: Not set
+2025-12-05T07:34:42.202693148Z [inf]  [0]   DB_SERVICE_URL: Not set
+2025-12-05T07:34:42.204673510Z [inf]  [1] Service initialized successfully
+2025-12-05T07:34:42.204684389Z [inf]  [1] Available endpoints:
+2025-12-05T07:34:42.204692304Z [inf]  [1]   POST /api/classify-task
+2025-12-05T07:34:42.204698740Z [inf]  [1]   POST /api/suggest-priority
+2025-12-05T07:34:42.204706367Z [inf]  [1]   POST /api/extract-tasks
+2025-12-05T07:34:42.204713068Z [inf]  [1]   POST /api/improve-task
+2025-12-05T07:34:42.204719186Z [inf]  [1]   POST /api/estimate-time
+2025-12-05T07:34:42.204732320Z [inf]  [1]   GET  /api/health
+2025-12-05T07:34:42.204740579Z [inf]  [1]   GET  /health (legacy)
+2025-12-05T07:34:42.204747116Z [inf]  [1] Running in production mode
+2025-12-05T07:34:42.204755923Z [inf]  [1] All environment variables:
+2025-12-05T07:34:42.204766022Z [inf]  [1]   OPENROUTER_API_KEY: Set
+2025-12-05T07:34:42.204771909Z [inf]  [1]   OPENAI_API_KEY: Set
+2025-12-05T07:34:42.204777595Z [inf]  [1]   OPENROUTER_MODEL: Set
+2025-12-05T07:34:42.204781882Z [inf]  [1]   OPENAI_MODEL: Set
+2025-12-05T07:34:42.204786396Z [inf]  [1]   NODE_ENV: Set
+2025-12-05T07:35:02.344619141Z [inf]  [0]     hostname: 'db-service'
+2025-12-05T07:35:02.344626993Z [inf]  [0]   }
+2025-12-05T07:35:02.344635117Z [inf]  [0] }
+2025-12-05T07:35:02.344642484Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-05T07:35:02.344649360Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:35:02.344652873Z [inf]  [0] Proxying DB request to: http://db-service:8280/api/health
+2025-12-05T07:35:02.344658390Z [inf]  [0] DB Service URL: http://db-service:8280
+2025-12-05T07:35:02.344659928Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:35:02.344663061Z [inf]  [0] Request path: /api/services/db/health
+2025-12-05T07:35:02.344668316Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND ai-service
+2025-12-05T07:35:02.344668642Z [inf]  [0] Proxying AI request to: http://ai-service:8190/health
+2025-12-05T07:35:02.344673354Z [inf]  [0] AI Service URL: http://ai-service:8190
+2025-12-05T07:35:02.344678639Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-05T07:35:02.344680105Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:35:02.344684023Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/notifications/user-1
+2025-12-05T07:35:02.344689214Z [inf]  [0]     errno: -3008,
+2025-12-05T07:35:02.344691547Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:35:02.344697150Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-05T07:35:02.344697545Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:35:02.344703280Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/health
+2025-12-05T07:35:02.344706501Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:35:02.344709821Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:35:02.344713871Z [inf]  [0]     hostname: 'ai-service'
+2025-12-05T07:35:02.344717277Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-05T07:35:02.344722170Z [inf]  [0]   }
+2025-12-05T07:35:02.344724270Z [inf]  [0] Database Service Error: TypeError: fetch failed
+2025-12-05T07:35:02.344730834Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:35:02.344731029Z [inf]  [0] }
+2025-12-05T07:35:02.344737525Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:35:02.344740450Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:35:02.344742943Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND db-service
+2025-12-05T07:35:02.344748352Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:35:02.344749476Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:35:02.344755181Z [inf]  [0]     errno: -3008,
+2025-12-05T07:35:02.344757857Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:35:02.344761437Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:35:02.344766741Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:35:02.344767680Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:35:02.344774766Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:35:02.344782652Z [inf]  [0]     errno: -3008,
+2025-12-05T07:35:02.344789859Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:35:02.344797390Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:35:02.344804538Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:35:02.344811293Z [inf]  [0]   }
+2025-12-05T07:35:02.344823278Z [inf]  [0] }
+2025-12-05T07:35:02.345091206Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:35:02.345097495Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:35:02.345103521Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:35:02.345109192Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:35:02.345114657Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:35:02.345121104Z [inf]  [0]     errno: -3008,
+2025-12-05T07:35:02.345219907Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:35:02.345226539Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:35:02.345232500Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:35:02.345238324Z [inf]  [0]   }
+2025-12-05T07:35:02.345244964Z [inf]  [0] }
+2025-12-05T07:36:02.589008174Z [inf]  [0] Proxying DB request to: http://db-service:8280/api/health
+2025-12-05T07:36:02.589016809Z [inf]  [0] DB Service URL: http://db-service:8280
+2025-12-05T07:36:02.589027990Z [inf]  [0] Request path: /api/services/db/health
+2025-12-05T07:36:02.589034401Z [inf]  [0] }
+2025-12-05T07:36:02.589041884Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/health
+2025-12-05T07:36:02.589056681Z [inf]  [0]   }
+2025-12-05T07:36:02.589068026Z [inf]  [0] }
+2025-12-05T07:36:02.589074681Z [inf]  [0] Database Service Error: TypeError: fetch failed
+2025-12-05T07:36:02.589080770Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:02.589086980Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:02.589096122Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND db-service
+2025-12-05T07:36:02.589105051Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:02.589108311Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:36:02.589116648Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-05T07:36:02.589120034Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:02.589123969Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/notifications/user-1
+2025-12-05T07:36:02.589129319Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:02.589134222Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:36:02.589138046Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:02.589139818Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-05T07:36:02.589150762Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-05T07:36:02.589157849Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:02.589159117Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:02.589164714Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:02.589166770Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:02.589171400Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND ai-service
+2025-12-05T07:36:02.589174338Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:02.589179252Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:02.589182236Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:02.589184788Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:02.589188362Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:36:02.589191512Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:02.589194471Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:36:02.589200395Z [inf]  [0]   }
+2025-12-05T07:36:02.589201506Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:02.589204526Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:02.589209521Z [inf]  [0]     hostname: 'ai-service'
+2025-12-05T07:36:02.589220367Z [inf]  [0]     hostname: 'db-service'
+2025-12-05T07:36:02.589225617Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:36:02.589227734Z [inf]  [0]   }
+2025-12-05T07:36:02.589234691Z [inf]  [0] }
+2025-12-05T07:36:02.589234712Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:02.589389514Z [inf]  [0] Proxying AI request to: http://ai-service:8190/health
+2025-12-05T07:36:02.589395069Z [inf]  [0] AI Service URL: http://ai-service:8190
+2025-12-05T07:36:02.589400515Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-05T07:36:02.591772983Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:36:02.591786597Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:02.591795421Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:02.591803710Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:36:02.591811577Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:02.591821409Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:02.591831460Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:02.591839608Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:02.591847962Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:36:02.591903969Z [inf]  [0]   }
+2025-12-05T07:36:02.591913477Z [inf]  [0] }
+2025-12-05T07:36:22.573796519Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.573798848Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.573804979Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.573825666Z [inf]  [0]     hostname: 'ai-service'
+2025-12-05T07:36:22.573828195Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.573837244Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND ai-service
+2025-12-05T07:36:22.573843141Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.573845516Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-05T07:36:22.573853006Z [inf]  [0] Proxying DB request to: http://db-service:8280/api/health
+2025-12-05T07:36:22.573854061Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.573861880Z [inf]  [0] DB Service URL: http://db-service:8280
+2025-12-05T07:36:22.573868453Z [inf]  [0] Request path: /api/services/db/health
+2025-12-05T07:36:22.573875708Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/health
+2025-12-05T07:36:22.573883491Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:36:22.573890850Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-05T07:36:22.573897663Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/notifications/user-1
+2025-12-05T07:36:22.573904122Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:36:22.573910802Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-05T07:36:22.573916706Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.573925952Z [inf]  [0] Proxying AI request to: http://ai-service:8190/health
+2025-12-05T07:36:22.573933274Z [inf]  [0] AI Service URL: http://ai-service:8190
+2025-12-05T07:36:22.577577644Z [inf]  [0]   }
+2025-12-05T07:36:22.577580479Z [inf]  [0]   }
+2025-12-05T07:36:22.577590791Z [inf]  [0] }
+2025-12-05T07:36:22.577591665Z [inf]  [0] }
+2025-12-05T07:36:22.577592750Z [inf]  [0] }
+2025-12-05T07:36:22.577596269Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.577601032Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.577604817Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.577606665Z [inf]  [0] Database Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.577606725Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.577606857Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:36:22.577611902Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.577613757Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.577617531Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.577617667Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.577618591Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.577627998Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.577628716Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.577630022Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.577635676Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND db-service
+2025-12-05T07:36:22.577639695Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.577641348Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.577642315Z [inf]  [0]     hostname: 'db-service'
+2025-12-05T07:36:22.577648896Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:36:22.577651213Z [inf]  [0]   }
+2025-12-05T07:36:22.578949955Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.578956394Z [inf]  [0] }
+2025-12-05T07:36:22.578956414Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.578962461Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:36:22.578969672Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/notifications/user-1
+2025-12-05T07:36:22.578969728Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.578976492Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.578978812Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:36:22.578982340Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.578986346Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-05T07:36:22.578989477Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.578994114Z [inf]  [0] Proxying AI request to: http://ai-service:8190/health
+2025-12-05T07:36:22.578996477Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:36:22.579002703Z [inf]  [0] AI Service URL: http://ai-service:8190
+2025-12-05T07:36:22.579003873Z [inf]  [0]   }
+2025-12-05T07:36:22.579010695Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-05T07:36:22.579018247Z [inf]  [0] Proxying DB request to: http://db-service:8280/api/health
+2025-12-05T07:36:22.579019395Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-05T07:36:22.579028081Z [inf]  [0] DB Service URL: http://db-service:8280
+2025-12-05T07:36:22.579035108Z [inf]  [0] Request path: /api/services/db/health
+2025-12-05T07:36:22.579041080Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/health
+2025-12-05T07:36:22.579047189Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:36:22.582022051Z [inf]  [0]   }
+2025-12-05T07:36:22.582024364Z [inf]  [0]     hostname: 'ai-service'
+2025-12-05T07:36:22.582035131Z [inf]  [0] }
+2025-12-05T07:36:22.582036164Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.582036802Z [inf]  [0]   }
+2025-12-05T07:36:22.582045789Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.582046083Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.582046933Z [inf]  [0] }
+2025-12-05T07:36:22.582055276Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.582056372Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.582056408Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.582064449Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:36:22.582064933Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.582066737Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.582074101Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.582074950Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND ai-service
+2025-12-05T07:36:22.582082811Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.582083240Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.582091653Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.582092129Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.582099710Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.582100308Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.582109398Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.582111151Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:36:22.584564443Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.584573040Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:36:22.584580255Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.584581928Z [inf]  [0] Database Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.584587972Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.584588624Z [inf]  [0] AI Service URL: http://ai-service:8190
+2025-12-05T07:36:22.584593900Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.584596341Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.584603063Z [inf]  [0] Request path: /api/services/ai/health
+2025-12-05T07:36:22.584603672Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.584605924Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.584612735Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND db-service
+2025-12-05T07:36:22.584614010Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:36:22.584615230Z [inf]  [0] Proxying DB request to: http://db-service:8280/api/health
+2025-12-05T07:36:22.584621689Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.584622122Z [inf]  [0]   }
+2025-12-05T07:36:22.584629635Z [inf]  [0] }
+2025-12-05T07:36:22.584630223Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.584638454Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.584645133Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.584652153Z [inf]  [0]     hostname: 'db-service'
+2025-12-05T07:36:22.584658495Z [inf]  [0]   }
+2025-12-05T07:36:22.584665158Z [inf]  [0] }
+2025-12-05T07:36:22.584672876Z [inf]  [0] Proxying AI request to: http://ai-service:8190/health
+2025-12-05T07:36:22.586522796Z [inf]  [0] DB Service URL: http://db-service:8280
+2025-12-05T07:36:22.586530671Z [inf]  [0] Request path: /api/services/db/health
+2025-12-05T07:36:22.586538313Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/health
+2025-12-05T07:36:22.586538944Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND ai-service
+2025-12-05T07:36:22.586544854Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:36:22.586550943Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.586552106Z [inf]  [0] Request path: /api/services/notification/health
+2025-12-05T07:36:22.586560222Z [inf]  [0] Proxying Notification request to: http://notification-service:8380/api/notifications/user-1
+2025-12-05T07:36:22.586562278Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.586569073Z [inf]  [0] Notification Service URL: http://notification-service:8380
+2025-12-05T07:36:22.586571544Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.586576663Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-05T07:36:22.586579507Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.586584339Z [inf]  [0] AI Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.586587669Z [inf]  [0]     hostname: 'ai-service'
+2025-12-05T07:36:22.586592562Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.586595733Z [inf]  [0]   }
+2025-12-05T07:36:22.586601692Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.586605572Z [inf]  [0] }
+2025-12-05T07:36:22.586611878Z [inf]  [0] Database Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.586620063Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.589077832Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.589083995Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.589088004Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND db-service
+2025-12-05T07:36:22.589094647Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.589095303Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.589096740Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.589103741Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.589105127Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:36:22.589105271Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:36:22.589105577Z [inf]  [0]     at node:internal/deps/undici/undici:12637:11
+2025-12-05T07:36:22.589110954Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.589114576Z [inf]  [0]     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-12-05T07:36:22.589116393Z [inf]  [0]   }
+2025-12-05T07:36:22.589118298Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.589124034Z [inf]  [0]   cause: Error: getaddrinfo ENOTFOUND notification-service
+2025-12-05T07:36:22.589124920Z [inf]  [0]     hostname: 'db-service'
+2025-12-05T07:36:22.589126105Z [inf]  [0] }
+2025-12-05T07:36:22.589130848Z [inf]  [0]   }
+2025-12-05T07:36:22.589132961Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.589135157Z [inf]  [0] Notification Service Error: TypeError: fetch failed
+2025-12-05T07:36:22.589140838Z [inf]  [0] }
+2025-12-05T07:36:22.589142583Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.589149284Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.589155340Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.591232927Z [inf]  [0]       at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:107:26) {
+2025-12-05T07:36:22.591239423Z [inf]  [0]     errno: -3008,
+2025-12-05T07:36:22.591245801Z [inf]  [0]     code: 'ENOTFOUND',
+2025-12-05T07:36:22.591252674Z [inf]  [0]     syscall: 'getaddrinfo',
+2025-12-05T07:36:22.591258505Z [inf]  [0]     hostname: 'notification-service'
+2025-12-05T07:36:22.591264545Z [inf]  [0]   }
+2025-12-05T07:36:22.591270577Z [inf]  [0] }”；；；页面我看只有主服务器成功了，，其他服务仍没启动成功 
+
+---
+
+_**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
+
+
+
+---
+
+_**User (2025-12-05 07:42Z)**_
+
+@agent 重试
+
+---
+
+_**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
+
+
+
+---
+
+_**User (2025-12-05 07:42Z)**_
+
+@agent 重试
+
+---
+
+_**Agent (model openrouter/kwaipilot/kat-coder-pro:free)**_
+
+根据新的部署日志，我发现了问题所在。虽然主服务启动了，但其他微服务（AI、数据库、通知服务）之间无法互相通信，因为它们使用的是服务名称（如 `ai-service`、`db-service`、`notification-service`），但在 Railway 的多服务部署中，这些服务是独立运行的，需要使用 localhost 或实际的服务端口。
+
+让我修复这个问题：
+
+ 
 
 ---
 
