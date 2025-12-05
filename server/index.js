@@ -13,7 +13,6 @@ const PORT = process.env.PORT || 3000;
 
 // Load environment variables
 const dotenv = require('dotenv');
-const fs = require('fs');
 
 // Try to load .env file if it exists
 if (fs.existsSync('.env')) {
