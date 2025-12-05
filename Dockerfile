@@ -1,7 +1,7 @@
 # Multi-stage build for ADHD Task Manager PWA
 
 # Build stage
-FROM node:20-slim AS builder
+FROM node:20.19.5-alpine3.20 AS builder
 
 WORKDIR /app
 
@@ -28,7 +28,7 @@ COPY . .
 RUN cd client && npm run build
 
 # Production stage
-FROM node:20-slim
+FROM node:20.19.5-alpine3.20
 
 WORKDIR /app
 
