@@ -78190,7 +78190,7 @@ git push origin main
 
 ---
 
-_**User (2025-12-05 08:23Z)**_
+_**User (2025-12-05 08:24Z)**_
 
 同时新的错误返回，关于页面提取任务的：“favicon.svg:1   Failed to load resource: the server responded with a status of 404 ()
 icons/icon-144x144.png:1   Failed to load resource: the server responded with a status of 404 ()
@@ -78330,6 +78330,117 @@ Status: **completed**
 
 ---
 
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\napp.post('/api/extract-tasks', async (req, res) =&gt; {\r\n  try {\r\n    const { text } = req.body;\r\n    if (!text) {\r\n      return res.status(400).json({ error: 'Text is required' });\r\n    }\r\n    console.log('Extract tasks request:', { text: text.substring(0, 50) });\r\n    console.log('Full request body:', JSON.stringify(req.body, null, 2));\r\n    const result = await extractTasks(text);\r\n    res.json(result);\r\n  } catch (error) {\r\n    console.error('Task Extraction Error:', error);\r\n    console.error('Error message:', error.message);\r\n    \r\n    // If the error is specifically about AI service being unavailable, return 503\r\n    if (error.message.includes('AI Service temporarily unavailable')) {\r\n      res.status(503).json({ \r\n        error: 'AI Service temporarily unavailable', \r\n        details: 'Please try again later'\r\n      });\r\n      return;\r\n    }\r\n    \r\n    res.status(500).json({ error: 'Failed to extract tasks' });\r\n  }\r\n});\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "app.post('/api/extract-tasks', async (req, res) =&gt; {\r\n  try {\r\n    const { text } = req.body;\r\n    if (!text) {\r\n      return res.status(400).json({ error: 'Text is required' });\r\n    }\r\n    console.log('Extract tasks request:', { text: text.substring(0, 50) });\r\n    console.log('Full request body:', JSON.stringify(req.body, null, 2));\r\n    const result = await extractTasks(text);\r\n    res.json(result);\r\n  } catch (error) {\r\n    console.error('Task Extraction Error:', error);\r\n    console.error('Error message:', error.message);\r\n    \r\n    // If the error is specifically about AI service being unavailable, return 503\r\n    if (error.message.includes('AI Service temporarily unavailable')) {\r\n      res.status(503).json({ \r\n        error: 'AI Service temporarily unavailable', \r\n        details: 'Please try again later'\r\n      });\r\n      return;\r\n    }\r\n    \r\n    res.status(500).json({ error: 'Failed to extract tasks' });\r\n  }\r\n});",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • 正在读取 [](file:///e%3A/MultiModel/ai-adhd-website/services/ai-service/index.js#200-200)，行 200 到 250</summary>
+
+
+读取 [](file:///e%3A/MultiModel/ai-adhd-website/services/ai-service/index.js#200-200)，行 200 到 250
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\napp.post('/api/improve-task', async (req, res) =&gt; {\r\n  try {\r\n    const { task, context } = req.body;\r\n    if (!task) {\r\n      return res.status(400).json({ error: 'Task is required' });\r\n    }\r\n    console.log('Improve task request:', { task: task.substring(0, 50), context });\r\n    console.log('Full request body:', JSON.stringify(req.body, null, 2));\r\n    const result = await improveTask(task, context);\r\n    res.json(result);\r\n  } catch (error) {\r\n    console.error('Task Improvement Error:', error);\r\n    console.error('Error message:', error.message);\r\n    \r\n    // If the error is specifically about AI service being unavailable, return 503\r\n    if (error.message.includes('AI Service temporarily unavailable')) {\r\n      res.status(503).json({ \r\n        error: 'AI Service temporarily unavailable', \r\n        details: 'Please try again later'\r\n      });\r\n      return;\r\n    }\r\n    \r\n    res.status(500).json({ error: 'Failed to improve task' });\r\n  }\r\n});\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "app.post('/api/improve-task', async (req, res) =&gt; {\r\n  try {\r\n    const { task, context } = req.body;\r\n    if (!task) {\r\n      return res.status(400).json({ error: 'Task is required' });\r\n    }\r\n    console.log('Improve task request:', { task: task.substring(0, 50), context });\r\n    console.log('Full request body:', JSON.stringify(req.body, null, 2));\r\n    const result = await improveTask(task, context);\r\n    res.json(result);\r\n  } catch (error) {\r\n    console.error('Task Improvement Error:', error);\r\n    console.error('Error message:', error.message);\r\n    \r\n    // If the error is specifically about AI service being unavailable, return 503\r\n    if (error.message.includes('AI Service temporarily unavailable')) {\r\n      res.status(503).json({ \r\n        error: 'AI Service temporarily unavailable', \r\n        details: 'Please try again later'\r\n      });\r\n      return;\r\n    }\r\n    \r\n    res.status(500).json({ error: 'Failed to improve task' });\r\n  }\r\n});",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\napp.post('/api/estimate-time', async (req, res) =&gt; {\r\n  try {\r\n    const { task, context } = req.body;\r\n    if (!task) {\r\n      return res.status(400).json({ error: 'Task is required' });\r\n    }\r\n    console.log('Estimate time request:', { task: task.substring(0, 50), context });\r\n    console.log('Full request body:', JSON.stringify(req.body, null, 2));\r\n    const result = await estimateTime(task, context);\r\n    res.json(result);\r\n  } catch (error) {\r\n    console.error('Time Estimation Error:', error);\r\n    console.error('Error message:', error.message);\r\n    \r\n    // If the error is specifically about AI service being unavailable, return 503\r\n    if (error.message.includes('AI Service temporarily unavailable')) {\r\n      res.status(503).json({ \r\n        error: 'AI Service temporarily unavailable', \r\n        details: 'Please try again later'\r\n      });\r\n      return;\r\n    }\r\n    \r\n    res.status(500).json({ error: 'Failed to estimate time' });\r\n  }\r\n});\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "app.post('/api/estimate-time', async (req, res) =&gt; {\r\n  try {\r\n    const { task, context } = req.body;\r\n    if (!task) {\r\n      return res.status(400).json({ error: 'Task is required' });\r\n    }\r\n    console.log('Estimate time request:', { task: task.substring(0, 50), context });\r\n    console.log('Full request body:', JSON.stringify(req.body, null, 2));\r\n    const result = await estimateTime(task, context);\r\n    res.json(result);\r\n  } catch (error) {\r\n    console.error('Time Estimation Error:', error);\r\n    console.error('Error message:', error.message);\r\n    \r\n    // If the error is specifically about AI service being unavailable, return 503\r\n    if (error.message.includes('AI Service temporarily unavailable')) {\r\n      res.status(503).json({ \r\n        error: 'AI Service temporarily unavailable', \r\n        details: 'Please try again later'\r\n      });\r\n      return;\r\n    }\r\n    \r\n    res.status(500).json({ error: 'Failed to estimate time' });\r\n  }\r\n});",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
 根据错误信息，AI 服务仍然返回 503 错误。让我检查一下 AI 服务的部署日志，看看具体的错误原因。
 
  我看到问题了。在错误处理中，当遇到 503 错误时，代码会抛出错误，但这个错误没有被正确捕获。让我检查一下路由处理器是否正确处理了这个错误。
@@ -78340,7 +78451,168 @@ Status: **completed**
 
  我看到问题了。extractTasks 路由处理器也没有正确处理 503 错误。让我修复这个问题：
 
- 
+ 现在让我检查 improveTask 和 estimateTime 路由处理器：
+
+ 我看到 improveTask 和 estimateTime 路由处理器也没有正确处理 503 错误。让我修复这些问题：
+
+ 现在让我修复 estimateTime 路由处理器：
+
+ 现在我已经修复了所有路由处理器的错误处理。让我总结一下所做的修改：
+
+### 修改总结：
+
+1. **修复了所有路由处理器的错误处理**：
+   - `classify-task` 路由处理器：已正确处理 503 错误
+   - `suggest-priority` 路由处理器：添加了 503 错误处理
+   - `extract-tasks` 路由处理器：添加了 503 错误处理
+   - `improve-task` 路由处理器：添加了 503 错误处理
+   - `estimate-time` 路由处理器：添加了 503 错误处理
+
+2. **修复了所有函数的错误处理**：
+   - 所有函数现在都会在遇到 503 错误时抛出错误，而不是尝试返回响应
+   - 路由处理器会捕获这些错误并正确返回 503 状态码
+
+3. **优先使用 OpenAI API**：
+   - 修改了 OpenAI 客户端配置，优先使用 `OPENAI_API_KEY`
+   - 修改了模型选择逻辑，优先使用 `OPENAI_MODEL`
+   - 默认模型从 `qwen/qwen3-235b-a22b-2507` 改为 `gpt-3.5-turbo`
+
+### 关键改进：
+
+- **正确的 503 错误处理**：现在当 OpenAI API 返回 503 错误时，AI 服务会正确返回 503 状态码给前端
+- **优先使用 OpenAI API**：代码现在会优先使用您在 Railway 中设置的 OpenAI API 密钥和模型
+- **更好的错误日志**：日志会显示具体的错误信息，便于调试
+
+现在您需要：
+1. 将这些更改推送到 Git 仓库
+2. 在 Railway 中重新部署应用
+
+请执行以下命令：
+```bash
+cd E:\MultiModel\ai-adhd-website
+git add .
+git commit -m "Fix all route handlers 503 error handling and prioritize OpenAI API"
+git push origin main
+```
+
+然后在 Railway 控制台中重新部署应用。
+
+这些修改应该能解决 503 错误问题，让应用能正确使用 OpenAI API 并在遇到 503 错误时返回适当的响应。
+
+---
+
+_**User (2025-12-05 08:27Z)**_
+
+部署后新的日志返回：“2025-12-05T08:26:28.000000000Z [inf]  Starting Container
+2025-12-05T08:26:29.205590449Z [inf]  
+2025-12-05T08:26:29.205600314Z [inf]  > adhd-task-manager-pwa@1.0.0 start
+2025-12-05T08:26:29.205607507Z [inf]  > concurrently "cross-env PORT=8080 node server/index.js" "cross-env PORT=8190 node services/ai-service/index.js" "cross-env PORT=8280 node services/db-service/index.js" "cross-env PORT=8380 node services/notification-service/index.js"
+2025-12-05T08:26:29.205614119Z [inf]  
+2025-12-05T08:26:29.682075196Z [inf]  [2] Database Service running on port 8280
+2025-12-05T08:26:29.682084635Z [inf]  [2] Database initialized successfully
+2025-12-05T08:26:29.682098391Z [inf]  [2] Available endpoints:
+2025-12-05T08:26:29.682448347Z [inf]  [2]   GET  /api/services/db/tasks
+2025-12-05T08:26:29.682459102Z [inf]  [2]   GET  /api/services/db/tasks/:id
+2025-12-05T08:26:29.682465018Z [inf]  [2]   POST /api/services/db/tasks
+2025-12-05T08:26:29.682470869Z [inf]  [2]   PUT  /api/services/db/tasks/:id
+2025-12-05T08:26:29.682477556Z [inf]  [2]   DELETE /api/services/db/tasks/:id
+2025-12-05T08:26:29.682484298Z [inf]  [2]   GET  /api/services/db/tasks/:id/history
+2025-12-05T08:26:29.682490631Z [inf]  [2]   GET  /api/services/db/stats
+2025-12-05T08:26:29.682496100Z [inf]  [2]   GET  /api/services/db/health
+2025-12-05T08:26:29.682501880Z [inf]  [2]   POST /api/services/db/backup
+2025-12-05T08:26:29.682507495Z [inf]  [2] Connected to SQLite database
+2025-12-05T08:26:29.724429197Z [inf]  [0] No .env file found, using environment variables from process.env
+2025-12-05T08:26:29.724441284Z [inf]  [0] Environment variables loaded:
+2025-12-05T08:26:29.724448581Z [inf]  [0]   AI_SERVICE_URL: Not set
+2025-12-05T08:26:29.724454833Z [inf]  [0]   DB_SERVICE_URL: Not set
+2025-12-05T08:26:29.724460557Z [inf]  [0]   NOTIFICATION_SERVICE_URL: Not set
+2025-12-05T08:26:29.724466602Z [inf]  [0] All environment variables:
+2025-12-05T08:26:29.724472869Z [inf]  [0]   PORT: 8080
+2025-12-05T08:26:29.724478524Z [inf]  [0]   RAILWAY_SERVICE_NAME: ai-adhd-website
+2025-12-05T08:26:29.724485470Z [inf]  [0]   RAILWAY_SERVICE_ID: b2987573-fbaa-4918-86ff-9c57ff357c3b
+2025-12-05T08:26:29.730259353Z [inf]  [0]   RAILWAY_SERVICE_AI_ADHD_WEBSITE_URL: ai-adhd-website-production.up.railway.app
+2025-12-05T08:26:29.730265449Z [inf]  [0]   CLIENT_PORT: 5173
+2025-12-05T08:26:29.730271928Z [inf]  [0]   NODE_ENV: production
+2025-12-05T08:26:29.731722063Z [inf]  [3] Notification Service running on port 8380
+2025-12-05T08:26:29.736228841Z [inf]  [0] Failed to load task progress: Error: ENOENT: no such file or directory, open '/app/task-progress.json'
+2025-12-05T08:26:29.736238828Z [inf]  [0]     at Object.openSync (node:fs:596:3)
+2025-12-05T08:26:29.736246220Z [inf]  [0]     at Object.readFileSync (node:fs:464:35)
+2025-12-05T08:26:29.736252797Z [inf]  [0]     at loadTaskProgress (/app/server/index.js:77:21)
+2025-12-05T08:26:29.736262805Z [inf]  [0]     at Object.<anonymous> (/app/server/index.js:73:20)
+2025-12-05T08:26:29.736269180Z [inf]  [0]     at Module._compile (node:internal/modules/cjs/loader:1364:14)
+2025-12-05T08:26:29.736275187Z [inf]  [0]     at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+2025-12-05T08:26:29.736281911Z [inf]  [0]     at Module.load (node:internal/modules/cjs/loader:1203:32)
+2025-12-05T08:26:29.736288297Z [inf]  [0]     at Module._load (node:internal/modules/cjs/loader:1019:12)
+2025-12-05T08:26:29.736294290Z [inf]  [0]     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+2025-12-05T08:26:29.736300759Z [inf]  [0]     at node:internal/main/run_main_module:28:49 {
+2025-12-05T08:26:29.736308978Z [inf]  [0]   errno: -2,
+2025-12-05T08:26:29.736315425Z [inf]  [0]   syscall: 'open',
+2025-12-05T08:26:29.736321907Z [inf]  [0]   code: 'ENOENT',
+2025-12-05T08:26:29.736327628Z [inf]  [0]   path: '/app/task-progress.json'
+2025-12-05T08:26:29.736333357Z [inf]  [0] }
+2025-12-05T08:26:29.738774037Z [inf]  [0] WebSocket disabled in production
+2025-12-05T08:26:29.738782752Z [inf]  [2] Database initialized successfully
+2025-12-05T08:26:29.744681039Z [inf]  [0] Server running on port 8080
+2025-12-05T08:26:29.744692664Z [inf]  [0] NODE_ENV: production
+2025-12-05T08:26:29.744700280Z [inf]  [0] WebSocket enabled: false
+2025-12-05T08:26:29.744710356Z [inf]  [0] Environment variables:
+2025-12-05T08:26:29.744717621Z [inf]  [0]   AI_SERVICE_URL: Not set
+2025-12-05T08:26:29.744725519Z [inf]  [0]   DB_SERVICE_URL: Not set
+2025-12-05T08:26:29.744731722Z [inf]  [0]   NOTIFICATION_SERVICE_URL: Not set
+2025-12-05T08:26:30.432507143Z [inf]  [1]   POST /api/improve-task
+2025-12-05T08:26:30.432520577Z [inf]  [1]   POST /api/estimate-time
+2025-12-05T08:26:30.432529234Z [inf]  [1]   GET  /api/health
+2025-12-05T08:26:30.432537800Z [inf]  [1]   GET  /health (legacy)
+2025-12-05T08:26:30.432547658Z [inf]  [1] Running in production mode
+2025-12-05T08:26:30.432555273Z [inf]  [1] All environment variables:
+2025-12-05T08:26:30.433372204Z [inf]  [1] API Key configured: OPENAI_API_KEY
+2025-12-05T08:26:30.433377828Z [inf]  [1] API Key length: 164
+2025-12-05T08:26:30.433383959Z [inf]  [1] Environment variables loaded successfully
+2025-12-05T08:26:30.433390004Z [inf]  [1] API key validation passed
+2025-12-05T08:26:30.433396107Z [inf]  [1] All API endpoints registered successfully
+2025-12-05T08:26:30.433405400Z [inf]  [1] AI Service running on port 8190
+2025-12-05T08:26:30.433411702Z [inf]  [1] NODE_ENV is: production
+2025-12-05T08:26:30.433418273Z [inf]  [1] Model: openai/gpt-4o-mini
+2025-12-05T08:26:30.433423897Z [inf]  [1] API Key: Set
+2025-12-05T08:26:30.433429694Z [inf]  [1] Environment variables: {
+2025-12-05T08:26:30.433438931Z [inf]  [1]   NODE_ENV: 'production',
+2025-12-05T08:26:30.433445199Z [inf]  [1]   OPENAI_MODEL: 'openai/gpt-4o-mini',
+2025-12-05T08:26:30.433450922Z [inf]  [1]   OPENROUTER_MODEL: 'qwen/qwen3-235b-a22b-2507',
+2025-12-05T08:26:30.433456598Z [inf]  [1]   OPENAI_API_KEY: 'Set',
+2025-12-05T08:26:30.433462455Z [inf]  [1]   OPENROUTER_API_KEY: 'Set'
+2025-12-05T08:26:30.433468832Z [inf]  [1] }
+2025-12-05T08:26:30.433477464Z [inf]  [1] Service initialized successfully
+2025-12-05T08:26:30.433483691Z [inf]  [1] Available endpoints:
+2025-12-05T08:26:30.433489744Z [inf]  [1]   POST /api/classify-task
+2025-12-05T08:26:30.433500055Z [inf]  [1]   POST /api/suggest-priority
+2025-12-05T08:26:30.433506854Z [inf]  [1]   POST /api/extract-tasks
+2025-12-05T08:26:30.436588483Z [inf]  [1]   OPENROUTER_API_KEY: Set
+2025-12-05T08:26:30.436594255Z [inf]  [1]   OPENAI_API_KEY: Set
+2025-12-05T08:26:30.436599370Z [inf]  [1]   OPENROUTER_MODEL: Set
+2025-12-05T08:26:30.436603975Z [inf]  [1]   OPENAI_MODEL: Set
+2025-12-05T08:26:30.436608425Z [inf]  [1]   NODE_ENV: Set
+2025-12-05T08:26:30.436613371Z [inf]  [1] Using OpenAI API
+2025-12-05T08:27:00.429582933Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/notifications/user-1
+2025-12-05T08:27:00.429595744Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-05T08:27:00.429609609Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-05T08:27:00.429616813Z [inf]  [0] Notification Service response status: 200
+2025-12-05T08:27:00.429623316Z [inf]  [0] Notification Service response data: []
+2025-12-05T08:27:00.429639543Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/notifications/user-1
+2025-12-05T08:27:00.429647566Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-05T08:27:00.429653785Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-05T08:27:00.429659001Z [inf]  [0] Notification Service response status: 200
+2025-12-05T08:27:00.429665028Z [inf]  [0] Notification Service response data: []
+2025-12-05T08:27:03.253295886Z [inf]  [0] Proxying Notification request to: http://localhost:8380/api/notifications/user-1
+2025-12-05T08:27:03.253302560Z [inf]  [0] Notification Service URL: http://localhost:8380
+2025-12-05T08:27:03.253309341Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
+2025-12-05T08:27:03.253316514Z [inf]  [0] Notification Service response status: 200
+2025-12-05T08:27:03.253323428Z [inf]  [0] Notification Service response data: []”
+
+---
+
+_**Agent (model openrouter/kwaipilot/kat-coder-pro:free)**_
+
+
 
 ---
 

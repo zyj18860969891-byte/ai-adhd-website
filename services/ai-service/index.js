@@ -315,6 +315,8 @@ Please return JSON format:
     console.error('OpenAI API Error:', error);
     console.error('Error details:', error.message);
     console.error('Error stack:', error.stack);
+    
+    // Check for different error formats from OpenAI API
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
@@ -322,6 +324,21 @@ Please return JSON format:
       
       // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.status) {
+      // OpenAI API might have status directly on the error object
+      console.error('Error status:', error.status);
+      console.error('Error data:', error.data);
+      
+      if (error.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.code) {
+      // Check for specific error codes
+      console.error('Error code:', error.code);
+      
+      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
     }
@@ -420,6 +437,8 @@ Please return JSON format:
     console.error('OpenAI API Error:', error);
     console.error('Error details:', error.message);
     console.error('Error stack:', error.stack);
+    
+    // Check for different error formats from OpenAI API
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
@@ -427,6 +446,21 @@ Please return JSON format:
       
       // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.status) {
+      // OpenAI API might have status directly on the error object
+      console.error('Error status:', error.status);
+      console.error('Error data:', error.data);
+      
+      if (error.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.code) {
+      // Check for specific error codes
+      console.error('Error code:', error.code);
+      
+      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
     }
@@ -527,6 +561,8 @@ async function extractTasks(text) {
     console.error('OpenAI API Error:', error);
     console.error('Error details:', error.message);
     console.error('Error stack:', error.stack);
+    
+    // Check for different error formats from OpenAI API
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
@@ -534,6 +570,21 @@ async function extractTasks(text) {
       
       // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.status) {
+      // OpenAI API might have status directly on the error object
+      console.error('Error status:', error.status);
+      console.error('Error data:', error.data);
+      
+      if (error.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.code) {
+      // Check for specific error codes
+      console.error('Error code:', error.code);
+      
+      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
     }
@@ -634,6 +685,8 @@ Please return JSON format:
     console.error('OpenAI API Error:', error);
     console.error('Error details:', error.message);
     console.error('Error stack:', error.stack);
+    
+    // Check for different error formats from OpenAI API
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
@@ -641,6 +694,21 @@ Please return JSON format:
       
       // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.status) {
+      // OpenAI API might have status directly on the error object
+      console.error('Error status:', error.status);
+      console.error('Error data:', error.data);
+      
+      if (error.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.code) {
+      // Check for specific error codes
+      console.error('Error code:', error.code);
+      
+      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
     }
@@ -739,6 +807,8 @@ Please return JSON format:
     console.error('OpenAI API Error:', error);
     console.error('Error details:', error.message);
     console.error('Error stack:', error.stack);
+    
+    // Check for different error formats from OpenAI API
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
@@ -746,6 +816,21 @@ Please return JSON format:
       
       // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler
       if (error.response.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.status) {
+      // OpenAI API might have status directly on the error object
+      console.error('Error status:', error.status);
+      console.error('Error data:', error.data);
+      
+      if (error.status === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.code) {
+      // Check for specific error codes
+      console.error('Error code:', error.code);
+      
+      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
     }
