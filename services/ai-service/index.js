@@ -11,9 +11,9 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY,
-  baseURL: 'https://openrouter.ai/api/v1',
-  defaultHeaders: {
+  apiKey: process.env.OPENAI_API_KEY || process.env.OPENROUTER_API_KEY,
+  baseURL: process.env.OPENAI_API_KEY ? undefined : 'https://openrouter.ai/api/v1',
+  defaultHeaders: process.env.OPENAI_API_KEY ? {} : {
     'HTTP-Referer': 'https://github.com/your-username/ai-adhd-website',
     'X-Title': 'ADHD Task Manager'
   },
@@ -21,12 +21,17 @@ const openai = new OpenAI({
 });
 
 // Validate API key on startup
-if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
+if (!process.env.OPENAI_API_KEY && !process.env.OPENROUTER_API_KEY) {
   console.warn('WARNING: No API key configured. AI service will use fallback responses.');
-  console.warn('Please set OPENROUTER_API_KEY or OPENAI_API_KEY environment variable.');
+  console.warn('Please set OPENAI_API_KEY or OPENROUTER_API_KEY environment variable.');
 } else {
-  console.log('API Key configured:', process.env.OPENROUTER_API_KEY ? 'OPENROUTER_API_KEY' : 'OPENAI_API_KEY');
-  console.log('API Key length:', process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.length : process.env.OPENAI_API_KEY.length);
+  if (process.env.OPENAI_API_KEY) {
+    console.log('API Key configured: OPENAI_API_KEY');
+    console.log('API Key length:', process.env.OPENAI_API_KEY.length);
+  } else {
+    console.log('API Key configured: OPENROUTER_API_KEY');
+    console.log('API Key length:', process.env.OPENROUTER_API_KEY.length);
+  }
   console.log('Environment variables loaded successfully');
 }
 
@@ -72,17 +77,18 @@ app.get('/api/health', (req, res) => {
     status: 'healthy', 
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
+    model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
     environment: process.env.NODE_ENV || 'development',
-    api_key_set: !!process.env.OPENROUTER_API_KEY || !!process.env.OPENAI_API_KEY,
+    api_key_set: !!process.env.OPENAI_API_KEY || !!process.env.OPENROUTER_API_KEY,
     node_version: process.version,
-    api_key_status: process.env.OPENROUTER_API_KEY ? 'Available' : process.env.OPENAI_API_KEY ? 'Available' : 'Not set',
-    api_key_length: process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.length : process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : 0,
+    api_key_status: process.env.OPENAI_API_KEY ? 'Available' : process.env.OPENROUTER_API_KEY ? 'Available' : 'Not set',
+    api_key_length: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.length : 0,
     environment_details: {
       NODE_ENV: process.env.NODE_ENV,
+      OPENAI_MODEL: process.env.OPENAI_MODEL,
       OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,
-      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set',
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set'
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set',
+      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set'
     }
   };
   
@@ -191,7 +197,7 @@ Please return JSON format:
 }`;
 
   try {
-    console.log('Calling OpenRouter API with model:', process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507');
+    console.log('Calling API with model:', process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo');
     console.log('API Key:', process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set');
     
     // Check if API key is available
@@ -206,7 +212,7 @@ Please return JSON format:
     }
     
     const response = await openai.chat.completions.create({
-      model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
+      model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: 'You are a helpful task classification assistant for ADHD task management. You understand Chinese and can properly classify Chinese tasks.' },
         { role: 'user', content: prompt }
@@ -254,8 +260,24 @@ Please return JSON format:
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
       console.error('Response headers:', error.response.headers);
+      
+      // If the error is 503 (Service Unavailable), return a 503 response
+      if (error.response.status === 503) {
+        res.status(503).json({ 
+          error: 'AI Service temporarily unavailable', 
+          details: 'Please try again later',
+          fallback: {
+            category: '个人',
+            confidence: 0.5,
+            reasoning: 'AI服务暂时不可用，使用默认分类',
+            suggestedTags: ['默认']
+          }
+        });
+        return;
+      }
     }
 
+    // For other errors, return fallback response
     return {
       category: '个人',
       confidence: 0.5,
@@ -297,7 +319,7 @@ Please return JSON format:
 }`;
 
   try {
-    console.log('Calling OpenRouter API for priority with model:', process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507');
+    console.log('Calling API for priority with model:', process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo');
     
     // Check if API key is available
     if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
@@ -310,7 +332,7 @@ Please return JSON format:
     }
     
     const response = await openai.chat.completions.create({
-      model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
+      model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: 'You are a helpful priority suggestion assistant for ADHD task management. You understand Chinese and can properly suggest priorities for Chinese tasks.' },
         { role: 'user', content: prompt }
@@ -342,8 +364,24 @@ Please return JSON format:
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
+      console.error('Response headers:', error.response.headers);
+      
+      // If the error is 503 (Service Unavailable), return a 503 response
+      if (error.response.status === 503) {
+        res.status(503).json({ 
+          error: 'AI Service temporarily unavailable', 
+          details: 'Please try again later',
+          fallback: {
+            priority: '中优先级',
+            confidence: 0.5,
+            reasoning: 'AI服务暂时不可用，使用默认优先级'
+          }
+        });
+        return;
+      }
     }
 
+    // For other errors, return fallback response
     return {
       priority: '中优先级',
       confidence: 0.5,
@@ -384,7 +422,7 @@ async function extractTasks(text) {
 }`;
 
   try {
-    console.log('Calling OpenRouter API for extraction with model:', process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507');
+    console.log('Calling API for extraction with model:', process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo');
     
     // Check if API key is available
     if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
@@ -401,7 +439,7 @@ async function extractTasks(text) {
     }
     
     const response = await openai.chat.completions.create({
-      model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
+      model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: 'You are a helpful task extraction assistant for ADHD task management. You understand Chinese and can properly extract tasks from Chinese text.' },
         { role: 'user', content: prompt }
@@ -432,8 +470,28 @@ async function extractTasks(text) {
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
+      console.error('Response headers:', error.response.headers);
+      
+      // If the error is 503 (Service Unavailable), return a 503 response
+      if (error.response.status === 503) {
+        res.status(503).json({ 
+          error: 'AI Service temporarily unavailable', 
+          details: 'Please try again later',
+          fallback: {
+            tasks: [
+              {
+                task: text,
+                category: '个人',
+                priority: '中优先级'
+              }
+            ]
+          }
+        });
+        return;
+      }
     }
 
+    // For other errors, return fallback response
     return {
       tasks: [
         {
@@ -478,7 +536,7 @@ Please return JSON format:
 }`;
 
   try {
-    console.log('Calling OpenRouter API for task improvement with model:', process.env.OPENROUTER_MODEL);
+    console.log('Calling API for task improvement with model:', process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo');
     
     // Check if API key is available
     if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
@@ -491,7 +549,7 @@ Please return JSON format:
     }
     
     const response = await openai.chat.completions.create({
-      model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
+      model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: 'You are a helpful task improvement assistant for ADHD task management. You understand Chinese and can make tasks more specific and actionable.' },
         { role: 'user', content: prompt }
@@ -522,8 +580,24 @@ Please return JSON format:
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
+      console.error('Response headers:', error.response.headers);
+      
+      // If the error is 503 (Service Unavailable), return a 503 response
+      if (error.response.status === 503) {
+        res.status(503).json({ 
+          error: 'AI Service temporarily unavailable', 
+          details: 'Please try again later',
+          fallback: {
+            improvedTask: task,
+            suggestions: ['任务描述已经很清晰'],
+            reasoning: 'AI服务暂时不可用，使用原始任务'
+          }
+        });
+        return;
+      }
     }
 
+    // For other errors, return fallback response
     return {
       improvedTask: task,
       suggestions: ['任务描述已经很清晰'],
@@ -565,7 +639,7 @@ Please return JSON format:
 }`;
 
   try {
-    console.log('Calling OpenRouter API for time estimation with model:', process.env.OPENROUTER_MODEL);
+    console.log('Calling API for time estimation with model:', process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo');
     
     // Check if API key is available
     if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
@@ -579,7 +653,7 @@ Please return JSON format:
     }
     
     const response = await openai.chat.completions.create({
-      model: process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507',
+      model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: 'You are a helpful time estimation assistant for ADHD task management. You understand Chinese and can provide realistic time estimates for tasks.' },
         { role: 'user', content: prompt }
@@ -610,8 +684,25 @@ Please return JSON format:
     if (error.response) {
       console.error('Response status:', error.response.status);
       console.error('Response data:', error.response.data);
+      console.error('Response headers:', error.response.headers);
+      
+      // If the error is 503 (Service Unavailable), return a 503 response
+      if (error.response.status === 503) {
+        res.status(503).json({ 
+          error: 'AI Service temporarily unavailable', 
+          details: 'Please try again later',
+          fallback: {
+            estimatedTime: '1小时',
+            confidence: 0.5,
+            reasoning: 'AI服务暂时不可用，使用默认估计',
+            suggestions: ['建议设置合理的时间限制']
+          }
+        });
+        return;
+      }
     }
 
+    // For other errors, return fallback response
     return {
       estimatedTime: '1小时',
       confidence: 0.5,
@@ -666,15 +757,16 @@ app.get('/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`AI Service running on port ${PORT}`);
+console.log('AI Service running on port', PORT);
   console.log(`NODE_ENV is: ${process.env.NODE_ENV || 'undefined'}`);
-  console.log(`Model: ${process.env.OPENROUTER_MODEL || 'qwen/qwen3-235b-a22b-2507'}`);
-  console.log(`API Key: ${process.env.OPENROUTER_API_KEY ? 'Set' : process.env.OPENAI_API_KEY ? 'Set' : 'Not set'}`);
+  console.log(`Model: ${process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo'}`);
+  console.log(`API Key: ${process.env.OPENAI_API_KEY ? 'Set' : process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set'}`);
   console.log(`Environment variables:`, {
     NODE_ENV: process.env.NODE_ENV,
+    OPENAI_MODEL: process.env.OPENAI_MODEL,
     OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,
-    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set',
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set'
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'Set' : 'Not set',
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ? 'Set' : 'Not set'
   });
   
   // Additional logging for debugging
@@ -701,4 +793,13 @@ app.listen(PORT, () => {
   Object.keys(process.env).filter(key => key.includes('OPENROUTER') || key.includes('OPENAI') || key.includes('NODE_ENV')).forEach(key => {
     console.log(`  ${key}: ${process.env[key] ? 'Set' : 'Not set'}`);
   });
+  
+  // Log which API is being used
+  if (process.env.OPENAI_API_KEY) {
+    console.log('Using OpenAI API');
+  } else if (process.env.OPENROUTER_API_KEY) {
+    console.log('Using OpenRouter API');
+  } else {
+    console.log('No API key configured - using fallback responses');
+  }
 });
