@@ -412,7 +412,23 @@ function addHistory(taskId, action, details) {
 // Create task reminder
 function createTaskReminder(task) {
   try {
-    const dueDate = new Date(task.dueDate);
+    // Parse due date as Beijing time (UTC+8)
+    const dueDateStr = task.dueDate;
+    let dueDate;
+    
+    if (dueDateStr.includes('T')) {
+      // If it's in format "YYYY-MM-DDTHH:mm", assume it's Beijing time
+      const [datePart, timePart] = dueDateStr.split('T');
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute] = timePart.split(':').map(Number);
+      
+      // Create date in Beijing time (UTC+8)
+      dueDate = new Date(Date.UTC(year, month - 1, day, hour, minute));
+    } else {
+      // Fallback to original parsing
+      dueDate = new Date(task.dueDate);
+    }
+    
     const now = new Date();
     const timeDiff = dueDate.getTime() - now.getTime();
     

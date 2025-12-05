@@ -206,7 +206,7 @@ function scheduleReminder(reminder) {
     createdAt: reminder.createdAt
   });
   
-  // Schedule using cron syntax with UTC timezone
+  // Schedule using cron syntax with Beijing timezone (UTC+8)
   cron.schedule(reminder.schedule, () => {
     console.log('Reminder triggered:', {
       id: reminder.id,
@@ -248,7 +248,7 @@ function scheduleReminder(reminder) {
       console.log('Reminder is not active, skipping:', reminder.id);
     }
   }, {
-    timezone: "UTC"
+    timezone: "Asia/Shanghai"
   });
 }
 
