@@ -1,7 +1,7 @@
 # Multi-stage build for ADHD Task Manager PWA
 
 # Build stage
-FROM node:18-alpine AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/library/node:18-alpine AS builder
 
 # Set timezone and locale
 RUN apk add --no-cache tzdata && \
@@ -34,7 +34,7 @@ COPY . .
 RUN cd client && npm run build
 
 # Production stage
-FROM node:18-alpine
+FROM registry.cn-hangzhou.aliyuncs.com/library/node:18-alpine
 
 # Set timezone and locale
 RUN apk add --no-cache tzdata && \
