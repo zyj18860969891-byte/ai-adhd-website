@@ -9,9 +9,17 @@ WORKDIR /app
 COPY package*.json ./
 COPY client/package*.json ./client/
 
-# Install dependencies
-RUN npm install
-RUN cd client && npm install
+# Install dependencies with retry and alternative registry
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm install --retry 3 --timeout 60000 || \
+    npm config set registry https://registry.npmjs.org && \
+    npm install --retry 3 --timeout 60000
+
+RUN cd client && \
+    npm config set registry https://registry.npmmirror.com && \
+    npm install --retry 3 --timeout 60000 || \
+    npm config set registry https://registry.npmjs.org && \
+    npm install --retry 3 --timeout 60000
 
 # Copy source code
 COPY . .
