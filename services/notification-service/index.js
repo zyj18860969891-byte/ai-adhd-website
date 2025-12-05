@@ -181,8 +181,9 @@ cron.schedule('0 * * * *', () => {
 
 // Send scheduled reminders every minute
 cron.schedule('* * * * *', () => {
-  // This would check scheduled reminders and send notifications
-  // Implementation depends on the reminder scheduling system
+  // Check for reminders that should be sent now
+  // This is handled by the individual cron schedules in scheduleReminder function
+  console.log('Checking scheduled reminders...');
 });
 
 // Helper functions

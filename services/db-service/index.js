@@ -174,6 +174,19 @@ app.post('/api/tasks', (req, res) => {
     // Add to history
     addHistory(id, 'created', { title, category, priority });
 
+    // If due date is set, create a reminder
+    if (dueDate) {
+      createTaskReminder({
+        id,
+        title,
+        description,
+        category,
+        priority,
+        dueDate,
+        tags
+      });
+    }
+
     res.status(201).json({
       id,
       title,
@@ -368,6 +381,58 @@ function addHistory(taskId, action, details) {
   const stmt = db.prepare('INSERT INTO task_history (taskId, action, details) VALUES (?, ?, ?)');
   stmt.run([taskId, action, JSON.stringify(details)]);
   stmt.finalize();
+}
+
+// Create task reminder
+function createTaskReminder(task) {
+  try {
+    const dueDate = new Date(task.dueDate);
+    const now = new Date();
+    const timeDiff = dueDate.getTime() - now.getTime();
+    
+    // Only create reminder if due date is in the future
+    if (timeDiff > 0) {
+      // Create reminder 1 minute before due date
+      const reminderTime = new Date(dueDate.getTime() - 60000); // 1 minute before
+      
+      // Check if reminder is still in the future
+      if (reminderTime.getTime() > now.getTime()) {
+        // Send reminder to notification service
+        const reminderData = {
+          userId: 'user-1', // Default user for demo
+          taskId: task.id,
+          title: `任务提醒: ${task.title}`,
+          message: `任务 "${task.title}" 即将到期！`,
+          schedule: getCronSchedule(reminderTime),
+          repeat: false
+        };
+        
+        // Send to notification service
+        fetch(`${process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3003'}/api/reminders`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(reminderData)
+        }).catch(err => {
+          console.error('Failed to create reminder:', err);
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error creating reminder:', error);
+  }
+}
+
+// Convert date to cron schedule
+function getCronSchedule(date) {
+  const minute = date.getMinutes();
+  const hour = date.getHours();
+  const day = date.getDate();
+  const month = date.getMonth() + 1; // Month is 0-indexed
+  const dayOfWeek = date.getDay();
+  
+  return `${minute} ${hour} ${day} ${month} ${dayOfWeek}`;
 }
 
 // Start server
