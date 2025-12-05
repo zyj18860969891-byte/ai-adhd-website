@@ -1,7 +1,13 @@
 # Multi-stage build for ADHD Task Manager PWA
 
 # Build stage
-FROM node:20.19.5-alpine3.20 AS builder
+FROM node:18-alpine AS builder
+
+# Set timezone and locale
+RUN apk add --no-cache tzdata && \
+    cp /usr/share/zoneinfo/UTC /etc/localtime && \
+    echo "UTC" > /etc/timezone && \
+    apk del tzdata
 
 WORKDIR /app
 
@@ -11,15 +17,15 @@ COPY client/package*.json ./client/
 
 # Install dependencies with retry and alternative registry
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install --retry 3 --timeout 60000 || \
+    npm install --retry 5 --timeout 120000 || \
     npm config set registry https://registry.npmjs.org && \
-    npm install --retry 3 --timeout 60000
+    npm install --retry 5 --timeout 120000
 
 RUN cd client && \
     npm config set registry https://registry.npmmirror.com && \
-    npm install --retry 3 --timeout 60000 || \
+    npm install --retry 5 --timeout 120000 || \
     npm config set registry https://registry.npmjs.org && \
-    npm install --retry 3 --timeout 60000
+    npm install --retry 5 --timeout 120000
 
 # Copy source code
 COPY . .
@@ -28,7 +34,13 @@ COPY . .
 RUN cd client && npm run build
 
 # Production stage
-FROM node:20.19.5-alpine3.20
+FROM node:18-alpine
+
+# Set timezone and locale
+RUN apk add --no-cache tzdata && \
+    cp /usr/share/zoneinfo/UTC /etc/localtime && \
+    echo "UTC" > /etc/timezone && \
+    apk del tzdata
 
 WORKDIR /app
 
