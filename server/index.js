@@ -161,7 +161,7 @@ app.post('/api/services/:serviceId/status', (req, res) => {
 
 // Microservices proxy endpoints
 app.get('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://ai-service:8190';
   const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -187,7 +187,7 @@ app.get('/api/services/ai/*', (req, res) => {
 });
 
 app.post('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://ai-service:8190';
   const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -219,7 +219,7 @@ app.post('/api/services/ai/*', (req, res) => {
 });
 
 app.put('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://ai-service:8190';
   const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -251,7 +251,7 @@ app.put('/api/services/ai/*', (req, res) => {
 });
 
 app.delete('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://ai-service:8190';
   const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -279,7 +279,7 @@ app.delete('/api/services/ai/*', (req, res) => {
 });
 
 app.get('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://db-service:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -306,7 +306,7 @@ app.get('/api/services/db/*', (req, res) => {
 });
 
 app.post('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://db-service:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -339,7 +339,7 @@ app.post('/api/services/db/*', (req, res) => {
 });
 
 app.put('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://db-service:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -372,7 +372,7 @@ app.put('/api/services/db/*', (req, res) => {
 });
 
 app.delete('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://db-service:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -401,7 +401,7 @@ app.delete('/api/services/db/*', (req, res) => {
 });
 
 app.get('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://notification-service:8380';
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   

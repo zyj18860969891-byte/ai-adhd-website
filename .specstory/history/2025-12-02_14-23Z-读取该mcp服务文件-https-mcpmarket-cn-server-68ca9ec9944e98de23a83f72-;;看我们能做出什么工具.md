@@ -75716,7 +75716,7 @@ Object.keys(process.env).filter(key => key.includes('SERVICE') || key.includes('
 
 ---
 
-_**User (2025-12-05 06:56Z)**_
+_**User (2025-12-05 07:02Z)**_
 
 当前不需要再在railway上补充variables环境变量了吧？？？确定后推送git 并部署 
 
@@ -75724,7 +75724,129 @@ _**User (2025-12-05 06:56Z)**_
 
 _**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
 
+我理解您的问题。根据我们之前的对话和分析，环境变量已经在 Railway 中正确设置了，现在需要将代码更改推送到 Git 并重新部署。
 
+让我先确认一下当前的修改内容，然后进行 Git 操作。
+
+ 让我直接使用终端命令来查看状态并进行 Git 操作。
+
+ 让我直接在终端中执行这些命令，因为工具调用出现了问题。
+
+ 我理解您的问题。根据我们之前的分析和修改，现在需要将代码推送到 Git 并重新部署。
+
+让我总结一下我们所做的修改：
+
+1. 修复了主服务（server）的环境变量加载逻辑，确保在 Railway 环境中能正确加载环境变量
+2. 修复了 AI 服务中重复定义的路由问题，避免了 404 错误
+
+这些修改应该已经解决了您在 Railway 部署中遇到的环境变量加载问题和 404 错误。
+
+如果您使用的是 GitHub 或其他 Git 托管服务，您需要手动执行以下命令：
+
+```bash
+cd E:\MultiModel\ai-adhd-website
+git add .
+git commit -m "Fix environment variable loading and remove duplicate routes"
+git push origin main
+```
+
+然后在 Railway 中触发重新部署。
+
+由于工具调用存在问题，我建议您：
+1. 手动在终端中执行上述 Git 命令
+2. 然后在 Railway 控制台中重新部署应用
+
+这些修改应该能解决您遇到的环境变量加载问题和 404 错误。
+
+---
+
+_**User (2025-12-05 07:18Z)**_
+
+新的测试后返回：“{
+  "requestId": "mOp5Szz8ROq5f_Q2V7rehQ",
+  "timestamp": "2025-12-05T07:14:23.932936213Z",
+  "method": "GET",
+  "path": "/api/task-progress",
+  "host": "ai-adhd-website-production.up.railway.app",
+  "httpStatus": 502,
+  "upstreamProto": "",
+  "downstreamProto": "HTTP/2.0",
+  "responseDetails": "Retried single replica",
+  "totalDuration": 163,
+  "upstreamAddress": "",
+  "clientUa": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0",
+  "upstreamRqDuration": 1,
+  "txBytes": 109,
+  "rxBytes": 807,
+  "srcIp": "64.120.95.34",
+  "edgeRegion": "asia-southeast1-eqsg3a",
+  "upstreamErrors": "[{\"deploymentInstanceID\":\"d30e9fab-5632-4ebf-bef7-af6cc2b6ecd1\",\"duration\":0,\"error\":\"connection refused\"},{\"deploymentInstanceID\":\"d30e9fab-5632-4ebf-bef7-af6cc2b6ecd1\",\"duration\":0,\"error\":\"connection refused\"},{\"deploymentInstanceID\":\"d30e9fab-5632-4ebf-bef7-af6cc2b6ecd1\",\"duration\":0,\"error\":\"connection refused\"}]"
+}”；；“{
+  "requestId": "qK6a9eQoRoG9NUhBV7rehQ",
+  "timestamp": "2025-12-05T07:14:23.932984888Z",
+  "method": "GET",
+  "path": "/api/services/notification/notifications/user-1",
+  "host": "ai-adhd-website-production.up.railway.app",
+  "httpStatus": 502,
+  "upstreamProto": "",
+  "downstreamProto": "HTTP/2.0",
+  "responseDetails": "Retried single replica",
+  "totalDuration": 163,
+  "upstreamAddress": "",
+  "clientUa": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0",
+  "upstreamRqDuration": 1,
+  "txBytes": 109,
+  "rxBytes": 836,
+  "srcIp": "64.120.95.34",
+  "edgeRegion": "asia-southeast1-eqsg3a",
+  "upstreamErrors": "[{\"deploymentInstanceID\":\"d30e9fab-5632-4ebf-bef7-af6cc2b6ecd1\",\"duration\":0,\"error\":\"connection refused\"},{\"deploymentInstanceID\":\"d30e9fab-5632-4ebf-bef7-af6cc2b6ecd1\",\"duration\":0,\"error\":\"connection refused\"},{\"deploymentInstanceID\":\"d30e9fab-5632-4ebf-bef7-af6cc2b6ecd1\",\"duration\":0,\"error\":\"connection refused\"}]"
+}”；；；
+
+---
+
+_**Agent (model openrouter/qwen/qwen3-coder-30b-a3b-instruct)**_
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • 正在读取 [](file:///e%3A/MultiModel/ai-adhd-website/server/index.js#100-100)，行 100 到 150</summary>
+
+
+读取 [](file:///e%3A/MultiModel/ai-adhd-website/server/index.js#100-100)，行 100 到 150
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • 正在读取 [](file:///e%3A/MultiModel/ai-adhd-website/server/index.js#150-150)，行 150 到 250</summary>
+
+
+读取 [](file:///e%3A/MultiModel/ai-adhd-website/server/index.js#150-150)，行 150 到 250
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • 正在读取 [](file:///e%3A/MultiModel/ai-adhd-website/server/index.js#250-250)，行 250 到 350</summary>
+
+
+读取 [](file:///e%3A/MultiModel/ai-adhd-website/server/index.js#250-250)，行 250 到 350
+
+</details>
+</tool-use>
+
+---
+
+根据新的测试结果，现在出现的是 502 错误，错误信息显示 "connection refused"，这表明主服务无法连接到其他微服务（通知服务和 AI 服务）。这说明环境变量虽然加载了，但服务间的通信仍然存在问题。
+
+让我检查一下当前的配置，特别是服务 URL 的设置。
+
+ 
 
 ---
 
