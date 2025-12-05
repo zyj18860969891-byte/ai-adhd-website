@@ -35,10 +35,15 @@ healthcheck_timeout = 10
 healthcheck_retries = 3
 healthcheck_start_period = 30
 
+# Auto deploy on git push
+auto_deploy = true
+
 # Environment variables for deployment
 [deploy.env]
 NODE_ENV = "production"
 PORT = "3000"
+# Railway specific settings
+RAILWAY_ENVIRONMENT = "production"
 
 # Service configuration
 [deploy.service]
@@ -49,30 +54,6 @@ max_instances = 3
 # Resource allocation
 cpu = "500m"
 memory = "512Mi"
-NPM_CONFIG_CACHE = "/tmp/.npm"
-
-# Set npm log level
-NPM_LOG_LEVEL = "info"
-
-# Disable npm audit for faster builds
-NPM_AUDIT = "false"
-
-# Use npm mirror for faster downloads
-NPM_REGISTRY = "https://registry.npmmirror.com"
-
-# Docker build options
-DOCKER_BUILDKIT = "1"
-
-# Enable verbose logging
-DEBUG = "1"
-
-[env]
-NODE_ENV = "production"
-# Note: API keys should be set in Railway environment variables
-# OPENROUTER_API_KEY and OPENAI_API_KEY should be set in Railway dashboard
-OPENROUTER_MODEL = "qwen/qwen3-235b-a22b-2507"
-JWT_SECRET = "your_strong_jwt_secret_here_change_this"
-DB_PATH = "./data/tasks.db"
 
 # 主服务器 (Gateway/API Gateway)
 [[services]]
@@ -105,19 +86,6 @@ root = "services/notification-service"
 command = "node index.js"
 port = 3003
 max_procs = 1
-
-# Deploy settings
-[deploy]
-# Auto deploy on git push
-auto_deploy = true
-
-# Deploy timeout in milliseconds (20 minutes)
-timeout = 1200000
-
-# Environment variables for deploy
-[deploy.env]
-# Railway specific settings
-RAILWAY_ENVIRONMENT = "production"
 RAILWAY_SERVICE_NAME = "ai-adhd-website"
 
 # Monitoring and logging
