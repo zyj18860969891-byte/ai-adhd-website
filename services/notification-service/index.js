@@ -206,7 +206,7 @@ function scheduleReminder(reminder) {
     createdAt: reminder.createdAt
   });
   
-  // Schedule using cron syntax
+  // Schedule using cron syntax with UTC timezone
   cron.schedule(reminder.schedule, () => {
     console.log('Reminder triggered:', {
       id: reminder.id,
@@ -247,6 +247,8 @@ function scheduleReminder(reminder) {
     } else {
       console.log('Reminder is not active, skipping:', reminder.id);
     }
+  }, {
+    timezone: "UTC"
   });
 }
 
