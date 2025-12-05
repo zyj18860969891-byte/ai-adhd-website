@@ -24,15 +24,15 @@ COPY client/package*.json ./client/
 
 # Install dependencies with retry and alternative registry
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install --retry 5 --timeout 120000 --prefer-offline || \
+    npm install --retry 5 --prefer-offline || \
     npm config set registry https://registry.npmjs.org && \
-    npm install --retry 5 --timeout 120000 --prefer-offline
+    npm install --retry 5 --prefer-offline
 
 RUN cd client && \
     npm config set registry https://registry.npmmirror.com && \
-    npm install --retry 5 --timeout 120000 --prefer-offline || \
+    npm install --retry 5 --prefer-offline || \
     npm config set registry https://registry.npmjs.org && \
-    npm install --retry 5 --timeout 120000 --prefer-offline
+    npm install --retry 5 --prefer-offline
 
 # Copy source code (excluding files in .dockerignore)
 COPY . .

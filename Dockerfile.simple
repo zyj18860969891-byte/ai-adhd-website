@@ -25,15 +25,15 @@ COPY client/package*.json ./client/
 
 # Install dependencies with fallback registry
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install --prefer-offline --no-optional || \
+    npm install --prefer-offline || \
     npm config set registry https://registry.npmjs.org && \
-    npm install --prefer-offline --no-optional
+    npm install --prefer-offline
 
 RUN cd client && \
     npm config set registry https://registry.npmmirror.com && \
-    npm install --prefer-offline --no-optional || \
+    npm install --prefer-offline || \
     npm config set registry https://registry.npmjs.org && \
-    npm install --prefer-offline --no-optional
+    npm install --prefer-offline
 
 # Copy source code
 COPY . .
