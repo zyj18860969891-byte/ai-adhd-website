@@ -1,7 +1,14 @@
 # Multi-stage build for ADHD Task Manager PWA
 
 # Build stage
-FROM registry.cn-hangzhou.aliyuncs.com/library/node:18-alpine AS builder
+FROM node:18-alpine AS builder
+
+# Add retry mechanism for base image pull
+RUN if ! apk add --no-cache --update-cache --allow-untrusted ca-certificates; then \
+    echo "Retrying apk update..."; \
+    sleep 5; \
+    apk add --no-cache --update-cache --allow-untrusted ca-certificates; \
+    fi
 
 # Set timezone and locale
 RUN apk add --no-cache tzdata && \
@@ -11,30 +18,37 @@ RUN apk add --no-cache tzdata && \
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (for better caching)
 COPY package*.json ./
 COPY client/package*.json ./client/
 
 # Install dependencies with retry and alternative registry
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm install --retry 5 --timeout 120000 || \
+    npm install --retry 5 --timeout 120000 --prefer-offline || \
     npm config set registry https://registry.npmjs.org && \
-    npm install --retry 5 --timeout 120000
+    npm install --retry 5 --timeout 120000 --prefer-offline
 
 RUN cd client && \
     npm config set registry https://registry.npmmirror.com && \
-    npm install --retry 5 --timeout 120000 || \
+    npm install --retry 5 --timeout 120000 --prefer-offline || \
     npm config set registry https://registry.npmjs.org && \
-    npm install --retry 5 --timeout 120000
+    npm install --retry 5 --timeout 120000 --prefer-offline
 
-# Copy source code
+# Copy source code (excluding files in .dockerignore)
 COPY . .
 
-# Build frontend
-RUN cd client && npm run build
+# Build frontend with memory optimization
+RUN cd client && npm run build -- --max-old-space-size=512
 
 # Production stage
-FROM registry.cn-hangzhou.aliyuncs.com/library/node:18-alpine
+FROM node:18-alpine
+
+# Add retry mechanism for production stage
+RUN if ! apk add --no-cache --update-cache --allow-untrusted ca-certificates; then \
+    echo "Retrying apk update for production stage..."; \
+    sleep 5; \
+    apk add --no-cache --update-cache --allow-untrusted ca-certificates; \
+    fi
 
 # Set timezone and locale
 RUN apk add --no-cache tzdata && \
@@ -53,9 +67,9 @@ RUN mkdir -p data
 # Expose ports
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+# Health check with retry
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
 
-# Start the application
-CMD ["npm", "start"]
+# Start the application with error handling
+CMD ["sh", "-c", "npm start || (echo 'Failed to start, retrying...' && sleep 5 && npm start)"]

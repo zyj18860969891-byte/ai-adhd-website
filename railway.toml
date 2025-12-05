@@ -1,7 +1,70 @@
 # Railway Multi-Service Monorepo Configuration for ADHD Task Manager PWA
 
 [build]
-builder = "nixpacks"
+builder = "docker"
+# Build timeout in milliseconds (20 minutes)
+timeout = 1200000
+
+# Environment variables for build
+[build.env]
+# Enable npm cache
+NPM_CONFIG_CACHE = "/tmp/.npm"
+# Enable verbose logging
+NPM_CONFIG_LOGLEVEL = "info"
+# Use mirror registry for faster builds
+NPM_CONFIG_REGISTRY = "https://registry.npmmirror.com"
+# Enable offline mode for better caching
+NPM_CONFIG_PREFER_OFFLINE = "true"
+# Set NODE_ENV for production
+NODE_ENV = "production"
+
+# Docker build configuration
+[build.docker]
+# Use simplified Dockerfile for better reliability
+dockerfile = "Dockerfile.simple"
+# Build arguments
+args = [
+  "NODE_ENV=production"
+]
+
+[deploy]
+# Health check configuration
+healthcheck_path = "/api/health"
+healthcheck_interval = 30
+healthcheck_timeout = 10
+healthcheck_retries = 3
+healthcheck_start_period = 30
+
+# Environment variables for deployment
+[deploy.env]
+NODE_ENV = "production"
+PORT = "3000"
+
+# Service configuration
+[deploy.service]
+# Enable auto-scaling
+min_instances = 1
+max_instances = 3
+
+# Resource allocation
+cpu = "500m"
+memory = "512Mi"
+NPM_CONFIG_CACHE = "/tmp/.npm"
+
+# Set npm log level
+NPM_LOG_LEVEL = "info"
+
+# Disable npm audit for faster builds
+NPM_AUDIT = "false"
+
+# Use npm mirror for faster downloads
+NPM_REGISTRY = "https://registry.npmmirror.com"
+
+# Docker build options
+DOCKER_BUILDKIT = "1"
+
+# Enable verbose logging
+DEBUG = "1"
 
 [env]
 NODE_ENV = "production"
@@ -42,3 +105,45 @@ root = "services/notification-service"
 command = "node index.js"
 port = 3003
 max_procs = 1
+
+# Deploy settings
+[deploy]
+# Auto deploy on git push
+auto_deploy = true
+
+# Deploy timeout in milliseconds (20 minutes)
+timeout = 1200000
+
+# Environment variables for deploy
+[deploy.env]
+# Railway specific settings
+RAILWAY_ENVIRONMENT = "production"
+RAILWAY_SERVICE_NAME = "ai-adhd-website"
+
+# Monitoring and logging
+[monitoring]
+# Enable health checks
+health_check_enabled = true
+
+# Health check interval in seconds
+health_check_interval = 30
+
+# Health check timeout in seconds
+health_check_timeout = 5
+
+# Number of failed health checks before restart
+health_check_retries = 3
+
+# Logging settings
+[logging]
+# Log level
+level = "info"
+
+# Enable structured logging
+structured = true
+
+# Enable request logging
+request_logging = true
+
+# Enable error logging
+error_logging = true

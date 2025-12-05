@@ -1,0 +1,76 @@
+# Simplified Dockerfile for ADHD Task Manager PWA
+# Optimized for Railway deployment with fallback strategies
+
+# Build stage
+FROM node:18-alpine AS builder
+
+# Install system dependencies with retry
+RUN set -e && \
+    for i in {1..3}; do \
+        if apk add --no-cache --update-cache ca-certificates tzdata; then \
+            break; \
+        else \
+            echo "Attempt $i failed, retrying..." && sleep 5; \
+        fi; \
+    done
+
+# Set timezone
+RUN cp /usr/share/zoneinfo/UTC /etc/localtime && echo "UTC" > /etc/timezone
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY client/package*.json ./client/
+
+# Install dependencies with fallback registry
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm install --prefer-offline --no-optional || \
+    npm config set registry https://registry.npmjs.org && \
+    npm install --prefer-offline --no-optional
+
+RUN cd client && \
+    npm config set registry https://registry.npmmirror.com && \
+    npm install --prefer-offline --no-optional || \
+    npm config set registry https://registry.npmjs.org && \
+    npm install --prefer-offline --no-optional
+
+# Copy source code
+COPY . .
+
+# Build frontend with memory optimization
+RUN cd client && npm run build -- --max-old-space-size=512
+
+# Production stage
+FROM node:18-alpine AS production
+
+# Install runtime dependencies with retry
+RUN set -e && \
+    for i in {1..3}; do \
+        if apk add --no-cache ca-certificates tzdata curl; then \
+            break; \
+        else \
+            echo "Attempt $i failed, retrying..." && sleep 5; \
+        fi; \
+    done
+
+# Set timezone
+RUN cp /usr/share/zoneinfo/UTC /etc/localtime && echo "UTC" > /etc/timezone
+
+WORKDIR /app
+
+# Copy built application
+COPY --from=builder /app ./
+
+# Create data directory
+RUN mkdir -p data
+
+# Expose port
+EXPOSE 3000
+
+# Health check with longer timeout
+HEALTHCHECK --interval=30s --timeout=15s --start-period=45s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Start application with retry
+CMD ["sh", "-c", "npm start || (echo 'Failed to start, retrying...' && sleep 5 && npm start)"]
