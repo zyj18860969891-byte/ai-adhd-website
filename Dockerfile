@@ -37,8 +37,8 @@ RUN cd client && \
 # Copy source code (excluding files in .dockerignore)
 COPY . .
 
-# Build frontend with memory optimization
-RUN cd client && npm run build -- --max-old-space-size=512
+# Build frontend
+RUN cd client && npm run build
 
 # Production stage
 FROM node:18-alpine
