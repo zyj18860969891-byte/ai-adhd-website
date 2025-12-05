@@ -132,7 +132,11 @@ app.get('/api/tasks', (req, res) => {
       console.error('Database query error:', err);
       return res.status(500).json({ error: 'Database query failed' });
     }
-    res.json(rows);
+    res.json(rows.map(row => ({
+      ...row,
+      tags: row.tags ? JSON.parse(row.tags) : [],
+      context: row.context ? JSON.parse(row.context) : {}
+    })));
   });
 });
 
@@ -146,7 +150,11 @@ app.get('/api/tasks/:id', (req, res) => {
     if (!row) {
       return res.status(404).json({ error: 'Task not found' });
     }
-    res.json(row);
+    res.json({
+      ...row,
+      tags: row.tags ? JSON.parse(row.tags) : [],
+      context: row.context ? JSON.parse(row.context) : {}
+    });
   });
 });
 
@@ -187,7 +195,7 @@ app.post('/api/tasks', (req, res) => {
       });
     }
 
-    res.status(201).json({
+res.json({
       id,
       title,
       description,
@@ -197,9 +205,9 @@ app.post('/api/tasks', (req, res) => {
       createdAt,
       updatedAt,
       dueDate,
-      tags,
+      tags: tags || [],
       estimatedTime,
-      context
+      context: context || {}
     });
   });
 
@@ -250,7 +258,22 @@ app.put('/api/tasks/:id', (req, res) => {
         addHistory(id, 'status_changed', { from: row.status, to: status });
       }
 
-      res.json({ success: true, changes: this.changes });
+      res.json({
+        id,
+        title,
+        description,
+        category,
+        priority,
+        status,
+        createdAt: row.createdAt,
+        updatedAt,
+        dueDate,
+        tags: tags ? JSON.parse(tags) : [],
+        estimatedTime,
+        actualTime,
+        completedAt,
+        context: context ? JSON.parse(context) : {}
+      });
     });
 
     stmt.finalize();
@@ -292,7 +315,10 @@ app.get('/api/tasks/:id/history', (req, res) => {
       console.error('Database query error:', err);
       return res.status(500).json({ error: 'Database query failed' });
     }
-    res.json(rows);
+    res.json(rows.map(row => ({
+      ...row,
+      details: row.details ? JSON.parse(row.details) : {}
+    })));
   });
 });
 
@@ -408,7 +434,9 @@ function createTaskReminder(task) {
         };
         
         // Send to notification service
-        fetch(`${process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3003'}/api/reminders`, {
+        const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+        console.log('Creating reminder with URL:', notificationServiceUrl);
+        fetch(`${notificationServiceUrl}/api/reminders`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

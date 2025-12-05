@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 8380;
 
 // Load environment variables
 require('dotenv').config();
@@ -200,6 +200,7 @@ function scheduleReminder(reminder) {
   cron.schedule(reminder.schedule, () => {
     if (reminder.active) {
       const notification = {
+        id: notificationIdCounter++,
         userId: reminder.userId,
         title: reminder.title,
         message: reminder.message,
@@ -210,7 +211,7 @@ function scheduleReminder(reminder) {
         status: 'pending'
       };
       
-      notifications.set(notificationIdCounter++, notification);
+      notifications.set(notification.id, notification);
       
       // Send to WebSocket clients
       clients.forEach(client => {
@@ -230,6 +231,14 @@ function scheduleReminder(reminder) {
 // Start server
 app.listen(PORT, () => {
   console.log(`Notification Service running on port ${PORT}`);
+  console.log(`Available endpoints:`);
+  console.log(`  POST /api/notifications`);
+  console.log(`  GET  /api/notifications/:userId`);
+  console.log(`  PUT  /api/notifications/:id/acknowledge`);
+  console.log(`  DELETE /api/notifications/:id`);
+  console.log(`  POST /api/reminders`);
+  console.log(`  GET  /api/health`);
+  
   if (process.env.NODE_ENV !== 'production') {
     console.log(`WebSocket running on port ${parseInt(PORT, 10) + 100}`);
   }
