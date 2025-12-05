@@ -161,7 +161,7 @@ app.post('/api/services/:serviceId/status', (req, res) => {
 // Microservices proxy endpoints
 app.get('/api/services/ai/*', (req, res) => {
   const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
-  const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
+  const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
   console.log('AI Service URL:', aiServiceUrl);
@@ -187,7 +187,7 @@ app.get('/api/services/ai/*', (req, res) => {
 
 app.post('/api/services/ai/*', (req, res) => {
   const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
-  const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
+  const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
   console.log('AI Service URL:', aiServiceUrl);
@@ -219,7 +219,7 @@ app.post('/api/services/ai/*', (req, res) => {
 
 app.put('/api/services/ai/*', (req, res) => {
   const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
-  const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
+  const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
   console.log('AI Service URL:', aiServiceUrl);
@@ -251,7 +251,7 @@ app.put('/api/services/ai/*', (req, res) => {
 
 app.delete('/api/services/ai/*', (req, res) => {
   const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
-  const targetUrl = `${aiServiceUrl}${req.originalUrl.replace('/api/services/ai', '')}`;
+  const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
   console.log('AI Service URL:', aiServiceUrl);
