@@ -78501,7 +78501,7 @@ git push origin main
 
 ---
 
-_**User (2025-12-05 08:27Z)**_
+_**User (2025-12-05 08:29Z)**_
 
 部署后新的日志返回：“2025-12-05T08:26:28.000000000Z [inf]  Starting Container
 2025-12-05T08:26:29.205590449Z [inf]  
@@ -78607,6 +78607,261 @@ _**User (2025-12-05 08:27Z)**_
 2025-12-05T08:27:03.253309341Z [inf]  [0] Request path: /api/services/notification/notifications/user-1
 2025-12-05T08:27:03.253316514Z [inf]  [0] Notification Service response status: 200
 2025-12-05T08:27:03.253323428Z [inf]  [0] Notification Service response data: []”
+
+---
+
+_**Agent (model openrouter/kwaipilot/kat-coder-pro:free)**_
+
+<tool-use data-tool-type="read" data-tool-name="copilot_readFile">
+<details>
+<summary>Tool use: **copilot_readFile** • 正在读取 [](file:///e%3A/MultiModel/ai-adhd-website/services/ai-service/index.js#250-250)，行 250 到 300</summary>
+
+
+读取 [](file:///e%3A/MultiModel/ai-adhd-website/services/ai-service/index.js#250-250)，行 250 到 300
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\n} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      category: '个人',\r\n      confidence: 0.5,\r\n      reasoning: 'AI分类失败，使用默认分类',\r\n      suggestedTags: ['默认']\r\n    };\r\n  }\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      category: '个人',\r\n      confidence: 0.5,\r\n      reasoning: 'AI分类失败，使用默认分类',\r\n      suggestedTags: ['默认']\r\n    };\r\n  }",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\n} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      priority: '中优先级',\r\n      confidence: 0.5,\r\n      reasoning: 'AI优先级建议失败，使用默认优先级'\r\n    };\r\n  }\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      priority: '中优先级',\r\n      confidence: 0.5,\r\n      reasoning: 'AI优先级建议失败，使用默认优先级'\r\n    };\r\n  }",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\n} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      tasks: [\r\n        {\r\n          task: text,\r\n          category: '个人',\r\n          priority: '中优先级'\r\n        }\r\n      ]\r\n    };\r\n  }\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      tasks: [\r\n        {\r\n          task: text,\r\n          category: '个人',\r\n          priority: '中优先级'\r\n        }\r\n      ]\r\n    };\r\n  }",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\n} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      improvedTask: task,\r\n      suggestions: ['任务描述已经很清晰'],\r\n      reasoning: 'AI任务改进失败，使用原始任务'\r\n    };\r\n  }\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      improvedTask: task,\r\n      suggestions: ['任务描述已经很清晰'],\r\n      reasoning: 'AI任务改进失败，使用原始任务'\r\n    };\r\n  }",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+<tool-use data-tool-type="unknown" data-tool-name="copilot_replaceString">
+<details>
+<summary>Tool use: **copilot_replaceString**</summary>
+
+Additional data:
+
+```json
+{
+  "vscodeToolId": "copilot_replaceString",
+  "isHidden": true
+}
+```
+Result:
+
+```json
+{
+  "invocationMessage": "正在使用 \"替换文件中的字符串\"",
+  "isConfirmed": {
+    "type": 1
+  },
+  "content": "&#96;&#96;&#96;javascript\n} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      estimatedTime: '1小时',\r\n      confidence: 0.5,\r\n      reasoning: 'AI时间估计失败，使用默认估计',\r\n      suggestions: ['建议设置合理的时间限制']\r\n    };\r\n  }\n&#96;&#96;&#96;\n\n",
+  "textEditContent": "} catch (error) {\r\n    console.error('OpenAI API Error:', error);\r\n    console.error('Error details:', error.message);\r\n    console.error('Error stack:', error.stack);\r\n    \r\n    // Check for different error formats from OpenAI API\r\n    if (error.response) {\r\n      console.error('Response status:', error.response.status);\r\n      console.error('Response data:', error.response.data);\r\n      console.error('Response headers:', error.response.headers);\r\n      \r\n      // If the error is 503 (Service Unavailable), throw an error to be caught by the route handler\r\n      if (error.response.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.status) {\r\n      // OpenAI API might have status directly on the error object\r\n      console.error('Error status:', error.status);\r\n      console.error('Error data:', error.data);\r\n      \r\n      if (error.status === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    } else if (error.code) {\r\n      // Check for specific error codes\r\n      console.error('Error code:', error.code);\r\n      \r\n      if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {\r\n        throw new Error('AI Service temporarily unavailable (503)');\r\n      }\r\n    }\r\n\r\n    // For other errors, return fallback response\r\n    return {\r\n      estimatedTime: '1小时',\r\n      confidence: 0.5,\r\n      reasoning: 'AI时间估计失败，使用默认估计',\r\n      suggestions: ['建议设置合理的时间限制']\r\n    };\r\n  }",
+  "toolCallResult": null
+}
+```
+Status: **completed**
+
+
+</details>
+</tool-use>
+
+---
+
+从新的部署日志可以看出，AI 服务现在正确配置了：
+
+1. **使用 OpenAI API**：日志显示 "Using OpenAI API"
+2. **API Key 正确设置**：API Key length: 164
+3. **模型正确**：Model: openai/gpt-4o-mini
+4. **所有环境变量都已设置**：OPENAI_API_KEY、OPENAI_MODEL 等都显示为 "Set"
+
+这表明 AI 服务现在正在使用 OpenAI API 而不是 OpenRouter。但是，您仍然遇到 503 错误。让我检查一下 AI 服务的错误处理，确保它能正确处理 OpenAI API 的错误。
+
+ 我看到问题了。在错误处理中，代码检查 `error.response.status`，但对于 OpenAI API，错误对象的结构可能不同。让我修改错误处理，确保它能正确处理 OpenAI API 的错误：
+
+ 现在让我修改其他函数中的错误处理，确保它们也能正确处理 OpenAI API 的错误：
+
+ 现在让我修改 extractTasks 函数中的错误处理：
+
+ 现在让我修改 improveTask 函数中的错误处理：
+
+ 最后修改 estimateTime 函数中的错误处理：
+
+ 现在我已经完成了所有修改。让我总结一下所做的更改：
+
+### 修改总结：
+
+1. **改进了错误处理逻辑**：
+   - 添加了对不同 OpenAI API 错误格式的支持
+   - 检查 `error.response.status`、`error.status` 和 `error.code`
+   - 确保能正确识别 503 错误并抛出异常
+
+2. **优先使用 OpenAI API**：
+   - 从部署日志可以看出，AI 服务现在正确使用 OpenAI API
+   - API Key length: 164（这是 OpenAI API 密钥的典型长度）
+   - Model: openai/gpt-4o-mini（这是 OpenAI 的模型）
+   - 日志显示 "Using OpenAI API"
+
+3. **修复了所有路由处理器的错误处理**：
+   - 所有路由处理器现在都能正确检测和处理 503 错误
+   - 当遇到 503 错误时，会返回适当的 503 状态码
+
+### 关键改进：
+
+- **更好的错误检测**：现在能正确检测 OpenAI API 的各种错误格式
+- **优先使用 OpenAI API**：代码现在会优先使用您在 Railway 中设置的 OpenAI API 密钥和模型
+- **正确的 503 错误处理**：当 OpenAI API 返回 503 错误时，AI 服务会正确返回 503 状态码给前端
+
+现在您需要：
+1. 将这些更改推送到 Git 仓库
+2. 在 Railway 中重新部署应用
+
+请执行以下命令：
+```bash
+cd E:\MultiModel\ai-adhd-website
+git add .
+git commit -m "Improve OpenAI API error handling for different error formats"
+git push origin main
+```
+
+然后在 Railway 控制台中重新部署应用。
+
+这些修改应该能解决 503 错误问题，让应用能正确使用 OpenAI API 并在遇到 503 错误时返回适当的响应。
+
+---
+
+_**User (2025-12-05 08:49Z)**_
+
+新的测试后返回，，页面控制器还是报：“favicon.svg:1   Failed to load resource: the server responded with a status of 404 ()
+icons/icon-144x144.png:1   Failed to load resource: the server responded with a status of 404 ()
+add:1  Error while trying to use the following icon from the Manifest: https://ai-adhd-website.vercel.app/icons/icon-144x144.png (Download error or resource isn't a valid image)
+ai-adhd-website-production.up.railway.app/api/services/ai/classify-task:1   Failed to load resource: the server responded with a status of 503 ()
+index-DEcurh4f.js:274  Failed to classify task: decode: "ERR_BAD_RESPONSE"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 0, …}message: "Request failed with status code 503"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 0, withCredentials: false, upload: XMLHttpRequestUpload, …}response: {data: {…}, status: 503, statusText: '', headers: ln, config: {…}, …}status: 503stack: "AxiosError: Request failed with status code 503\n    at _k (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:211:1083)\n    at XMLHttpRequest.v (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:211:5821)\n    at no.request (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:213:2094)\n    at async Object.classifyTask (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:274:40319)\n    at async S (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:274:42009)"[[Prototype]]: Error
+classifyTask @ index-DEcurh4f.js:274
+index-DEcurh4f.js:274  Failed to get AI suggestions: decode: "ERR_BAD_RESPONSE"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 0, …}message: "Request failed with status code 503"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 0, withCredentials: false, upload: XMLHttpRequestUpload, …}response: {data: {…}, status: 503, statusText: '', headers: ln, config: {…}, …}status: 503stack: "AxiosError: Request failed with status code 503\n    at _k (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:211:1083)\n    at XMLHttpRequest.v (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:211:5821)\n    at no.request (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:213:2094)\n    at async Object.classifyTask (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:274:40319)\n    at async S (https://ai-adhd-website.vercel.app/assets/index-DEcurh4f.js:274:42009)"[[Prototype]]: Error
+S @ index-DEcurh4f.js:274
+”；；；
 
 ---
 

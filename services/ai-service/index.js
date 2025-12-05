@@ -341,6 +341,13 @@ Please return JSON format:
       if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
+    } else if (error.status_code) {
+      // Some OpenAI errors might have status_code
+      console.error('Error status_code:', error.status_code);
+      
+      if (error.status_code === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
     }
 
     // For other errors, return fallback response
@@ -461,6 +468,13 @@ Please return JSON format:
       console.error('Error code:', error.code);
       
       if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.status_code) {
+      // Some OpenAI errors might have status_code
+      console.error('Error status_code:', error.status_code);
+      
+      if (error.status_code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
     }
@@ -587,6 +601,13 @@ async function extractTasks(text) {
       if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
+    } else if (error.status_code) {
+      // Some OpenAI errors might have status_code
+      console.error('Error status_code:', error.status_code);
+      
+      if (error.status_code === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
     }
 
     // For other errors, return fallback response
@@ -711,6 +732,13 @@ Please return JSON format:
       if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
+    } else if (error.status_code) {
+      // Some OpenAI errors might have status_code
+      console.error('Error status_code:', error.status_code);
+      
+      if (error.status_code === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
     }
 
     // For other errors, return fallback response
@@ -831,6 +859,13 @@ Please return JSON format:
       console.error('Error code:', error.code);
       
       if (error.code === 'ERR_BAD_RESPONSE' || error.code === 503) {
+        throw new Error('AI Service temporarily unavailable (503)');
+      }
+    } else if (error.status_code) {
+      // Some OpenAI errors might have status_code
+      console.error('Error status_code:', error.status_code);
+      
+      if (error.status_code === 503) {
         throw new Error('AI Service temporarily unavailable (503)');
       }
     }
