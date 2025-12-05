@@ -1,7 +1,7 @@
 # Railway Multi-Service Monorepo Configuration for ADHD Task Manager PWA
 
 [build]
-builder = "docker"
+builder = "nixpacks"
 # Build timeout in milliseconds (20 minutes)
 timeout = 1200000
 
@@ -18,9 +18,7 @@ NPM_CONFIG_PREFER_OFFLINE = "true"
 # Set NODE_ENV for production
 NODE_ENV = "production"
 
-# Docker build configuration
-[build.docker]
-# Use simplified Dockerfile for better reliability
+# Build configuration
 dockerfile = "Dockerfile.simple"
 # Build arguments
 args = [
