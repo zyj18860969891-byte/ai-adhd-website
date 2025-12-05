@@ -155,6 +155,8 @@ app.post('/api/reminders', (req, res) => {
     createdAt: new Date().toISOString()
   };
   
+  console.log('Received reminder:', reminder);
+  
   // Schedule the reminder
   scheduleReminder(reminder);
   
@@ -196,8 +198,24 @@ function acknowledgeNotification(id) {
 }
 
 function scheduleReminder(reminder) {
+  console.log('Scheduling reminder:', {
+    id: reminder.id,
+    taskId: reminder.taskId,
+    title: reminder.title,
+    schedule: reminder.schedule,
+    createdAt: reminder.createdAt
+  });
+  
   // Schedule using cron syntax
   cron.schedule(reminder.schedule, () => {
+    console.log('Reminder triggered:', {
+      id: reminder.id,
+      taskId: reminder.taskId,
+      title: reminder.title,
+      active: reminder.active,
+      now: new Date().toISOString()
+    });
+    
     if (reminder.active) {
       const notification = {
         id: notificationIdCounter++,
@@ -211,6 +229,7 @@ function scheduleReminder(reminder) {
         status: 'pending'
       };
       
+      console.log('Creating notification:', notification);
       notifications.set(notification.id, notification);
       
       // Send to WebSocket clients
@@ -223,7 +242,10 @@ function scheduleReminder(reminder) {
       // If not repeating, deactivate
       if (!reminder.repeat) {
         reminder.active = false;
+        console.log('Deactivating reminder:', reminder.id);
       }
+    } else {
+      console.log('Reminder is not active, skipping:', reminder.id);
     }
   });
 }

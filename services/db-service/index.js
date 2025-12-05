@@ -436,6 +436,16 @@ function createTaskReminder(task) {
         // Send to notification service
         const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
         console.log('Creating reminder with URL:', notificationServiceUrl);
+        console.log('Reminder details:', {
+          userId: reminderData.userId,
+          taskId: reminderData.taskId,
+          title: reminderData.title,
+          message: reminderData.message,
+          schedule: reminderData.schedule,
+          dueDate: task.dueDate,
+          reminderTime: reminderTime.toISOString(),
+          now: now.toISOString()
+        });
         fetch(`${notificationServiceUrl}/api/reminders`, {
           method: 'POST',
           headers: {
