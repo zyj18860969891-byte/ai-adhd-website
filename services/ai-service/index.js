@@ -176,33 +176,6 @@ app.post('/api/estimate-time', async (req, res) => {
 // Ensure all routes are registered before server starts
 console.log('All API endpoints registered successfully');
 
-app.post('/api/classify-task', async (req, res) => {
-  try {
-    const { text, context } = req.body;
-    if (!text) {
-      return res.status(400).json({ error: 'Task text is required' });
-    }
-    console.log('Classify task request:', { text: text.substring(0, 50), context });
-    console.log('Environment check:', {
-      NODE_ENV: process.env.NODE_ENV,
-      OPENROUTER_MODEL: process.env.OPENROUTER_MODEL,
-      API_KEY_SET: !!process.env.OPENROUTER_API_KEY,
-      API_KEY_LENGTH: process.env.OPENROUTER_API_KEY ? process.env.OPENROUTER_API_KEY.length : 0
-    });
-    
-    // Log the full request body for debugging
-    console.log('Full request body:', JSON.stringify(req.body, null, 2));
-    
-    const result = await classifyTask(text, context);
-    console.log('Classification result:', JSON.stringify(result, null, 2));
-    res.json(result);
-  } catch (error) {
-    console.error('Classification Error:', error);
-    console.error('Error stack:', error.stack);
-    res.status(500).json({ error: 'Failed to classify task' });
-  }
-});
-
 async function classifyTask(text, context = {}) {
   const prompt = `Please classify the following Chinese task and return JSON format:
 

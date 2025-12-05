@@ -12,7 +12,28 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Load environment variables
-require('dotenv').config();
+const dotenv = require('dotenv');
+const fs = require('fs');
+
+// Try to load .env file if it exists
+if (fs.existsSync('.env')) {
+  dotenv.config({ path: '.env' });
+} else {
+  // In production environments like Railway, environment variables are set directly
+  console.log('No .env file found, using environment variables from process.env');
+}
+
+// Debug environment variables
+console.log('Environment variables loaded:');
+console.log('  AI_SERVICE_URL:', process.env.AI_SERVICE_URL || 'Not set');
+console.log('  DB_SERVICE_URL:', process.env.DB_SERVICE_URL || 'Not set');
+console.log('  NOTIFICATION_SERVICE_URL:', process.env.NOTIFICATION_SERVICE_URL || 'Not set');
+
+// Log all environment variables for debugging
+console.log('All environment variables:');
+Object.keys(process.env).filter(key => key.includes('SERVICE') || key.includes('PORT') || key.includes('NODE_ENV')).forEach(key => {
+  console.log(`  ${key}: ${process.env[key] || 'Not set'}`);
+});
 
 // Trust proxy (required for Railway and other cloud platforms)
 app.set('trust proxy', 1);
