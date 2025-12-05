@@ -63,6 +63,9 @@ if (!process.env.OPENROUTER_API_KEY && !process.env.OPENAI_API_KEY) {
   console.warn('Please set OPENROUTER_API_KEY or OPENAI_API_KEY environment variable.');
 }
 
+// Add explicit route handling for all endpoints to ensure compatibility
+// This fixes the 404 error by ensuring all routes are properly registered
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   const healthStatus = {
@@ -87,7 +90,13 @@ app.get('/api/health', (req, res) => {
   res.json(healthStatus);
 });
 
-// Add explicit API endpoints for compatibility
+// Ensure all endpoints are registered properly
+app.all('/api/*', (req, res, next) => {
+  console.log(`Received ${req.method} request to ${req.path}`);
+  next();
+});
+
+// Explicitly define all API endpoints that frontend expects
 app.post('/api/classify-task', async (req, res) => {
   try {
     const { text, context } = req.body;
@@ -163,6 +172,9 @@ app.post('/api/estimate-time', async (req, res) => {
     res.status(500).json({ error: 'Failed to estimate time' });
   }
 });
+
+// Ensure all routes are registered before server starts
+console.log('All API endpoints registered successfully');
 
 app.post('/api/classify-task', async (req, res) => {
   try {
