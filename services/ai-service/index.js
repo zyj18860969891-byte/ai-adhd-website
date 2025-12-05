@@ -270,10 +270,16 @@ Please return JSON format:
       };
     }
     
+    const model = process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo';
+    // Remove provider prefix if present (e.g., "openai/gpt-4o-mini" -> "gpt-4o-mini")
+    const cleanModel = model.replace(/^openai\//, '').replace(/^anthropic\//, '').replace(/^google\//, '');
+    
+    console.log('Using clean model name:', cleanModel);
+    
     const response = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
+      model: cleanModel,
       messages: [
-        { role: 'system', content: 'You are a helpful task classification assistant for ADHD task management. You understand Chinese and can properly classify Chinese tasks.' },
+        { role: 'system', content: 'You are a helpful task classification assistant for ADHD task management. You understand Chinese and can properly classify Chinese tasks. Please用中文回答。' },
         { role: 'user', content: prompt }
       ],
       temperature: 0.3,
@@ -414,10 +420,16 @@ Please return JSON format:
       };
     }
     
+    const model = process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo';
+    // Remove provider prefix if present (e.g., "openai/gpt-4o-mini" -> "gpt-4o-mini")
+    const cleanModel = model.replace(/^openai\//, '').replace(/^anthropic\//, '').replace(/^google\//, '');
+    
+    console.log('Using clean model name for priority:', cleanModel);
+    
     const response = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
+      model: cleanModel,
       messages: [
-        { role: 'system', content: 'You are a helpful priority suggestion assistant for ADHD task management. You understand Chinese and can properly suggest priorities for Chinese tasks.' },
+        { role: 'system', content: 'You are a helpful priority suggestion assistant for ADHD task management. You understand Chinese and can properly suggest priorities for Chinese tasks. Please用中文回答。' },
         { role: 'user', content: prompt }
       ],
       temperature: 0.3,
@@ -549,7 +561,7 @@ async function extractTasks(text) {
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
       messages: [
-        { role: 'system', content: 'You are a helpful task extraction assistant for ADHD task management. You understand Chinese and can properly extract tasks from Chinese text.' },
+        { role: 'system', content: 'You are a helpful task extraction assistant for ADHD task management. You understand Chinese and can properly extract tasks from Chinese text. Please用中文回答。' },
         { role: 'user', content: prompt }
       ],
       temperature: 0.3,
@@ -680,7 +692,7 @@ Please return JSON format:
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
       messages: [
-        { role: 'system', content: 'You are a helpful task improvement assistant for ADHD task management. You understand Chinese and can make tasks more specific and actionable.' },
+        { role: 'system', content: 'You are a helpful task improvement assistant for ADHD task management. You understand Chinese and can make tasks more specific和可执行。Please用中文回答。' },
         { role: 'user', content: prompt }
       ],
       temperature: 0.3,
@@ -809,7 +821,7 @@ Please return JSON format:
     const response = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || process.env.OPENROUTER_MODEL || 'gpt-3.5-turbo',
       messages: [
-        { role: 'system', content: 'You are a helpful time estimation assistant for ADHD task management. You understand Chinese and can provide realistic time estimates for tasks.' },
+        { role: 'system', content: 'You are a helpful time estimation assistant for ADHD task管理. You understand Chinese并且可以为任务提供现实的时间估计。Please用中文回答。' },
         { role: 'user', content: prompt }
       ],
       temperature: 0.3,

@@ -24,6 +24,11 @@ self.addEventListener('install', (event) => {
 
 // Fetch event - serve cached resources or fetch from network
 self.addEventListener('fetch', (event) => {
+  // Skip chrome-extension requests
+  if (event.request.url.startsWith('chrome-extension://')) {
+    return
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
