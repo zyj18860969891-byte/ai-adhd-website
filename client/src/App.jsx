@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppBar, Toolbar, Typography, Container, Box, Drawer, List, ListItem, ListItemIcon, ListItemText, IconButton, Badge, Snackbar, Alert, Button, Dialog, DialogTitle, DialogContent, DialogActions, RadioGroup, FormControlLabel, Radio, TextField } from '@mui/material'
-import { Menu as MenuIcon, Home as HomeIcon, Add as AddIcon, List as ListIcon, BarChart as ChartIcon, Notifications as NotificationsIcon, Settings as SettingsIcon } from '@mui/icons-material'
+import { Menu as MenuIcon, Home as HomeIcon, Add as AddIcon, List as ListIcon, BarChart as ChartIcon, Notifications as NotificationsIcon, Settings as SettingsIcon, Check as CheckIcon, Schedule as ScheduleIcon } from '@mui/icons-material'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 
@@ -53,11 +53,10 @@ function App() {
         
         setNotifications(pendingNotifications)
         
-        // Show snackbar for new reminders
+        // Show modal for new reminders
         newNotifications.forEach(notification => {
           if (notification.type === 'reminder') {
             setSnackbarMessage(notification.message)
-            setSnackbarSeverity('warning')
             setCurrentNotification(notification)
             setSnackbarOpen(true)
           }
@@ -85,7 +84,7 @@ function App() {
     }
 
     loadNotifications()
-    const interval = setInterval(loadNotifications, 5000) // Refresh every 5 seconds for better real-time experience
+    const interval = setInterval(loadNotifications, 15000) // Refresh every 15 seconds
     return () => clearInterval(interval)
   }, [])
 
@@ -101,7 +100,7 @@ function App() {
     }
 
     loadTaskProgress()
-    const interval = setInterval(loadTaskProgress, 5000) // Refresh every 5 seconds
+    const interval = setInterval(loadTaskProgress, 30000) // Refresh every 30 seconds
     return () => clearInterval(interval)
   }, [])
 
@@ -112,6 +111,46 @@ function App() {
     { text: '数据分析', icon: <ChartIcon />, path: '/analytics' },
     { text: '设置', icon: <SettingsIcon />, path: '/settings' }
   ]
+
+  // Defer dialog component
+  const DeferDialog = (
+    <Dialog open={deferDialogOpen} onClose={() => setDeferDialogOpen(false)}>
+      <DialogTitle>延期任务</DialogTitle>
+      <DialogContent>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          请选择延期时间：
+        </Typography>
+        <RadioGroup
+          value={deferOption}
+          onChange={(e) => setDeferOption(e.target.value)}
+        >
+          <FormControlLabel value="1" control={<Radio />} label="1小时后" />
+          <FormControlLabel value="2" control={<Radio />} label="2小时后" />
+          <FormControlLabel value="4" control={<Radio />} label="4小时后" />
+          <FormControlLabel value="24" control={<Radio />} label="1天后" />
+          <FormControlLabel value="custom" control={<Radio />} label="自定义小时数：" />
+        </RadioGroup>
+        {deferOption === 'custom' && (
+          <TextField
+            autoFocus
+            margin="dense"
+            label="小时数"
+            type="number"
+            fullWidth
+            value={customDeferHours}
+            onChange={(e) => setCustomDeferHours(e.target.value)}
+            inputProps={{ min: 1, step: 1 }}
+          />
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setDeferDialogOpen(false)}>取消</Button>
+        <Button onClick={confirmDefer} variant="contained" color="primary">
+          确认延期
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
 
   return (
     <ThemeProvider theme={createTheme()}>
@@ -140,39 +179,101 @@ function App() {
           </Toolbar>
         </AppBar>
 
-        {/* Notification Snackbar */}
-        <Snackbar
+        {/* Notification Modal - Always on top */}
+        <Dialog
           open={snackbarOpen}
-          autoHideDuration={null} // 不自动隐藏，让用户操作
           onClose={() => setSnackbarOpen(false)}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        >
-          <Alert 
-            onClose={() => setSnackbarOpen(false)} 
-            severity={snackbarSeverity} 
-            sx={{ width: '100%' }}
-            action={
-              <React.Fragment>
-                <Button 
-                  color="success" 
-                  size="small"
-                  onClick={() => handleTaskComplete(currentNotification)}
-                >
-                  已完成
-                </Button>
-                <Button 
-                  color="warning" 
-                  size="small"
-                  onClick={() => handleTaskDefer(currentNotification)}
-                >
-                  延期
-                </Button>
-              </React.Fragment>
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: 24,
+              p: 2
             }
-          >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
+          }}
+        >
+          <DialogTitle>
+            <NotificationsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+            任务提醒
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              {snackbarMessage}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              请选择如何处理这个任务
+            </Typography>
+            
+            <RadioGroup
+              value={deferOption}
+              onChange={(e) => setDeferOption(e.target.value)}
+              sx={{ mb: 2 }}
+            >
+              <FormControlLabel 
+                value="1" 
+                control={<Radio />} 
+                label="延期 1 小时" 
+              />
+              <FormControlLabel 
+                value="2" 
+                control={<Radio />} 
+                label="延期 2 小时" 
+              />
+              <FormControlLabel 
+                value="4" 
+                control={<Radio />} 
+                label="延期 4 小时" 
+              />
+              <FormControlLabel 
+                value="24" 
+                control={<Radio />} 
+                label="延期 1 天" 
+              />
+              <FormControlLabel 
+                value="custom" 
+                control={<Radio />} 
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    自定义延期时间
+                    <TextField
+                      size="small"
+                      type="number"
+                      value={customDeferHours}
+                      onChange={(e) => setCustomDeferHours(e.target.value)}
+                      placeholder="小时数"
+                      sx={{ width: 120 }}
+                    />
+                  </Box>
+                }
+              />
+            </RadioGroup>
+          </DialogContent>
+          <DialogActions>
+            <Button 
+              onClick={() => handleTaskComplete(currentNotification)}
+              variant="contained"
+              color="success"
+              startIcon={<CheckIcon />}
+            >
+              标记为已完成
+            </Button>
+            <Button 
+              onClick={() => handleTaskDefer(currentNotification)}
+              variant="contained"
+              color="warning"
+              startIcon={<ScheduleIcon />}
+            >
+              延期任务
+            </Button>
+            <Button 
+              onClick={() => setSnackbarOpen(false)}
+              variant="outlined"
+            >
+              稍后提醒
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {/* Drawer */}
         <Drawer
