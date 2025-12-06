@@ -43,22 +43,29 @@ function App() {
   useEffect(() => {
     const loadNotifications = async () => {
       try {
+        console.log('📥 Loading notifications...');
         const userNotifications = await notificationService.getUserNotifications('user-1')
+        console.log('📥 All notifications from server:', userNotifications);
+        
         const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
+        console.log('📥 Pending notifications:', pendingNotifications);
         
         // Check for new notifications
         const newNotifications = pendingNotifications.filter(n => 
           !notifications.find(existing => existing.id === n.id)
         )
+        console.log('📥 New notifications:', newNotifications);
         
         setNotifications(pendingNotifications)
         
         // Show modal for new reminders
         newNotifications.forEach(notification => {
           if (notification.type === 'reminder') {
+            console.log('🔔 New reminder detected:', notification.message);
             setSnackbarMessage(notification.message)
             setCurrentNotification(notification)
             setSnackbarOpen(true)
+            console.log('🔔 Modal opened for new reminder');
           }
         })
         
@@ -67,6 +74,7 @@ function App() {
           if (notification.type === 'reminder' && 
               'Notification' in window && 
               Notification.permission === 'granted') {
+            console.log('🌐 Showing browser notification:', notification.title);
             new Notification(notification.title, {
               body: notification.message,
               icon: '/icons/icon-72x72.png'
@@ -80,6 +88,7 @@ function App() {
 
     // Request notification permission
     if ('Notification' in window && Notification.permission === 'default') {
+      console.log('🌐 Requesting notification permission...');
       Notification.requestPermission()
     }
 
@@ -90,13 +99,25 @@ function App() {
 
   // Auto-show modal when notifications change (for cross-page reminders)
   useEffect(() => {
+    console.log('🔄 Notifications changed:', notifications.length);
+    console.log('🔄 Snackbar open status:', snackbarOpen);
+    console.log('🔄 Latest notification:', notifications[notifications.length - 1]);
+    
     if (notifications.length > 0 && !snackbarOpen) {
       const latestNotification = notifications[notifications.length - 1]
+      console.log('🔄 Checking latest notification type:', latestNotification.type);
+      
       if (latestNotification.type === 'reminder') {
+        console.log('🔄 Auto-showing reminder modal for:', latestNotification.message);
         setSnackbarMessage(latestNotification.message)
         setCurrentNotification(latestNotification)
         setSnackbarOpen(true)
+        console.log('🔄 Modal opened successfully');
+      } else {
+        console.log('🔄 Latest notification is not a reminder');
       }
+    } else {
+      console.log('🔄 Conditions not met for auto-showing modal');
     }
   }, [notifications])
 
@@ -188,11 +209,19 @@ function App() {
             <Badge badgeContent={notifications.length} color="secondary">
               <NotificationsIcon 
                 onClick={() => {
+                  console.log('🔔 NotificationsIcon clicked!');
+                  console.log('Notifications count:', notifications.length);
+                  console.log('Notifications:', notifications);
+                  
                   if (notifications.length > 0) {
+                    console.log('🔔 Showing notification:', notifications[0]);
                     // 如果有未读通知，显示第一个
                     setSnackbarMessage(notifications[0].message);
                     setCurrentNotification(notifications[0]);
                     setSnackbarOpen(true);
+                    console.log('🔔 Snackbar opened with message:', notifications[0].message);
+                  } else {
+                    console.log('🔔 No notifications to show');
                   }
                 }}
                 style={{ cursor: 'pointer' }}
@@ -347,6 +376,143 @@ function App() {
 export default App
 
   // Handle task completion
+  const handleTaskComplete = async (notification) => {
+    if (!notification || !notification.taskId) return
+    
+    try {
+      // Update task status to completed
+      await taskService.updateTask(notification.taskId, { 
+        status: 'completed',
+        completedAt: new Date().toISOString()
+      })
+      
+      // Acknowledge notification
+      await notificationService.acknowledgeNotification(notification.id)
+      
+      setSnackbarOpen(false)
+      setCurrentNotification(null)
+      
+      // Show success message
+      setSnackbarMessage('任务已完成！')
+      setSnackbarSeverity('success')
+      setSnackbarOpen(true)
+      
+      // Refresh notifications
+      const userNotifications = await notificationService.getUserNotifications('user-1')
+      setNotifications(userNotifications.filter(n => n.status === 'pending'))
+    } catch (error) {
+      console.error('Failed to complete task:', error)
+      setSnackbarMessage('完成任务失败')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+    }
+  }
+
+  // Handle task defer
+  const handleTaskDefer = async (notification) => {
+    if (!notification || !notification.taskId) return
+    
+    setCurrentNotification(notification)
+    setDeferDialogOpen(true)
+  }
+
+  // Confirm defer with selected option
+  const confirmDefer = async () => {
+    if (!currentNotification) return
+    
+    try {
+      const deferHours = deferOption === 'custom' ? parseInt(customDeferHours) : parseInt(deferOption)
+      
+      if (isNaN(deferHours) || deferHours <= 0) {
+        setSnackbarMessage('请输入有效的延期时间')
+        setSnackbarSeverity('error')
+        setSnackbarOpen(true)
+        return
+      }
+      
+      const newDueDate = new Date()
+      newDueDate.setHours(newDueDate.getHours() + deferHours)
+      
+      // Update task due date
+      await taskService.updateTask(currentNotification.taskId, { 
+        dueDate: newDueDate.toISOString()
+      })
+      
+      // Create new deferred reminder
+      const newReminderTime = new Date(newDueDate.getTime() - 60000) // 1 minute before new due date
+      
+      const deferredReminder = {
+        userId: 'user-1',
+        taskId: currentNotification.taskId,
+        title: currentNotification.title,
+        message: currentNotification.message,
+        newSchedule: getCronSchedule(newReminderTime),
+        deferHours: deferHours
+      }
+      
+      await notificationService.deferReminder(deferredReminder)
+      
+      // Acknowledge current notification
+      await notificationService.acknowledgeNotification(currentNotification.id)
+      
+      setDeferDialogOpen(false)
+      setCurrentNotification(null)
+      
+      // Show success message
+      setSnackbarMessage(`任务已延期至 ${newDueDate.toLocaleString()}，新提醒将在 ${newReminderTime.toLocaleString()} 触发`)
+      setSnackbarSeverity('info')
+      setSnackbarOpen(true)
+      
+      // Refresh notifications
+      const userNotifications = await notificationService.getUserNotifications('user-1')
+      setNotifications(userNotifications.filter(n => n.status === 'pending'))
+    } catch (error) {
+      console.error('Failed to defer task:', error)
+      setSnackbarMessage('延期任务失败')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+    }
+  }
+
+  // Defer dialog component
+  const DeferDialog = (
+    <Dialog open={deferDialogOpen} onClose={() => setDeferDialogOpen(false)}>
+      <DialogTitle>延期任务</DialogTitle>
+      <DialogContent>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          请选择延期时间：
+        </Typography>
+        <RadioGroup
+          value={deferOption}
+          onChange={(e) => setDeferOption(e.target.value)}
+        >
+          <FormControlLabel value="1" control={<Radio />} label="1小时后" />
+          <FormControlLabel value="2" control={<Radio />} label="2小时后" />
+          <FormControlLabel value="4" control={<Radio />} label="4小时后" />
+          <FormControlLabel value="24" control={<Radio />} label="1天后" />
+          <FormControlLabel value="custom" control={<Radio />} label="自定义小时数：" />
+        </RadioGroup>
+        {deferOption === 'custom' && (
+          <TextField
+            autoFocus
+            margin="dense"
+            label="小时数"
+            type="number"
+            fullWidth
+            value={customDeferHours}
+            onChange={(e) => setCustomDeferHours(e.target.value)}
+            inputProps={{ min: 1, step: 1 }}
+          />
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setDeferDialogOpen(false)}>取消</Button>
+        <Button onClick={confirmDefer} variant="contained" color="primary">
+          确认延期
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
   const handleTaskComplete = async (notification) => {
     if (!notification || !notification.taskId) return
     
