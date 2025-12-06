@@ -73,6 +73,17 @@ const notificationService = {
     }
   },
 
+  // Defer reminder
+  async deferReminder(reminder) {
+    try {
+      const response = await axios.post(`${getApiBase()}/services/notification/reminders/defer`, reminder)
+      return response.data
+    } catch (error) {
+      console.error('Failed to defer reminder:', error)
+      throw error
+    }
+  },
+
   // Health check
   async getHealth() {
     try {
