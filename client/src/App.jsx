@@ -88,6 +88,18 @@ function App() {
     return () => clearInterval(interval)
   }, [])
 
+  // Auto-show modal when notifications change (for cross-page reminders)
+  useEffect(() => {
+    if (notifications.length > 0 && !snackbarOpen) {
+      const latestNotification = notifications[notifications.length - 1]
+      if (latestNotification.type === 'reminder') {
+        setSnackbarMessage(latestNotification.message)
+        setCurrentNotification(latestNotification)
+        setSnackbarOpen(true)
+      }
+    }
+  }, [notifications])
+
   // Load task progress
   useEffect(() => {
     const loadTaskProgress = async () => {
@@ -174,7 +186,18 @@ function App() {
             </Typography>
 
             <Badge badgeContent={notifications.length} color="secondary">
-              <NotificationsIcon />
+              <NotificationsIcon 
+                onClick={() => {
+                  if (notifications.length > 0) {
+                    // 如果有未读通知，显示第一个
+                    setSnackbarMessage(notifications[0].message);
+                    setCurrentNotification(notifications[0]);
+                    setSnackbarOpen(true);
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+                title="点击查看提醒"
+              />
             </Badge>
           </Toolbar>
         </AppBar>
