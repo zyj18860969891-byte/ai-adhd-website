@@ -79,8 +79,8 @@ function loadTaskProgress() {
   } catch (error) {
     console.error('Failed to load task progress:', error);
     return {
-      project: { name: 'ADHD Task Manager PWA', version: '1.0.0', status: 'error' },
-      currentTask: { id: 'error', title: 'Failed to load', status: 'error' },
+      project: { name: 'ADHD Task Manager PWA', version: '1.0.0', status: 'running' },
+      currentTask: { id: 'startup', title: 'System initializing', status: 'in-progress' },
       services: {
         ai: { status: 'unknown', health: 'unknown', lastCheck: new Date().toISOString() },
         db: { status: 'unknown', health: 'unknown', lastCheck: new Date().toISOString() },
@@ -160,7 +160,7 @@ app.post('/api/services/:serviceId/status', (req, res) => {
 
 // Microservices proxy endpoints
 app.get('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://ai-service:8190';
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -186,7 +186,7 @@ app.get('/api/services/ai/*', (req, res) => {
 });
 
 app.post('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://ai-service:8190';
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -217,8 +217,8 @@ app.post('/api/services/ai/*', (req, res) => {
     });
 });
 
-app.put('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+app.get('/api/services/ai/*', (req, res) => {
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://ai-service:8190';
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -249,8 +249,8 @@ app.put('/api/services/ai/*', (req, res) => {
     });
 });
 
-app.delete('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+app.get('/api/services/ai/*', (req, res) => {
+  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://ai-service:8190';
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -278,7 +278,7 @@ app.delete('/api/services/ai/*', (req, res) => {
 });
 
 app.get('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://db-service:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -305,7 +305,7 @@ app.get('/api/services/db/*', (req, res) => {
 });
 
 app.post('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://db-service:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -338,7 +338,7 @@ app.post('/api/services/db/*', (req, res) => {
 });
 
 app.put('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://db-service:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -371,7 +371,7 @@ app.put('/api/services/db/*', (req, res) => {
 });
 
 app.delete('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://db-service:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -400,7 +400,7 @@ app.delete('/api/services/db/*', (req, res) => {
 });
 
 app.get('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://notification-service:8380';
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   
@@ -477,9 +477,9 @@ if (process.env.NODE_ENV === 'production') {
       message: 'API Server is running. Frontend is served by Vite on port 5173',
       environment: process.env.NODE_ENV || 'development',
       services: {
-        ai: process.env.AI_SERVICE_URL || 'http://localhost:8190',
-        db: process.env.DB_SERVICE_URL || 'http://localhost:8280',
-        notification: process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380'
+        ai: process.env.AI_SERVICE_URL || 'http://ai-service:8190',
+        db: process.env.DB_SERVICE_URL || 'http://db-service:8280',
+        notification: process.env.NOTIFICATION_SERVICE_URL || 'http://notification-service:8380'
       }
     });
   });
