@@ -199,7 +199,7 @@ function App() {
           </List>
         </Drawer>
 
-// Main content */}
+{/* Main content */}
         <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: 8 }}>
           <Container maxWidth="lg">
             <Routes>
