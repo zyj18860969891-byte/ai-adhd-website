@@ -346,46 +346,6 @@ function App() {
 
 export default App
 
-  // Defer dialog component
-  const DeferDialog = (
-    <Dialog open={deferDialogOpen} onClose={() => setDeferDialogOpen(false)}>
-      <DialogTitle>延期任务</DialogTitle>
-      <DialogContent>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          请选择延期时间：
-        </Typography>
-        <RadioGroup
-          value={deferOption}
-          onChange={(e) => setDeferOption(e.target.value)}
-        >
-          <FormControlLabel value="1" control={<Radio />} label="1小时后" />
-          <FormControlLabel value="2" control={<Radio />} label="2小时后" />
-          <FormControlLabel value="4" control={<Radio />} label="4小时后" />
-          <FormControlLabel value="24" control={<Radio />} label="1天后" />
-          <FormControlLabel value="custom" control={<Radio />} label="自定义小时数：" />
-        </RadioGroup>
-        {deferOption === 'custom' && (
-          <TextField
-            autoFocus
-            margin="dense"
-            label="小时数"
-            type="number"
-            fullWidth
-            value={customDeferHours}
-            onChange={(e) => setCustomDeferHours(e.target.value)}
-            inputProps={{ min: 1, step: 1 }}
-          />
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setDeferDialogOpen(false)}>取消</Button>
-        <Button onClick={confirmDefer} variant="contained" color="primary">
-          确认延期
-        </Button>
-      </DialogActions>
-    </Dialog>
-  )
-
   // Handle task completion
   const handleTaskComplete = async (notification) => {
     if (!notification || !notification.taskId) return
@@ -484,3 +444,43 @@ export default App
       setSnackbarOpen(true)
     }
   }
+
+  // Defer dialog component
+  const DeferDialog = (
+    <Dialog open={deferDialogOpen} onClose={() => setDeferDialogOpen(false)}>
+      <DialogTitle>延期任务</DialogTitle>
+      <DialogContent>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          请选择延期时间：
+        </Typography>
+        <RadioGroup
+          value={deferOption}
+          onChange={(e) => setDeferOption(e.target.value)}
+        >
+          <FormControlLabel value="1" control={<Radio />} label="1小时后" />
+          <FormControlLabel value="2" control={<Radio />} label="2小时后" />
+          <FormControlLabel value="4" control={<Radio />} label="4小时后" />
+          <FormControlLabel value="24" control={<Radio />} label="1天后" />
+          <FormControlLabel value="custom" control={<Radio />} label="自定义小时数：" />
+        </RadioGroup>
+        {deferOption === 'custom' && (
+          <TextField
+            autoFocus
+            margin="dense"
+            label="小时数"
+            type="number"
+            fullWidth
+            value={customDeferHours}
+            onChange={(e) => setCustomDeferHours(e.target.value)}
+            inputProps={{ min: 1, step: 1 }}
+          />
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setDeferDialogOpen(false)}>取消</Button>
+        <Button onClick={confirmDefer} variant="contained" color="primary">
+          确认延期
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
