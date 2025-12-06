@@ -163,6 +163,34 @@ app.post('/api/reminders', (req, res) => {
   res.status(201).json(reminder);
 });
 
+// Defer reminder (create new reminder with new schedule)
+app.post('/api/reminders/defer', (req, res) => {
+  const { userId, taskId, title, message, newSchedule, deferHours } = req.body;
+  
+  if (!userId || !taskId || !title || !newSchedule) {
+    return res.status(400).json({ error: 'userId, taskId, title, and newSchedule are required' });
+  }
+  
+  const reminder = {
+    id: `reminder_${Date.now()}_deferred`,
+    userId,
+    taskId,
+    title: `延期提醒: ${title}`,
+    message: `${message} (已延期 ${deferHours} 小时)`,
+    schedule: newSchedule,
+    repeat: false,
+    active: true,
+    createdAt: new Date().toISOString()
+  };
+  
+  console.log('Received deferred reminder:', reminder);
+  
+  // Schedule the deferred reminder
+  scheduleReminder(reminder);
+  
+  res.status(201).json(reminder);
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   healthStatus.lastCheck = new Date().toISOString();

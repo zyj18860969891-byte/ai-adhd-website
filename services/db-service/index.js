@@ -432,6 +432,17 @@ function createTaskReminder(task) {
     const now = new Date();
     const timeDiff = dueDate.getTime() - now.getTime();
     
+    // Check if task is overdue and update status
+    if (timeDiff < 0 && task.status !== 'completed') {
+      console.log('Task is overdue, updating status to overdue');
+      const stmt = db.prepare('UPDATE tasks SET status = "overdue", updatedAt = ? WHERE id = ?');
+      stmt.run([new Date().toISOString(), task.id]);
+      stmt.finalize();
+      
+      // Add to history
+      addHistory(task.id, 'status_changed', { from: task.status, to: 'overdue' });
+    }
+    
     // Only create reminder if due date is in the future
     if (timeDiff > 0) {
       // Create reminder 1 minute before due date
@@ -472,6 +483,28 @@ function createTaskReminder(task) {
           console.error('Failed to create reminder:', err);
         });
       }
+    } else {
+      // Task is already overdue, create immediate notification
+      console.log('Task is already overdue, creating immediate notification');
+      const reminderData = {
+        userId: 'user-1',
+        taskId: task.id,
+        title: `任务已过期: ${task.title}`,
+        message: `任务 "${task.title}" 已经过期！`,
+        schedule: getCronSchedule(new Date()),
+        repeat: false
+      };
+      
+      const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+      fetch(`${notificationServiceUrl}/api/reminders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reminderData)
+      }).catch(err => {
+        console.error('Failed to create overdue notification:', err);
+      });
     }
   } catch (error) {
     console.error('Error creating reminder:', error);
@@ -488,6 +521,58 @@ function getCronSchedule(date) {
   
   return `${minute} ${hour} ${day} ${month} ${dayOfWeek}`;
 }
+
+// Background tasks
+// Check for overdue tasks every minute
+cron.schedule('* * * * *', () => {
+  const now = new Date();
+  
+  // Check for tasks that are overdue
+  db.all('SELECT * FROM tasks WHERE status NOT IN ("completed", "overdue") AND dueDate IS NOT NULL', (err, rows) => {
+    if (err) {
+      console.error('Database query error:', err);
+      return;
+    }
+    
+    rows.forEach(task => {
+      const dueDate = new Date(task.dueDate);
+      if (now.getTime() > dueDate.getTime()) {
+        console.log('Task is overdue:', task.id, task.title);
+        
+        // Update task status to overdue
+        const stmt = db.prepare('UPDATE tasks SET status = "overdue", updatedAt = ? WHERE id = ?');
+        stmt.run([new Date().toISOString(), task.id]);
+        stmt.finalize();
+        
+        // Add to history
+        addHistory(task.id, 'status_changed', { from: task.status, to: 'overdue' });
+        
+        // Create overdue notification
+        const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+        const notificationData = {
+          userId: 'user-1',
+          title: `任务已过期: ${task.title}`,
+          message: `任务 "${task.title}" 已经过期！`,
+          type: 'reminder',
+          priority: 'high',
+          taskId: task.id
+        };
+        
+        fetch(`${notificationServiceUrl}/api/notifications`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(notificationData)
+        }).catch(err => {
+          console.error('Failed to create overdue notification:', err);
+        });
+      }
+    });
+  });
+  
+  console.log('Checking overdue tasks...');
+});
 
 // Start server
 app.listen(PORT, () => {
