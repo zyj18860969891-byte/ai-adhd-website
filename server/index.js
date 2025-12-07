@@ -28,15 +28,61 @@ console.log('  AI_SERVICE_URL:', process.env.AI_SERVICE_URL || 'Not set');
 console.log('  DB_SERVICE_URL:', process.env.DB_SERVICE_URL || 'Not set');
 console.log('  NOTIFICATION_SERVICE_URL:', process.env.NOTIFICATION_SERVICE_URL || 'Not set');
 
+// Enhanced fetch with retry and fallback support
+async function fetchWithRetry(url, options = {}, fallbackUrls = []) {
+  const urls = [url, ...fallbackUrls];
+  
+  for (let i = 0; i < urls.length; i++) {
+    const currentUrl = urls[i];
+    try {
+      const response = await fetch(currentUrl, options);
+      if (response.ok) {
+        return response;
+      } else {
+        throw new Error(`Service responded with status: ${response.status}`);
+      }
+    } catch (error) {
+      console.log(`Attempt ${i + 1}/${urls.length} failed for ${currentUrl}:`, error.message);
+      if (i === urls.length - 1) {
+        throw error;
+      }
+      // Wait before retry
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+}
+
 // Railway service discovery
 function getServiceUrl(serviceName, defaultPort) {
-  // In Railway, services can be discovered using Railway service discovery
   // Check if we're in Railway environment
   const isRailway = process.env.RAILWAY_SERVICE_ID || process.env.RAILWAY_ENVIRONMENT;
   
   if (isRailway) {
-    // For Railway, use the internal service discovery format
-    return `http://${serviceName}.railway.internal:${defaultPort}`;
+    // For Railway, try multiple approaches for service discovery
+    const railwayServiceName = process.env.RAILWAY_SERVICE_NAME;
+    
+    if (railwayServiceName) {
+      // Try different service discovery methods
+      const attempts = [
+        `http://${serviceName}.railway.internal:${defaultPort}`,  // Railway internal DNS
+        `http://${serviceName}:${defaultPort}`,                  // Direct service name
+        `http://localhost:${defaultPort}`,                      // Local fallback
+      ];
+      
+      console.log(`Railway service discovery for ${serviceName}:`, attempts);
+      return attempts[0]; // Start with Railway internal DNS
+    }
+    
+    // Fallback: use environment variables if available
+    const envServiceUrl = process.env[`${serviceName.toUpperCase()}_SERVICE_URL`];
+    if (envServiceUrl) {
+      console.log(`Using environment variable for ${serviceName}:`, envServiceUrl);
+      return envServiceUrl;
+    }
+    
+    // Last resort: use localhost
+    console.log(`Using localhost fallback for ${serviceName}`);
+    return `http://localhost:${defaultPort}`;
   }
   
   // For local development or other environments, use the provided URL or default
@@ -191,12 +237,14 @@ app.get('/api/services/ai/*', (req, res) => {
   console.log('AI Service URL:', aiServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl)
+  fetchWithRetry(targetUrl, {
+    method: 'GET'
+  }, [
+    `http://ai-service:${PORT}`,           // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('AI Service response status:', response.status);
-      if (!response.ok) {
-        throw new Error(`AI Service responded with status: ${response.status}`);
-      }
       return response.json();
     })
     .then(data => {
@@ -216,13 +264,16 @@ app.post('/api/services/ai/*', (req, res) => {
   console.log('AI Service URL:', aiServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl, {
+  fetchWithRetry(targetUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(req.body)
-  })
+  }, [
+    `http://ai-service:${PORT}`,           // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('AI Service response status:', response.status);
       if (!response.ok) {
@@ -247,13 +298,16 @@ app.put('/api/services/ai/*', (req, res) => {
   console.log('AI Service URL:', aiServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl, {
+  fetchWithRetry(targetUrl, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(req.body)
-  })
+  }, [
+    `http://ai-service:${PORT}`,           // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('AI Service response status:', response.status);
       if (!response.ok) {
@@ -278,9 +332,12 @@ app.delete('/api/services/ai/*', (req, res) => {
   console.log('AI Service URL:', aiServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl, {
+  fetchWithRetry(targetUrl, {
     method: 'DELETE'
-  })
+  }, [
+    `http://ai-service:${PORT}`,           // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('AI Service response status:', response.status);
       if (!response.ok) {
@@ -306,12 +363,14 @@ app.get('/api/services/db/*', (req, res) => {
   console.log('DB Service URL:', dbServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl)
+  fetchWithRetry(targetUrl, {
+    method: 'GET'
+  }, [
+    `http://db-service:${PORT}`,           // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('DB Service response status:', response.status);
-      if (!response.ok) {
-        throw new Error(`DB Service responded with status: ${response.status}`);
-      }
       return response.json();
     })
     .then(data => {
@@ -332,13 +391,16 @@ app.post('/api/services/db/*', (req, res) => {
   console.log('DB Service URL:', dbServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl, {
+  fetchWithRetry(targetUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(req.body)
-  })
+  }, [
+    `http://db-service:${PORT}`,           // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('DB Service response status:', response.status);
       if (!response.ok) {
@@ -364,13 +426,16 @@ app.put('/api/services/db/*', (req, res) => {
   console.log('DB Service URL:', dbServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl, {
+  fetchWithRetry(targetUrl, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(req.body)
-  })
+  }, [
+    `http://db-service:${PORT}`,           // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('DB Service response status:', response.status);
       if (!response.ok) {
@@ -396,9 +461,12 @@ app.delete('/api/services/db/*', (req, res) => {
   console.log('DB Service URL:', dbServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl, {
+  fetchWithRetry(targetUrl, {
     method: 'DELETE'
-  })
+  }, [
+    `http://db-service:${PORT}`,           // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('DB Service response status:', response.status);
       if (!response.ok) {
@@ -424,7 +492,12 @@ app.get('/api/services/notification/*', (req, res) => {
   console.log('Notification Service URL:', notificationServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl)
+  fetchWithRetry(targetUrl, {
+    method: 'GET'
+  }, [
+    `http://notification-service:${PORT}`,  // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
       if (!response.ok) {
@@ -450,13 +523,16 @@ app.post('/api/services/notification/*', (req, res) => {
   console.log('Notification Service URL:', notificationServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl, {
+  fetchWithRetry(targetUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(req.body)
-  })
+  }, [
+    `http://notification-service:${PORT}`,  // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
       if (!response.ok) {
@@ -482,13 +558,16 @@ app.put('/api/services/notification/*', (req, res) => {
   console.log('Notification Service URL:', notificationServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl, {
+  fetchWithRetry(targetUrl, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(req.body)
-  })
+  }, [
+    `http://notification-service:${PORT}`,  // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
       if (!response.ok) {
@@ -514,9 +593,12 @@ app.delete('/api/services/notification/*', (req, res) => {
   console.log('Notification Service URL:', notificationServiceUrl);
   console.log('Request path:', req.originalUrl);
   
-  fetch(targetUrl, {
+  fetchWithRetry(targetUrl, {
     method: 'DELETE'
-  })
+  }, [
+    `http://notification-service:${PORT}`,  // Fallback 1: Direct service name
+    `http://localhost:${PORT}`            // Fallback 2: Localhost
+  ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
       if (!response.ok) {
