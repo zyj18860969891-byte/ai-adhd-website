@@ -241,7 +241,6 @@ app.post('/api/services/ai/*', (req, res) => {
 });
 
 app.put('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = aiServiceUrl;
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -273,7 +272,6 @@ app.put('/api/services/ai/*', (req, res) => {
 });
 
 app.delete('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = aiServiceUrl;
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -359,7 +357,6 @@ app.post('/api/services/db/*', (req, res) => {
 });
 
 app.put('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = dbServiceUrl;
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -392,7 +389,6 @@ app.put('/api/services/db/*', (req, res) => {
 });
 
 app.delete('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = dbServiceUrl;
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -421,7 +417,6 @@ app.delete('/api/services/db/*', (req, res) => {
 });
 
 app.get('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = notificationServiceUrl;
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   
@@ -448,7 +443,6 @@ app.get('/api/services/notification/*', (req, res) => {
 });
 
 app.post('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = notificationServiceUrl;
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   
@@ -481,7 +475,6 @@ app.post('/api/services/notification/*', (req, res) => {
 });
 
 app.put('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = notificationServiceUrl;
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   
@@ -514,7 +507,6 @@ app.put('/api/services/notification/*', (req, res) => {
 });
 
 app.delete('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = notificationServiceUrl;
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   
