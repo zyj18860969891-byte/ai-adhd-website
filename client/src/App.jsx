@@ -24,9 +24,7 @@ import Analytics from './pages/Analytics.jsx'
 import Settings from './pages/Settings.jsx'
 import TestNotifications from './pages/TestNotifications.jsx'
 
-// Import icons
-import CheckIcon from '@mui/icons-material/Check';
-import ScheduleIcon from '@mui/icons-material/Schedule';
+// Import icons (already imported above)
 
 // Import services
 import taskService from './services/taskService.js'
