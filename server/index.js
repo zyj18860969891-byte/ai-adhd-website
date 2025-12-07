@@ -28,6 +28,28 @@ console.log('  AI_SERVICE_URL:', process.env.AI_SERVICE_URL || 'Not set');
 console.log('  DB_SERVICE_URL:', process.env.DB_SERVICE_URL || 'Not set');
 console.log('  NOTIFICATION_SERVICE_URL:', process.env.NOTIFICATION_SERVICE_URL || 'Not set');
 
+// Railway service discovery
+function getServiceUrl(serviceName, defaultPort) {
+  // In Railway, services can be discovered using Railway service discovery
+  // Format: http://service-name.railway.internal:port
+  if (process.env.RAILWAY_ENVIRONMENT === 'production') {
+    return `http://${serviceName}.railway.internal:${defaultPort}`;
+  }
+  
+  // For local development or other environments, use the provided URL or default
+  return process.env[`${serviceName.toUpperCase()}_SERVICE_URL`] || `http://localhost:${defaultPort}`;
+}
+
+// Get service URLs
+const aiServiceUrl = getServiceUrl('ai-service', 8190);
+const dbServiceUrl = getServiceUrl('db-service', 8280);
+const notificationServiceUrl = getServiceUrl('notification-service', 8380);
+
+console.log('Resolved service URLs:');
+console.log('  AI Service URL:', aiServiceUrl);
+console.log('  DB Service URL:', dbServiceUrl);
+console.log('  Notification Service URL:', notificationServiceUrl);
+
 // Log all environment variables for debugging
 console.log('All environment variables:');
 Object.keys(process.env).filter(key => key.includes('SERVICE') || key.includes('PORT') || key.includes('NODE_ENV')).forEach(key => {
@@ -160,7 +182,6 @@ app.post('/api/services/:serviceId/status', (req, res) => {
 
 // Microservices proxy endpoints
 app.get('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -186,7 +207,6 @@ app.get('/api/services/ai/*', (req, res) => {
 });
 
 app.post('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -278,7 +298,6 @@ app.delete('/api/services/ai/*', (req, res) => {
 });
 
 app.get('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -305,7 +324,6 @@ app.get('/api/services/db/*', (req, res) => {
 });
 
 app.post('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
