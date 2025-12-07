@@ -13,22 +13,22 @@
     "ai": {
       "status": "unknown",
       "health": "unknown",
-      "lastCheck": "2025-12-07T15:55:45.894Z"
+      "lastCheck": "2025-12-07T17:33:20.707Z"
     },
     "db": {
       "status": "unknown",
       "health": "unknown",
-      "lastCheck": "2025-12-07T15:55:45.894Z"
+      "lastCheck": "2025-12-07T17:33:20.707Z"
     },
     "notification": {
       "status": "unknown",
       "health": "unknown",
-      "lastCheck": "2025-12-07T15:55:45.895Z"
+      "lastCheck": "2025-12-07T17:33:20.707Z"
     }
   },
   "deployment": {
     "status": "running",
-    "lastUpdated": "2025-12-07T15:54:32.322Z"
+    "lastUpdated": "2025-12-07T17:33:34.872Z"
   },
-  "lastUpdated": "2025-12-07T15:55:45.895Z"
+  "lastUpdated": "2025-12-07T17:33:20.707Z"
 }

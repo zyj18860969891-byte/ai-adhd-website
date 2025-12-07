@@ -20,6 +20,7 @@ function getCronSchedule(date) {
 import Home from './pages/Home.jsx'
 import TaskBoard from './pages/TaskBoard.jsx'
 import AddTask from './pages/AddTask.jsx'
+import EditTask from './pages/EditTask.jsx'
 import Analytics from './pages/Analytics.jsx'
 import Settings from './pages/Settings.jsx'
 import TestNotifications from './pages/TestNotifications.jsx'
@@ -60,17 +61,19 @@ function App() {
         }
         
         const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
+        console.log('📥 Pending notifications count:', pendingNotifications.length);
         console.log('📥 Pending notifications:', pendingNotifications);
         
         // Check for new notifications
         const newNotifications = pendingNotifications.filter(n => 
           !notifications.find(existing => existing.id === n.id)
         )
+        console.log('📥 New notifications count:', newNotifications.length);
         console.log('📥 New notifications:', newNotifications);
         
         // Only update if there are changes
         if (JSON.stringify(pendingNotifications) !== JSON.stringify(notifications)) {
-          console.log('📥 Updating notifications state');
+          console.log('📥 Updating notifications state - changes detected');
           setNotifications(pendingNotifications)
         } else {
           console.log('📥 No notification changes detected');
@@ -80,12 +83,18 @@ function App() {
         if (newNotifications.length > 0) {
           console.log('🔔 Found', newNotifications.length, 'new notifications');
           newNotifications.forEach(notification => {
+            console.log('🔔 Processing notification:', notification.id, 'type:', notification.type);
             if (notification.type === 'reminder') {
               console.log('🔔 New reminder detected:', notification.message);
+              console.log('🔔 Setting snackbar message:', notification.message);
               setSnackbarMessage(notification.message)
+              console.log('🔔 Setting current notification:', notification.id);
               setCurrentNotification(notification)
+              console.log('🔔 Opening snackbar modal');
               setSnackbarOpen(true)
               console.log('🔔 Modal opened for new reminder');
+            } else {
+              console.log('🔔 Notification is not a reminder, skipping');
             }
           })
         } else {
@@ -102,6 +111,9 @@ function App() {
               body: notification.message,
               icon: '/icons/icon-72x72.png'
             })
+          } else if (notification.type === 'reminder') {
+            console.log('🌐 Browser notification not shown - permission:', 
+              'Notification' in window ? Notification.permission : 'Not supported');
           }
         })
         
@@ -132,19 +144,28 @@ function App() {
     
     if (notifications.length > 0 && !snackbarOpen) {
       const latestNotification = notifications[notifications.length - 1]
-      console.log('🔄 Checking latest notification type:', latestNotification.type);
+      console.log('🔄 Checking latest notification:', latestNotification?.id);
+      console.log('🔄 Latest notification type:', latestNotification?.type);
       
-      if (latestNotification.type === 'reminder') {
+      if (latestNotification && latestNotification.type === 'reminder') {
         console.log('🔄 Auto-showing reminder modal for:', latestNotification.message);
+        console.log('🔄 Setting snackbar message:', latestNotification.message);
         setSnackbarMessage(latestNotification.message)
+        console.log('🔄 Setting current notification:', latestNotification.id);
         setCurrentNotification(latestNotification)
+        console.log('🔄 Opening snackbar modal');
         setSnackbarOpen(true)
         console.log('🔄 Modal opened successfully');
       } else {
-        console.log('🔄 Latest notification is not a reminder');
+        console.log('🔄 Latest notification is not a reminder or is null');
+        if (latestNotification) {
+          console.log('🔄 Notification type is:', latestNotification.type);
+        }
       }
     } else {
       console.log('🔄 Conditions not met for auto-showing modal');
+      console.log('🔄 notifications.length > 0:', notifications.length > 0);
+      console.log('🔄 snackbarOpen:', snackbarOpen);
     }
   }, [notifications, snackbarOpen])
 
@@ -276,13 +297,15 @@ function App() {
 
             <Badge badgeContent={notifications.length} color="secondary">
               <NotificationsIcon 
-                onClick={() => {
+                onClick={(e) => {
                   console.log('🔔 NotificationsIcon clicked!');
                   console.log('Notifications count:', notifications.length);
-                  console.log('Notifications:', notifications);
+                  console.log('Notifications array:', notifications);
+                  console.log('Snackbar open status:', snackbarOpen);
                   
                   if (notifications.length > 0) {
-                    console.log('🔔 Showing notification:', notifications[0]);
+                    console.log('🔔 Showing notification:', notifications[0].id);
+                    console.log('🔔 Notification message:', notifications[0].message);
                     // 如果有未读通知，显示第一个
                     setSnackbarMessage(notifications[0].message);
                     setCurrentNotification(notifications[0]);
@@ -420,13 +443,14 @@ function App() {
           </List>
         </Drawer>
 
-{/* Main content */}
+        {/* Main content */}
         <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: 8 }}>
           <Container maxWidth="lg">
             <Routes>
               <Route path="/" element={<Home taskProgress={taskProgress} />} />
               <Route path="/tasks" element={<TaskBoard />} />
               <Route path="/add" element={<AddTask />} />
+              <Route path="/edit/:id" element={<EditTask />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/test-notifications" element={<TestNotifications />} />
@@ -478,47 +502,6 @@ function App() {
       </div>
     </ThemeProvider>
   )
-
-  // Handle task complete
-  const handleTaskComplete = async (notification) => {
-    if (!notification || !notification.taskId) return
-    
-    try {
-      // Update task status to completed
-      await taskService.updateTask(notification.taskId, { 
-        status: 'completed',
-        completedAt: new Date().toISOString()
-      })
-      
-      // Acknowledge notification
-      await notificationService.acknowledgeNotification(notification.id)
-      
-      setSnackbarOpen(false)
-      setCurrentNotification(null)
-      
-      // Show success message
-      setSnackbarMessage('任务已完成！')
-      setSnackbarSeverity('success')
-      setSnackbarOpen(true)
-      
-      // Refresh notifications
-      const userNotifications = await notificationService.getUserNotifications('user-1')
-      setNotifications(userNotifications.filter(n => n.status === 'pending'))
-    } catch (error) {
-      console.error('Failed to complete task:', error)
-      setSnackbarMessage('完成任务失败')
-      setSnackbarSeverity('error')
-      setSnackbarOpen(true)
-    }
-  }
-
-  // Handle task defer
-  const handleTaskDefer = async (notification) => {
-    if (!notification || !notification.taskId) return
-    
-    setCurrentNotification(notification)
-    setDeferDialogOpen(true)
-  }
 
   // Confirm defer with selected option
   const confirmDefer = async () => {
@@ -578,246 +561,46 @@ function App() {
     }
   }
 
-  return (
-    <ThemeProvider theme={createTheme()}>
-      <CssBaseline />
-      <div style={{ display: 'flex' }}>
-        {/* AppBar */}
-        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={() => setDrawerOpen(!drawerOpen)}
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
-            
-            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-              ADHD Task Manager
-            </Typography>
+  // Handle task complete
+  const handleTaskComplete = async (notification) => {
+    if (!notification || !notification.taskId) return
+    
+    try {
+      // Update task status to completed
+      await taskService.updateTask(notification.taskId, { 
+        status: 'completed',
+        completedAt: new Date().toISOString()
+      })
+      
+      // Acknowledge notification
+      await notificationService.acknowledgeNotification(notification.id)
+      
+      setSnackbarOpen(false)
+      setCurrentNotification(null)
+      
+      // Show success message
+      setSnackbarMessage('任务已完成！')
+      setSnackbarSeverity('success')
+      setSnackbarOpen(true)
+      
+      // Refresh notifications
+      const userNotifications = await notificationService.getUserNotifications('user-1')
+      setNotifications(userNotifications.filter(n => n.status === 'pending'))
+    } catch (error) {
+      console.error('Failed to complete task:', error)
+      setSnackbarMessage('完成任务失败')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+    }
+  }
 
-            <Button 
-              color="inherit" 
-              onClick={refreshNotifications}
-              sx={{ mr: 1 }}
-            >
-              Refresh
-            </Button>
-            <Button 
-              color="inherit" 
-              onClick={createTestNotification}
-              sx={{ mr: 2 }}
-            >
-              Test Notification
-            </Button>
-
-            <Badge badgeContent={notifications.length} color="secondary">
-              <NotificationsIcon 
-                onClick={() => {
-                  console.log('🔔 NotificationsIcon clicked!');
-                  console.log('Notifications count:', notifications.length);
-                  console.log('Notifications:', notifications);
-                  
-                  if (notifications.length > 0) {
-                    console.log('🔔 Showing notification:', notifications[0]);
-                    // 如果有未读通知，显示第一个
-                    setSnackbarMessage(notifications[0].message);
-                    setCurrentNotification(notifications[0]);
-                    setSnackbarOpen(true);
-                    console.log('🔔 Snackbar opened with message:', notifications[0].message);
-                  } else {
-                    console.log('🔔 No notifications to show');
-                  }
-                }}
-                style={{ cursor: 'pointer' }}
-                title="点击查看提醒"
-              />
-            </Badge>
-          </Toolbar>
-        </AppBar>
-
-        {/* Notification Modal - Always on top */}
-        <Dialog
-          open={snackbarOpen}
-          onClose={() => setSnackbarOpen(false)}
-          maxWidth="sm"
-          fullWidth
-          PaperProps={{
-            sx: {
-              borderRadius: 3,
-              boxShadow: 24,
-              p: 2
-            }
-          }}
-        >
-          <DialogTitle>
-            <NotificationsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-            任务提醒
-          </DialogTitle>
-          <DialogContent>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              {snackbarMessage}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              请选择如何处理这个任务
-            </Typography>
-            
-            <RadioGroup
-              value={deferOption}
-              onChange={(e) => setDeferOption(e.target.value)}
-              sx={{ mb: 2 }}
-            >
-              <FormControlLabel 
-                value="1" 
-                control={<Radio />} 
-                label="延期 1 小时" 
-              />
-              <FormControlLabel 
-                value="2" 
-                control={<Radio />} 
-                label="延期 2 小时" 
-              />
-              <FormControlLabel 
-                value="4" 
-                control={<Radio />} 
-                label="延期 4 小时" 
-              />
-              <FormControlLabel 
-                value="24" 
-                control={<Radio />} 
-                label="延期 1 天" 
-              />
-              <FormControlLabel 
-                value="custom" 
-                control={<Radio />} 
-                label={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    自定义延期时间
-                    <TextField
-                      size="small"
-                      type="number"
-                      value={customDeferHours}
-                      onChange={(e) => setCustomDeferHours(e.target.value)}
-                      placeholder="小时数"
-                      sx={{ width: 120 }}
-                    />
-                  </Box>
-                }
-              />
-            </RadioGroup>
-          </DialogContent>
-          <DialogActions>
-            <Button 
-              onClick={() => handleTaskComplete(currentNotification)}
-              variant="contained"
-              color="success"
-              startIcon={<CheckIcon />}
-            >
-              标记为已完成
-            </Button>
-            <Button 
-              onClick={() => handleTaskDefer(currentNotification)}
-              variant="contained"
-              color="warning"
-              startIcon={<ScheduleIcon />}
-            >
-              延期任务
-            </Button>
-            <Button 
-              onClick={() => setSnackbarOpen(false)}
-              variant="outlined"
-            >
-              稍后提醒
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Drawer */}
-        <Drawer
-          variant="temporary"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 }
-          }}
-        >
-          <Toolbar />
-          <List>
-            {menuItems.map((item) => (
-              <ListItem button key={item.text} component="a" href={item.path}>
-                <ListItemIcon>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-
-{/* Main content */}
-        <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: 8 }}>
-          <Container maxWidth="lg">
-            <Routes>
-              <Route path="/" element={<Home taskProgress={taskProgress} />} />
-              <Route path="/tasks" element={<TaskBoard />} />
-              <Route path="/add" element={<AddTask />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/test-notifications" element={<TestNotifications />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Container>
-        </Box>
-
-        {/* Defer Dialog */}
-        <Dialog
-          open={deferDialogOpen}
-          onClose={() => setDeferDialogOpen(false)}
-        >
-          <DialogTitle>延期任务</DialogTitle>
-          <DialogContent>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              请选择延期时间：
-            </Typography>
-            <RadioGroup
-              value={deferOption}
-              onChange={(e) => setDeferOption(e.target.value)}
-            >
-              <FormControlLabel value="1" control={<Radio />} label="1小时后" />
-              <FormControlLabel value="2" control={<Radio />} label="2小时后" />
-              <FormControlLabel value="4" control={<Radio />} label="4小时后" />
-              <FormControlLabel value="24" control={<Radio />} label="1天后" />
-              <FormControlLabel value="custom" control={<Radio />} label="自定义小时数：" />
-            </RadioGroup>
-            {deferOption === 'custom' && (
-              <TextField
-                autoFocus
-                margin="dense"
-                label="小时数"
-                type="number"
-                fullWidth
-                value={customDeferHours}
-                onChange={(e) => setCustomDeferHours(e.target.value)}
-                inputProps={{ min: 1, step: 1 }}
-              />
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDeferDialogOpen(false)}>取消</Button>
-            <Button onClick={confirmDefer} variant="contained" color="primary">
-              确认延期
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </div>
-    </ThemeProvider>
-  )
+  // Handle task defer
+  const handleTaskDefer = async (notification) => {
+    if (!notification || !notification.taskId) return
+    
+    setCurrentNotification(notification)
+    setDeferDialogOpen(true)
+  }
 }
 
 export default App
