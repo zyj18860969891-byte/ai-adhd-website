@@ -74,14 +74,19 @@ function App() {
         // Only update if there are changes
         if (JSON.stringify(pendingNotifications) !== JSON.stringify(notifications)) {
           console.log('📥 Updating notifications state - changes detected');
+          console.log('📥 Old notifications:', notifications);
+          console.log('📥 New notifications:', pendingNotifications);
           setNotifications(pendingNotifications)
         } else {
           console.log('📥 No notification changes detected');
+          console.log('📥 Old notifications:', notifications);
+          console.log('📥 New notifications:', pendingNotifications);
         }
         
         // Show modal for new reminders
         if (newNotifications.length > 0) {
           console.log('🔔 Found', newNotifications.length, 'new notifications');
+          console.log('🔔 New notifications details:', newNotifications);
           newNotifications.forEach(notification => {
             console.log('🔔 Processing notification:', notification.id, 'type:', notification.type);
             if (notification.type === 'reminder') {
@@ -99,6 +104,9 @@ function App() {
           })
         } else {
           console.log('🔔 No new notifications found');
+          console.log('🔔 Pending notifications:', pendingNotifications);
+          console.log('🔔 Current notifications:', notifications);
+          console.log('🔔 Notifications comparison:', JSON.stringify(pendingNotifications) === JSON.stringify(notifications));
         }
         
         // Show browser notification for new reminders
