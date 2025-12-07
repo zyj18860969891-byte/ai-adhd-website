@@ -43,8 +43,95 @@ function App() {
   const [deferOption, setDeferOption] = useState('1')
   const [customDeferHours, setCustomDeferHours] = useState('')
 
+  // Confirm defer with selected option
+  const confirmDefer = async () => {
+    if (!currentNotification) return
+    
+    try {
+      const deferHours = deferOption === 'custom' ? parseInt(customDeferHours) : parseInt(deferOption)
+      
+      if (isNaN(deferHours) || deferHours <= 0) {
+        setSnackbarMessage('请输入有效的延期时间')
+        setSnackbarSeverity('error')
+        setSnackbarOpen(true)
+        return
+      }
+      
+      const newDueDate = new Date()
+      newDueDate.setHours(newDueDate.getHours() + deferHours)
+      
+      // Update task due date
+      await taskService.updateTask(currentNotification.taskId, { 
+        dueDate: newDueDate.toISOString()
+      })
+      
+      // Acknowledge notification
+      await notificationService.acknowledgeNotification(currentNotification.id)
+      
+      setDeferDialogOpen(false)
+      setCurrentNotification(null)
+      
+      // Show success message
+      setSnackbarMessage(`任务已延期 ${deferHours} 小时！`)
+      setSnackbarSeverity('success')
+      setSnackbarOpen(true)
+      
+      // Refresh notifications
+      const userNotifications = await notificationService.getUserNotifications('user-1')
+      setNotifications(userNotifications.filter(n => n.status === 'pending'))
+    } catch (error) {
+      console.error('Failed to defer task:', error)
+      setSnackbarMessage('延期任务失败')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+    }
+  }
+
+  // Handle task complete
+  const handleTaskComplete = async (notification) => {
+    if (!notification || !notification.taskId) return
+    
+    try {
+      // Update task status to completed
+      await taskService.updateTask(notification.taskId, { 
+        status: 'completed',
+        completedAt: new Date().toISOString()
+      })
+      
+      // Acknowledge notification
+      await notificationService.acknowledgeNotification(notification.id)
+      
+      setSnackbarOpen(false)
+      setCurrentNotification(null)
+      
+      // Show success message
+      setSnackbarMessage('任务已完成！')
+      setSnackbarSeverity('success')
+      setSnackbarOpen(true)
+      
+      // Refresh notifications
+      const userNotifications = await notificationService.getUserNotifications('user-1')
+      setNotifications(userNotifications.filter(n => n.status === 'pending'))
+    } catch (error) {
+      console.error('Failed to complete task:', error)
+      setSnackbarMessage('完成任务失败')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+    }
+  }
+
+  // Handle task defer
+  const handleTaskDefer = async (notification) => {
+    if (!notification || !notification.taskId) return
+    
+    setCurrentNotification(notification)
+    setDeferDialogOpen(true)
+  }
+
   // Load notifications
   useEffect(() => {
+    let isMounted = true;
+    
     const loadNotifications = async () => {
       try {
         console.log('📥 Loading notifications...');
@@ -56,7 +143,7 @@ function App() {
         // Check if response is valid
         if (!userNotifications || !Array.isArray(userNotifications)) {
           console.log('📥 Invalid notifications response, using empty array');
-          setNotifications([]);
+          if (isMounted) setNotifications([]);
           return;
         }
         
@@ -76,7 +163,7 @@ function App() {
           console.log('📥 Updating notifications state - changes detected');
           console.log('📥 Old notifications:', notifications);
           console.log('📥 New notifications:', pendingNotifications);
-          setNotifications(pendingNotifications)
+          if (isMounted) setNotifications(pendingNotifications)
         } else {
           console.log('📥 No notification changes detected');
           console.log('📥 Old notifications:', notifications);
@@ -87,21 +174,26 @@ function App() {
         if (newNotifications.length > 0) {
           console.log('🔔 Found', newNotifications.length, 'new notifications');
           console.log('🔔 New notifications details:', newNotifications);
-          newNotifications.forEach(notification => {
-            console.log('🔔 Processing notification:', notification.id, 'type:', notification.type);
-            if (notification.type === 'reminder') {
-              console.log('🔔 New reminder detected:', notification.message);
-              console.log('🔔 Setting snackbar message:', notification.message);
-              setSnackbarMessage(notification.message)
-              console.log('🔔 Setting current notification:', notification.id);
-              setCurrentNotification(notification)
-              console.log('🔔 Opening snackbar modal');
-              setSnackbarOpen(true)
-              console.log('🔔 Modal opened for new reminder');
-            } else {
-              console.log('🔔 Notification is not a reminder, skipping');
-            }
-          })
+          // 使用 requestAnimationFrame 优化性能
+          if (isMounted) {
+            requestAnimationFrame(() => {
+              newNotifications.forEach(notification => {
+                console.log('🔔 Processing notification:', notification.id, 'type:', notification.type);
+                if (notification.type === 'reminder') {
+                  console.log('🔔 New reminder detected:', notification.message);
+                  console.log('🔔 Setting snackbar message:', notification.message);
+                  setSnackbarMessage(notification.message)
+                  console.log('🔔 Setting current notification:', notification.id);
+                  setCurrentNotification(notification)
+                  console.log('🔔 Opening snackbar modal');
+                  setSnackbarOpen(true)
+                  console.log('🔔 Modal opened for new reminder');
+                } else {
+                  console.log('🔔 Notification is not a reminder, skipping');
+                }
+              })
+            });
+          }
         } else {
           console.log('🔔 No new notifications found');
           console.log('🔔 Pending notifications:', pendingNotifications);
@@ -128,8 +220,10 @@ function App() {
         // Debug the current state
         debugNotificationState();
       } catch (error) {
-        console.error('Failed to load notifications:', error)
-        console.error('Error details:', error.response || error.message || error);
+        if (isMounted) {
+          console.error('Failed to load notifications:', error)
+          console.error('Error details:', error.response || error.message || error);
+        }
       }
     }
 
@@ -140,40 +234,49 @@ function App() {
     }
 
     loadNotifications()
-    const interval = setInterval(loadNotifications, 15000) // Refresh every 15 seconds
-    return () => clearInterval(interval)
+    // 优化轮询频率，避免性能问题
+    const interval = setInterval(async () => {
+      if (isMounted) {
+        await loadNotifications();
+      }
+    }, 5000) // 减少到5秒一次
+    
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    }
   }, [])
 
   // Auto-show modal when notifications change (for cross-page reminders)
   useEffect(() => {
+    // 防止重复触发和性能问题
+    if (!notifications || notifications.length === 0 || snackbarOpen) {
+      return;
+    }
+    
     console.log('🔄 Notifications changed:', notifications.length);
     console.log('🔄 Snackbar open status:', snackbarOpen);
-    console.log('🔄 Latest notification:', notifications[notifications.length - 1]);
     
-    if (notifications.length > 0 && !snackbarOpen) {
-      const latestNotification = notifications[notifications.length - 1]
-      console.log('🔄 Checking latest notification:', latestNotification?.id);
-      console.log('🔄 Latest notification type:', latestNotification?.type);
+    // 只处理最新的通知
+    const latestNotification = notifications[notifications.length - 1];
+    console.log('🔄 Latest notification:', latestNotification?.id);
+    
+    if (latestNotification && latestNotification.type === 'reminder') {
+      console.log('🔄 Auto-showing reminder modal for:', latestNotification.message);
+      console.log('🔄 Setting snackbar message:', latestNotification.message);
       
-      if (latestNotification && latestNotification.type === 'reminder') {
-        console.log('🔄 Auto-showing reminder modal for:', latestNotification.message);
-        console.log('🔄 Setting snackbar message:', latestNotification.message);
-        setSnackbarMessage(latestNotification.message)
-        console.log('🔄 Setting current notification:', latestNotification.id);
-        setCurrentNotification(latestNotification)
-        console.log('🔄 Opening snackbar modal');
-        setSnackbarOpen(true)
+      // 使用 requestAnimationFrame 优化性能
+      requestAnimationFrame(() => {
+        setSnackbarMessage(latestNotification.message);
+        setCurrentNotification(latestNotification);
+        setSnackbarOpen(true);
         console.log('🔄 Modal opened successfully');
-      } else {
-        console.log('🔄 Latest notification is not a reminder or is null');
-        if (latestNotification) {
-          console.log('🔄 Notification type is:', latestNotification.type);
-        }
-      }
+      });
     } else {
-      console.log('🔄 Conditions not met for auto-showing modal');
-      console.log('🔄 notifications.length > 0:', notifications.length > 0);
-      console.log('🔄 snackbarOpen:', snackbarOpen);
+      console.log('🔄 Latest notification is not a reminder or is null');
+      if (latestNotification) {
+        console.log('🔄 Notification type is:', latestNotification.type);
+      }
     }
   }, [notifications, snackbarOpen])
 
@@ -511,104 +614,111 @@ function App() {
     </ThemeProvider>
   )
 
-  // Confirm defer with selected option
-  const confirmDefer = async () => {
-    if (!currentNotification) return
-    
-    try {
-      const deferHours = deferOption === 'custom' ? parseInt(customDeferHours) : parseInt(deferOption)
-      
-      if (isNaN(deferHours) || deferHours <= 0) {
-        setSnackbarMessage('请输入有效的延期时间')
-        setSnackbarSeverity('error')
-        setSnackbarOpen(true)
-        return
-      }
-      
-      const newDueDate = new Date()
-      newDueDate.setHours(newDueDate.getHours() + deferHours)
-      
-      // Update task due date
-      await taskService.updateTask(currentNotification.taskId, { 
-        dueDate: newDueDate.toISOString()
-      })
-      
-      // Create new deferred reminder
-      const newReminderTime = new Date(newDueDate.getTime() - 60000) // 1 minute before new due date
-      
-      const deferredReminder = {
-        userId: 'user-1',
-        taskId: currentNotification.taskId,
-        title: currentNotification.title,
-        message: currentNotification.message,
-        newSchedule: getCronSchedule(newReminderTime),
-        deferHours: deferHours
-      }
-      
-      await notificationService.deferReminder(deferredReminder)
-      
-      // Acknowledge current notification
-      await notificationService.acknowledgeNotification(currentNotification.id)
-      
-      setDeferDialogOpen(false)
-      setCurrentNotification(null)
-      
-      // Show success message
-      setSnackbarMessage(`任务已延期至 ${newDueDate.toLocaleString()}，新提醒将在 ${newReminderTime.toLocaleString()} 触发`)
-      setSnackbarSeverity('info')
-      setSnackbarOpen(true)
-      
-      // Refresh notifications
-      const userNotifications = await notificationService.getUserNotifications('user-1')
-      setNotifications(userNotifications.filter(n => n.status === 'pending'))
-    } catch (error) {
-      console.error('Failed to defer task:', error)
-      setSnackbarMessage('延期任务失败')
-      setSnackbarSeverity('error')
-      setSnackbarOpen(true)
-    }
-  }
 
-  // Handle task complete
-  const handleTaskComplete = async (notification) => {
-    if (!notification || !notification.taskId) return
-    
-    try {
-      // Update task status to completed
-      await taskService.updateTask(notification.taskId, { 
-        status: 'completed',
-        completedAt: new Date().toISOString()
-      })
-      
-      // Acknowledge notification
-      await notificationService.acknowledgeNotification(notification.id)
-      
-      setSnackbarOpen(false)
-      setCurrentNotification(null)
-      
-      // Show success message
-      setSnackbarMessage('任务已完成！')
-      setSnackbarSeverity('success')
-      setSnackbarOpen(true)
-      
-      // Refresh notifications
-      const userNotifications = await notificationService.getUserNotifications('user-1')
-      setNotifications(userNotifications.filter(n => n.status === 'pending'))
-    } catch (error) {
-      console.error('Failed to complete task:', error)
-      setSnackbarMessage('完成任务失败')
-      setSnackbarSeverity('error')
-      setSnackbarOpen(true)
-    }
-  }
 
-  // Handle task defer
-  const handleTaskDefer = async (notification) => {
-    if (!notification || !notification.taskId) return
+
+
+  // Load notifications
+  useEffect(() => {
+    let isMounted = true; // 防止组件卸载后更新状态
     
-    setCurrentNotification(notification)
-    setDeferDialogOpen(true)
-  }
+    const loadNotifications = async () => {
+      try {
+        console.log('📥 Loading notifications...');
+        const userNotifications = await notificationService.getUserNotifications('user-1')
+        console.log('📥 All notifications from server:', userNotifications);
+        console.log('📥 Server response type:', typeof userNotifications);
+        console.log('📥 Server response length:', Array.isArray(userNotifications) ? userNotifications.length : 'Not an array');
+        
+        // Check if response is valid
+        if (!userNotifications || !Array.isArray(userNotifications)) {
+          console.log('📥 Invalid notifications response, using empty array');
+          if (isMounted) setNotifications([]);
+          return;
+        }
+        
+        const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
+        console.log('📥 Pending notifications count:', pendingNotifications.length);
+        console.log('📥 Pending notifications:', pendingNotifications);
+        
+        // Check for new notifications
+        const newNotifications = pendingNotifications.filter(n => 
+          !notifications.find(existing => existing.id === n.id)
+        )
+        console.log('📥 New notifications count:', newNotifications.length);
+        console.log('📥 New notifications:', newNotifications);
+        
+        // Only update if there are changes
+        if (JSON.stringify(pendingNotifications) !== JSON.stringify(notifications)) {
+          console.log('📥 Updating notifications state - changes detected');
+          if (isMounted) setNotifications(pendingNotifications)
+        } else {
+          console.log('📥 No notification changes detected');
+        }
+        
+        // Show modal for new reminders
+        if (newNotifications.length > 0) {
+          console.log('🔔 Found', newNotifications.length, 'new notifications');
+          // 使用 requestAnimationFrame 优化性能
+          if (isMounted) {
+            requestAnimationFrame(() => {
+              newNotifications.forEach(notification => {
+                if (notification.type === 'reminder') {
+                  console.log('🔔 New reminder detected:', notification.message);
+                  setSnackbarMessage(notification.message)
+                  setCurrentNotification(notification)
+                  setSnackbarOpen(true)
+                  console.log('🔔 Modal opened for new reminder');
+                }
+              })
+            });
+          }
+        } else {
+          console.log('🔔 No new notifications found');
+        }
+        
+        // Show browser notification for new reminders
+        newNotifications.forEach(notification => {
+          if (notification.type === 'reminder' && 
+              'Notification' in window && 
+              Notification.permission === 'granted') {
+            console.log('🌐 Showing browser notification:', notification.title);
+            new Notification(notification.title, {
+              body: notification.message,
+              icon: '/icons/icon-72x72.png'
+            })
+          }
+        })
+        
+        // Debug the current state
+        debugNotificationState();
+      } catch (error) {
+        if (isMounted) {
+          console.error('Failed to load notifications:', error)
+          console.error('Error details:', error.response || error.message || error);
+        }
+      }
+    }
+
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      console.log('🌐 Requesting notification permission...');
+      Notification.requestPermission()
+    }
+
+    loadNotifications()
+    // 优化轮询频率，避免性能问题
+    const interval = setInterval(async () => {
+      if (isMounted) {
+        await loadNotifications();
+      }
+    }, 5000) // 减少到5秒一次
+    
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    }
+  }, [])
 }
 
 export default App

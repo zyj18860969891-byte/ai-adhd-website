@@ -29,6 +29,13 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
+  // Skip unsupported schemes
+  if (event.request.url.startsWith('chrome-extension://') || 
+      event.request.url.startsWith('moz-extension://') ||
+      event.request.url.startsWith('safari-extension://')) {
+    return
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
