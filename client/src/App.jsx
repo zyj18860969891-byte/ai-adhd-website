@@ -577,6 +577,247 @@ function App() {
       setSnackbarOpen(true)
     }
   }
+
+  return (
+    <ThemeProvider theme={createTheme()}>
+      <CssBaseline />
+      <div style={{ display: 'flex' }}>
+        {/* AppBar */}
+        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={() => setDrawerOpen(!drawerOpen)}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+            
+            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+              ADHD Task Manager
+            </Typography>
+
+            <Button 
+              color="inherit" 
+              onClick={refreshNotifications}
+              sx={{ mr: 1 }}
+            >
+              Refresh
+            </Button>
+            <Button 
+              color="inherit" 
+              onClick={createTestNotification}
+              sx={{ mr: 2 }}
+            >
+              Test Notification
+            </Button>
+
+            <Badge badgeContent={notifications.length} color="secondary">
+              <NotificationsIcon 
+                onClick={() => {
+                  console.log('🔔 NotificationsIcon clicked!');
+                  console.log('Notifications count:', notifications.length);
+                  console.log('Notifications:', notifications);
+                  
+                  if (notifications.length > 0) {
+                    console.log('🔔 Showing notification:', notifications[0]);
+                    // 如果有未读通知，显示第一个
+                    setSnackbarMessage(notifications[0].message);
+                    setCurrentNotification(notifications[0]);
+                    setSnackbarOpen(true);
+                    console.log('🔔 Snackbar opened with message:', notifications[0].message);
+                  } else {
+                    console.log('🔔 No notifications to show');
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+                title="点击查看提醒"
+              />
+            </Badge>
+          </Toolbar>
+        </AppBar>
+
+        {/* Notification Modal - Always on top */}
+        <Dialog
+          open={snackbarOpen}
+          onClose={() => setSnackbarOpen(false)}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: 24,
+              p: 2
+            }
+          }}
+        >
+          <DialogTitle>
+            <NotificationsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+            任务提醒
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              {snackbarMessage}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              请选择如何处理这个任务
+            </Typography>
+            
+            <RadioGroup
+              value={deferOption}
+              onChange={(e) => setDeferOption(e.target.value)}
+              sx={{ mb: 2 }}
+            >
+              <FormControlLabel 
+                value="1" 
+                control={<Radio />} 
+                label="延期 1 小时" 
+              />
+              <FormControlLabel 
+                value="2" 
+                control={<Radio />} 
+                label="延期 2 小时" 
+              />
+              <FormControlLabel 
+                value="4" 
+                control={<Radio />} 
+                label="延期 4 小时" 
+              />
+              <FormControlLabel 
+                value="24" 
+                control={<Radio />} 
+                label="延期 1 天" 
+              />
+              <FormControlLabel 
+                value="custom" 
+                control={<Radio />} 
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    自定义延期时间
+                    <TextField
+                      size="small"
+                      type="number"
+                      value={customDeferHours}
+                      onChange={(e) => setCustomDeferHours(e.target.value)}
+                      placeholder="小时数"
+                      sx={{ width: 120 }}
+                    />
+                  </Box>
+                }
+              />
+            </RadioGroup>
+          </DialogContent>
+          <DialogActions>
+            <Button 
+              onClick={() => handleTaskComplete(currentNotification)}
+              variant="contained"
+              color="success"
+              startIcon={<CheckIcon />}
+            >
+              标记为已完成
+            </Button>
+            <Button 
+              onClick={() => handleTaskDefer(currentNotification)}
+              variant="contained"
+              color="warning"
+              startIcon={<ScheduleIcon />}
+            >
+              延期任务
+            </Button>
+            <Button 
+              onClick={() => setSnackbarOpen(false)}
+              variant="outlined"
+            >
+              稍后提醒
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Drawer */}
+        <Drawer
+          variant="temporary"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 }
+          }}
+        >
+          <Toolbar />
+          <List>
+            {menuItems.map((item) => (
+              <ListItem button key={item.text} component="a" href={item.path}>
+                <ListItemIcon>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+
+{/* Main content */}
+        <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: 8 }}>
+          <Container maxWidth="lg">
+            <Routes>
+              <Route path="/" element={<Home taskProgress={taskProgress} />} />
+              <Route path="/tasks" element={<TaskBoard />} />
+              <Route path="/add" element={<AddTask />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/test-notifications" element={<TestNotifications />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Container>
+        </Box>
+
+        {/* Defer Dialog */}
+        <Dialog
+          open={deferDialogOpen}
+          onClose={() => setDeferDialogOpen(false)}
+        >
+          <DialogTitle>延期任务</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              请选择延期时间：
+            </Typography>
+            <RadioGroup
+              value={deferOption}
+              onChange={(e) => setDeferOption(e.target.value)}
+            >
+              <FormControlLabel value="1" control={<Radio />} label="1小时后" />
+              <FormControlLabel value="2" control={<Radio />} label="2小时后" />
+              <FormControlLabel value="4" control={<Radio />} label="4小时后" />
+              <FormControlLabel value="24" control={<Radio />} label="1天后" />
+              <FormControlLabel value="custom" control={<Radio />} label="自定义小时数：" />
+            </RadioGroup>
+            {deferOption === 'custom' && (
+              <TextField
+                autoFocus
+                margin="dense"
+                label="小时数"
+                type="number"
+                fullWidth
+                value={customDeferHours}
+                onChange={(e) => setCustomDeferHours(e.target.value)}
+                inputProps={{ min: 1, step: 1 }}
+              />
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeferDialogOpen(false)}>取消</Button>
+            <Button onClick={confirmDefer} variant="contained" color="primary">
+              确认延期
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </ThemeProvider>
+  )
 }
 
 export default App
