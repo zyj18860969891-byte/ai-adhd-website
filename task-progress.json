@@ -1,0 +1,34 @@
+{
+  "project": {
+    "name": "ADHD Task Manager PWA",
+    "version": "1.0.0",
+    "status": "running"
+  },
+  "currentTask": {
+    "id": "startup",
+    "title": "System initializing",
+    "status": "in-progress"
+  },
+  "services": {
+    "ai": {
+      "status": "unknown",
+      "health": "unknown",
+      "lastCheck": "2025-12-07T07:17:20.785Z"
+    },
+    "db": {
+      "status": "unknown",
+      "health": "unknown",
+      "lastCheck": "2025-12-07T07:17:20.785Z"
+    },
+    "notification": {
+      "status": "unknown",
+      "health": "unknown",
+      "lastCheck": "2025-12-07T07:17:20.785Z"
+    }
+  },
+  "deployment": {
+    "status": "running",
+    "lastUpdated": "2025-12-07T07:17:46.991Z"
+  },
+  "lastUpdated": "2025-12-07T07:17:20.785Z"
+}

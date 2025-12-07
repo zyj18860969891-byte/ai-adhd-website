@@ -22,6 +22,11 @@ import TaskBoard from './pages/TaskBoard.jsx'
 import AddTask from './pages/AddTask.jsx'
 import Analytics from './pages/Analytics.jsx'
 import Settings from './pages/Settings.jsx'
+import TestNotifications from './pages/TestNotifications.jsx'
+
+// Import icons
+import CheckIcon from '@mui/icons-material/Check';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 
 // Import services
 import taskService from './services/taskService.js'
@@ -46,6 +51,15 @@ function App() {
         console.log('📥 Loading notifications...');
         const userNotifications = await notificationService.getUserNotifications('user-1')
         console.log('📥 All notifications from server:', userNotifications);
+        console.log('📥 Server response type:', typeof userNotifications);
+        console.log('📥 Server response length:', Array.isArray(userNotifications) ? userNotifications.length : 'Not an array');
+        
+        // Check if response is valid
+        if (!userNotifications || !Array.isArray(userNotifications)) {
+          console.log('📥 Invalid notifications response, using empty array');
+          setNotifications([]);
+          return;
+        }
         
         const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
         console.log('📥 Pending notifications:', pendingNotifications);
@@ -56,18 +70,29 @@ function App() {
         )
         console.log('📥 New notifications:', newNotifications);
         
-        setNotifications(pendingNotifications)
+        // Only update if there are changes
+        if (JSON.stringify(pendingNotifications) !== JSON.stringify(notifications)) {
+          console.log('📥 Updating notifications state');
+          setNotifications(pendingNotifications)
+        } else {
+          console.log('📥 No notification changes detected');
+        }
         
         // Show modal for new reminders
-        newNotifications.forEach(notification => {
-          if (notification.type === 'reminder') {
-            console.log('🔔 New reminder detected:', notification.message);
-            setSnackbarMessage(notification.message)
-            setCurrentNotification(notification)
-            setSnackbarOpen(true)
-            console.log('🔔 Modal opened for new reminder');
-          }
-        })
+        if (newNotifications.length > 0) {
+          console.log('🔔 Found', newNotifications.length, 'new notifications');
+          newNotifications.forEach(notification => {
+            if (notification.type === 'reminder') {
+              console.log('🔔 New reminder detected:', notification.message);
+              setSnackbarMessage(notification.message)
+              setCurrentNotification(notification)
+              setSnackbarOpen(true)
+              console.log('🔔 Modal opened for new reminder');
+            }
+          })
+        } else {
+          console.log('🔔 No new notifications found');
+        }
         
         // Show browser notification for new reminders
         newNotifications.forEach(notification => {
@@ -81,8 +106,12 @@ function App() {
             })
           }
         })
+        
+        // Debug the current state
+        debugNotificationState();
       } catch (error) {
         console.error('Failed to load notifications:', error)
+        console.error('Error details:', error.response || error.message || error);
       }
     }
 
@@ -119,7 +148,72 @@ function App() {
     } else {
       console.log('🔄 Conditions not met for auto-showing modal');
     }
-  }, [notifications])
+  }, [notifications, snackbarOpen])
+
+  // Debug function to check notification state
+  const debugNotificationState = () => {
+    console.log('=== DEBUG NOTIFICATION STATE ===');
+    console.log('Current notifications:', notifications);
+    console.log('Snackbar open:', snackbarOpen);
+    console.log('Current notification:', currentNotification);
+    console.log('Pending notifications count:', notifications.filter(n => n.status === 'pending').length);
+    console.log('Reminder notifications count:', notifications.filter(n => n.type === 'reminder').length);
+    console.log('=== END DEBUG ===');
+  }
+
+  // Test function to create a test notification
+  const createTestNotification = async () => {
+    try {
+      console.log('🧪 Creating test notification...');
+      const testNotification = {
+        userId: 'user-1',
+        type: 'reminder',
+        title: 'Test Reminder',
+        message: 'This is a test notification to verify the system works!',
+        taskId: 'test-task-1',
+        schedule: '*/1 * * * *', // Every minute
+        repeat: false
+      };
+      
+      const result = await notificationService.sendNotification(testNotification);
+      console.log('🧪 Test notification created:', result);
+      
+      // Reload notifications to see the new one
+      const userNotifications = await notificationService.getUserNotifications('user-1');
+      console.log('🧪 All notifications after test:', userNotifications);
+      
+      // Show success message
+      setSnackbarMessage('Test notification created successfully!');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('🧪 Failed to create test notification:', error);
+      setSnackbarMessage('Failed to create test notification');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  }
+
+  // Manual refresh function
+  const refreshNotifications = async () => {
+    try {
+      console.log('🔄 Manually refreshing notifications...');
+      const userNotifications = await notificationService.getUserNotifications('user-1');
+      console.log('🔄 Manual refresh result:', userNotifications);
+      
+      const pendingNotifications = userNotifications.filter(n => n.status === 'pending');
+      setNotifications(pendingNotifications);
+      
+      setSnackbarMessage('Notifications refreshed manually');
+      setSnackbarSeverity('info');
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('🔄 Failed to refresh notifications:', error);
+      setSnackbarMessage('Failed to refresh notifications');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    }
+  }
 
   // Load task progress
   useEffect(() => {
@@ -142,7 +236,8 @@ function App() {
     { text: '任务看板', icon: <ListIcon />, path: '/tasks' },
     { text: '添加任务', icon: <AddIcon />, path: '/add' },
     { text: '数据分析', icon: <ChartIcon />, path: '/analytics' },
-    { text: '设置', icon: <SettingsIcon />, path: '/settings' }
+    { text: '设置', icon: <SettingsIcon />, path: '/settings' },
+    { text: '测试通知', icon: <NotificationsIcon />, path: '/test-notifications' }
   ]
 
   return (
@@ -165,6 +260,21 @@ function App() {
             <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
               ADHD Task Manager
             </Typography>
+
+            <Button 
+              color="inherit" 
+              onClick={refreshNotifications}
+              sx={{ mr: 1 }}
+            >
+              Refresh
+            </Button>
+            <Button 
+              color="inherit" 
+              onClick={createTestNotification}
+              sx={{ mr: 2 }}
+            >
+              Test Notification
+            </Button>
 
             <Badge badgeContent={notifications.length} color="secondary">
               <NotificationsIcon 
@@ -321,19 +431,57 @@ function App() {
               <Route path="/add" element={<AddTask />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/test-notifications" element={<TestNotifications />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Container>
         </Box>
 
         {/* Defer Dialog */}
-        {DeferDialog}
+        <Dialog
+          open={deferDialogOpen}
+          onClose={() => setDeferDialogOpen(false)}
+        >
+          <DialogTitle>延期任务</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              请选择延期时间：
+            </Typography>
+            <RadioGroup
+              value={deferOption}
+              onChange={(e) => setDeferOption(e.target.value)}
+            >
+              <FormControlLabel value="1" control={<Radio />} label="1小时后" />
+              <FormControlLabel value="2" control={<Radio />} label="2小时后" />
+              <FormControlLabel value="4" control={<Radio />} label="4小时后" />
+              <FormControlLabel value="24" control={<Radio />} label="1天后" />
+              <FormControlLabel value="custom" control={<Radio />} label="自定义小时数：" />
+            </RadioGroup>
+            {deferOption === 'custom' && (
+              <TextField
+                autoFocus
+                margin="dense"
+                label="小时数"
+                type="number"
+                fullWidth
+                value={customDeferHours}
+                onChange={(e) => setCustomDeferHours(e.target.value)}
+                inputProps={{ min: 1, step: 1 }}
+              />
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDeferDialogOpen(false)}>取消</Button>
+            <Button onClick={confirmDefer} variant="contained" color="primary">
+              确认延期
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     </ThemeProvider>
   )
-}
 
-export default App
+  // Handle task complete
   const handleTaskComplete = async (notification) => {
     if (!notification || !notification.taskId) return
     
@@ -431,43 +579,6 @@ export default App
       setSnackbarOpen(true)
     }
   }
+}
 
-  // Defer dialog component
-  const DeferDialog = (
-    <Dialog open={deferDialogOpen} onClose={() => setDeferDialogOpen(false)}>
-      <DialogTitle>延期任务</DialogTitle>
-      <DialogContent>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          请选择延期时间：
-        </Typography>
-        <RadioGroup
-          value={deferOption}
-          onChange={(e) => setDeferOption(e.target.value)}
-        >
-          <FormControlLabel value="1" control={<Radio />} label="1小时后" />
-          <FormControlLabel value="2" control={<Radio />} label="2小时后" />
-          <FormControlLabel value="4" control={<Radio />} label="4小时后" />
-          <FormControlLabel value="24" control={<Radio />} label="1天后" />
-          <FormControlLabel value="custom" control={<Radio />} label="自定义小时数：" />
-        </RadioGroup>
-        {deferOption === 'custom' && (
-          <TextField
-            autoFocus
-            margin="dense"
-            label="小时数"
-            type="number"
-            fullWidth
-            value={customDeferHours}
-            onChange={(e) => setCustomDeferHours(e.target.value)}
-            inputProps={{ min: 1, step: 1 }}
-          />
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setDeferDialogOpen(false)}>取消</Button>
-        <Button onClick={confirmDefer} variant="contained" color="primary">
-          确认延期
-        </Button>
-      </DialogActions>
-    </Dialog>
-  )
+export default App

@@ -217,7 +217,7 @@ app.post('/api/services/ai/*', (req, res) => {
     });
 });
 
-app.get('/api/services/ai/*', (req, res) => {
+app.put('/api/services/ai/*', (req, res) => {
   const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
@@ -249,7 +249,7 @@ app.get('/api/services/ai/*', (req, res) => {
     });
 });
 
-app.get('/api/services/ai/*', (req, res) => {
+app.delete('/api/services/ai/*', (req, res) => {
   const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
@@ -426,6 +426,101 @@ app.get('/api/services/notification/*', (req, res) => {
     });
 });
 
+app.post('/api/services/notification/*', (req, res) => {
+  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+  const path = req.originalUrl.replace('/api/services/notification', '/api');
+  const targetUrl = `${notificationServiceUrl}${path}`;
+  
+  console.log('Proxying Notification request to:', targetUrl);
+  console.log('Notification Service URL:', notificationServiceUrl);
+  console.log('Request path:', req.originalUrl);
+  
+  fetch(targetUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(req.body)
+  })
+    .then(response => {
+      console.log('Notification Service response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`Notification Service responded with status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Notification Service response data:', JSON.stringify(data, null, 2));
+      res.json(data);
+    })
+    .catch(error => {
+      console.error('Notification Service Error:', error);
+      res.status(503).json({ error: 'Notification Service unavailable', details: error.message });
+    });
+});
+
+app.put('/api/services/notification/*', (req, res) => {
+  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+  const path = req.originalUrl.replace('/api/services/notification', '/api');
+  const targetUrl = `${notificationServiceUrl}${path}`;
+  
+  console.log('Proxying Notification request to:', targetUrl);
+  console.log('Notification Service URL:', notificationServiceUrl);
+  console.log('Request path:', req.originalUrl);
+  
+  fetch(targetUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(req.body)
+  })
+    .then(response => {
+      console.log('Notification Service response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`Notification Service responded with status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Notification Service response data:', JSON.stringify(data, null, 2));
+      res.json(data);
+    })
+    .catch(error => {
+      console.error('Notification Service Error:', error);
+      res.status(503).json({ error: 'Notification Service unavailable', details: error.message });
+    });
+});
+
+app.delete('/api/services/notification/*', (req, res) => {
+  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+  const path = req.originalUrl.replace('/api/services/notification', '/api');
+  const targetUrl = `${notificationServiceUrl}${path}`;
+  
+  console.log('Proxying Notification request to:', targetUrl);
+  console.log('Notification Service URL:', notificationServiceUrl);
+  console.log('Request path:', req.originalUrl);
+  
+  fetch(targetUrl, {
+    method: 'DELETE'
+  })
+    .then(response => {
+      console.log('Notification Service response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`Notification Service responded with status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Notification Service response data:', JSON.stringify(data, null, 2));
+      res.json(data);
+    })
+    .catch(error => {
+      console.error('Notification Service Error:', error);
+      res.status(503).json({ error: 'Notification Service unavailable', details: error.message });
+    });
+});
+
 // WebSocket for real-time updates (disabled in production)
 let wss;
 if (process.env.NODE_ENV !== 'production') {
@@ -484,6 +579,36 @@ if (process.env.NODE_ENV === 'production') {
     });
   });
 }
+
+// Health check for all services
+app.get('/api/services/health', async (req, res) => {
+  const services = ['ai', 'db', 'notification'];
+  const results = {};
+  
+  for (const service of services) {
+    const serviceUrl = process.env[`${service.toUpperCase()}_SERVICE_URL`] || 
+      (service === 'ai' ? 'http://localhost:8190' : 
+       service === 'db' ? 'http://localhost:8280' : 
+       'http://localhost:8380');
+    
+    try {
+      const response = await fetch(`${serviceUrl}/api/health`, { timeout: 5000 });
+      results[service] = {
+        status: response.ok ? 'healthy' : 'unhealthy',
+        statusCode: response.status,
+        url: serviceUrl
+      };
+    } catch (error) {
+      results[service] = {
+        status: 'error',
+        error: error.message,
+        url: serviceUrl
+      };
+    }
+  }
+  
+  res.json(results);
+});
 
 // Error handling
 app.use((error, req, res, next) => {
