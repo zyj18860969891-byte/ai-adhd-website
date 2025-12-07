@@ -7,7 +7,7 @@ const { promisify } = require('util');
 const cron = require('node-cron');
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 8280;
 
 // Load environment variables
 require('dotenv').config();

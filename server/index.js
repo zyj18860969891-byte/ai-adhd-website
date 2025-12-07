@@ -31,8 +31,11 @@ console.log('  NOTIFICATION_SERVICE_URL:', process.env.NOTIFICATION_SERVICE_URL 
 // Railway service discovery
 function getServiceUrl(serviceName, defaultPort) {
   // In Railway, services can be discovered using Railway service discovery
-  // Format: http://service-name.railway.internal:port
-  if (process.env.RAILWAY_ENVIRONMENT === 'production') {
+  // Check if we're in Railway environment
+  const isRailway = process.env.RAILWAY_SERVICE_ID || process.env.RAILWAY_ENVIRONMENT;
+  
+  if (isRailway) {
+    // For Railway, use the internal service discovery format
     return `http://${serviceName}.railway.internal:${defaultPort}`;
   }
   
@@ -238,7 +241,7 @@ app.post('/api/services/ai/*', (req, res) => {
 });
 
 app.put('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+  const aiServiceUrl = aiServiceUrl;
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -270,7 +273,7 @@ app.put('/api/services/ai/*', (req, res) => {
 });
 
 app.delete('/api/services/ai/*', (req, res) => {
-  const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8190';
+  const aiServiceUrl = aiServiceUrl;
   const targetUrl = `${aiServiceUrl}/api${req.originalUrl.replace('/api/services/ai', '')}`;
   
   console.log('Proxying AI request to:', targetUrl);
@@ -356,7 +359,7 @@ app.post('/api/services/db/*', (req, res) => {
 });
 
 app.put('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = dbServiceUrl;
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -389,7 +392,7 @@ app.put('/api/services/db/*', (req, res) => {
 });
 
 app.delete('/api/services/db/*', (req, res) => {
-  const dbServiceUrl = process.env.DB_SERVICE_URL || 'http://localhost:8280';
+  const dbServiceUrl = dbServiceUrl;
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -418,7 +421,7 @@ app.delete('/api/services/db/*', (req, res) => {
 });
 
 app.get('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+  const notificationServiceUrl = notificationServiceUrl;
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   
@@ -445,7 +448,7 @@ app.get('/api/services/notification/*', (req, res) => {
 });
 
 app.post('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+  const notificationServiceUrl = notificationServiceUrl;
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   
@@ -478,7 +481,7 @@ app.post('/api/services/notification/*', (req, res) => {
 });
 
 app.put('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+  const notificationServiceUrl = notificationServiceUrl;
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   
@@ -511,7 +514,7 @@ app.put('/api/services/notification/*', (req, res) => {
 });
 
 app.delete('/api/services/notification/*', (req, res) => {
-  const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+  const notificationServiceUrl = notificationServiceUrl;
   const path = req.originalUrl.replace('/api/services/notification', '/api');
   const targetUrl = `${notificationServiceUrl}${path}`;
   
@@ -590,9 +593,9 @@ if (process.env.NODE_ENV === 'production') {
       message: 'API Server is running. Frontend is served by Vite on port 5173',
       environment: process.env.NODE_ENV || 'development',
       services: {
-        ai: process.env.AI_SERVICE_URL || 'http://localhost:8190',
-        db: process.env.DB_SERVICE_URL || 'http://localhost:8280',
-        notification: process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380'
+        ai: aiServiceUrl,
+        db: dbServiceUrl,
+        notification: notificationServiceUrl
       }
     });
   });
@@ -604,10 +607,9 @@ app.get('/api/services/health', async (req, res) => {
   const results = {};
   
   for (const service of services) {
-    const serviceUrl = process.env[`${service.toUpperCase()}_SERVICE_URL`] || 
-      (service === 'ai' ? 'http://localhost:8190' : 
-       service === 'db' ? 'http://localhost:8280' : 
-       'http://localhost:8380');
+    const serviceUrl = service === 'ai' ? aiServiceUrl :
+                     service === 'db' ? dbServiceUrl :
+                     notificationServiceUrl;
     
     try {
       const response = await fetch(`${serviceUrl}/api/health`, { timeout: 5000 });
