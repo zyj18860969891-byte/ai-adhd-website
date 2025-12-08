@@ -7,7 +7,6 @@ const path = require('path');
 const fs = require('fs');
 const cron = require('node-cron');
 const WebSocket = require('ws');
-const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,20 +35,19 @@ async function fetchWithRetry(url, options = {}, fallbackUrls = []) {
   for (let i = 0; i < urls.length; i++) {
     const currentUrl = urls[i];
     try {
-      const response = await axios({
-        url: currentUrl,
-        method: options.method || 'GET',
-        headers: options.headers || {},
-        data: options.body || undefined,
-        timeout: 30000
-      });
-      
-      // Check if response is JSON
-      const contentType = response.headers['content-type'];
-      if (contentType && contentType.includes('application/json')) {
-        return response;
+      const response = await fetch(currentUrl, options);
+      if (response.ok) {
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          return response;
+        } else {
+          // If not JSON, read as text and throw error
+          const text = await response.text();
+          throw new Error(`Service responded with non-JSON content: ${text.substring(0, 200)}`);
+        }
       } else {
-        throw new Error(`Service responded with non-JSON content: ${JSON.stringify(response.data).substring(0, 200)}`);
+        throw new Error(`Service responded with status: ${response.status}`);
       }
     } catch (error) {
       console.log(`Attempt ${i + 1}/${urls.length} failed for ${currentUrl}:`, error.message);
@@ -255,7 +253,7 @@ app.get('/api/services/ai/*', (req, res) => {
   ])
     .then(response => {
       console.log('AI Service response status:', response.status);
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('AI Service response data:', JSON.stringify(data, null, 2));
@@ -289,7 +287,7 @@ app.post('/api/services/ai/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`AI Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('AI Service response data:', JSON.stringify(data, null, 2));
@@ -323,7 +321,7 @@ app.put('/api/services/ai/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`AI Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('AI Service response data:', JSON.stringify(data, null, 2));
@@ -353,7 +351,7 @@ app.delete('/api/services/ai/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`AI Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('AI Service response data:', JSON.stringify(data, null, 2));
@@ -381,7 +379,7 @@ app.get('/api/services/db/*', (req, res) => {
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('DB Service response data:', JSON.stringify(data, null, 2));
@@ -416,7 +414,7 @@ app.post('/api/services/db/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`DB Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('DB Service response data:', JSON.stringify(data, null, 2));
@@ -451,7 +449,7 @@ app.put('/api/services/db/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`DB Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('DB Service response data:', JSON.stringify(data, null, 2));
@@ -482,7 +480,7 @@ app.delete('/api/services/db/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`DB Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('DB Service response data:', JSON.stringify(data, null, 2));
@@ -513,7 +511,7 @@ app.get('/api/services/notification/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`Notification Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('Notification Service response data:', JSON.stringify(data, null, 2));
@@ -548,7 +546,7 @@ app.post('/api/services/notification/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`Notification Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('Notification Service response data:', JSON.stringify(data, null, 2));
@@ -583,7 +581,7 @@ app.put('/api/services/notification/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`Notification Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('Notification Service response data:', JSON.stringify(data, null, 2));
@@ -614,7 +612,7 @@ app.delete('/api/services/notification/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`Notification Service responded with status: ${response.status}`);
       }
-      return response.data;
+      return response.json();
     })
     .then(data => {
       console.log('Notification Service response data:', JSON.stringify(data, null, 2));
@@ -685,7 +683,108 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Root endpoint for Railway
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'ADHD Task Manager API Gateway',
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Test service connectivity
+async function testServiceConnectivity() {
+  console.log('Testing service connectivity...');
+  
+  const services = [
+    { name: 'AI Service', url: aiServiceUrl },
+    { name: 'Database Service', url: dbServiceUrl },
+    { name: 'Notification Service', url: notificationServiceUrl }
+  ];
+  
+  for (const service of services) {
+    try {
+      console.log(`Testing ${service.name} at ${service.url}`);
+      const response = await fetch(`${service.url}/api/health`, { 
+        timeout: 5000 
+      });
+      
+      if (response.ok) {
+        console.log(`✓ ${service.name} is reachable`);
+      } else {
+        console.log(`✗ ${service.name} returned status ${response.status}`);
+      }
+    } catch (error) {
+      console.log(`✗ ${service.name} is not reachable: ${error.message}`);
+    }
+  }
+}
+
+// Test service connectivity
+async function testServiceConnectivity() {
+  console.log('Testing service connectivity...');
+  
+  const services = [
+    { name: 'AI Service', url: aiServiceUrl },
+    { name: 'Database Service', url: dbServiceUrl },
+    { name: 'Notification Service', url: notificationServiceUrl }
+  ];
+  
+  for (const service of services) {
+    try {
+      console.log(`Testing ${service.name} at ${service.url}`);
+      const response = await fetch(`${service.url}/api/health`, { 
+        timeout: 5000 
+      });
+      
+      if (response.ok) {
+        console.log(`✓ ${service.name} is reachable`);
+      } else {
+        console.log(`✗ ${service.name} returned status ${response.status}`);
+      }
+    } catch (error) {
+      console.log(`✗ ${service.name} is not reachable: ${error.message}`);
+    }
+  }
+}
+
+// Health check endpoint for Railway
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    services: taskProgress.services
+  });
+});
+
 // Health check for all services
+app.get('/api/services/health', async (req, res) => {
+  const services = ['ai', 'db', 'notification'];
+  const results = {};
+  
+  for (const service of services) {
+    const serviceUrl = service === 'ai' ? aiServiceUrl :
+                     service === 'db' ? dbServiceUrl :
+                     notificationServiceUrl;
+    
+    try {
+      const response = await fetch(`${serviceUrl}/api/health`, { timeout: 5000 });
+      results[service] = {
+        status: response.ok ? 'healthy' : 'unhealthy',
+        statusCode: response.status,
+        url: serviceUrl
+      };
+    } catch (error) {
+      results[service] = {
+        status: 'error',
+        error: error.message,
+        url: serviceUrl
+      };
+    }
+  }
+  
+  res.json(results);
+});
 app.get('/api/services/health', async (req, res) => {
   const services = ['ai', 'db', 'notification'];
   const results = {};
@@ -725,6 +824,14 @@ app.use((error, req, res, next) => {
   });
 });
 
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ 
+    error: 'Not Found',
+    message: `Route ${req.method} ${req.url} not found`
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
@@ -739,4 +846,10 @@ app.listen(PORT, () => {
   taskProgress.deployment.status = 'running';
   taskProgress.deployment.lastUpdated = new Date().toISOString();
   saveTaskProgress();
+  
+  console.log('Server ready to handle requests');
+  
+  // Test service connectivity
+  console.log('Testing service connectivity...');
+  testServiceConnectivity();
 });
