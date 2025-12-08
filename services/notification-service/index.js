@@ -120,7 +120,7 @@ app.put('/api/notifications/:id/acknowledge', (req, res) => {
   }
   
   acknowledgeNotification(id);
-  res.json({ success: true, notification });
+  res.status(204).send(); // 返回204状态码，符合REST API规范
 });
 
 app.delete('/api/notifications/:id', (req, res) => {

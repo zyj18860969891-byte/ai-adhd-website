@@ -45,29 +45,57 @@ function App() {
 
   // Confirm defer with selected option
   const confirmDefer = async () => {
-    if (!currentNotification || !currentNotification.taskId) return
+    console.log('⏰ Starting confirmDefer function');
+    console.log('Current notification:', currentNotification);
+    console.log('Defer option:', deferOption);
+    console.log('Custom hours:', customDeferHours);
+    
+    if (!currentNotification || !currentNotification.taskId) {
+      console.error('❌ No valid notification or taskId');
+      setSnackbarMessage('无效的通知')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
     
     try {
-      const deferHours = deferOption === 'custom' ? parseInt(customDeferHours) : parseInt(deferOption)
+      let deferHours;
+      
+      if (deferOption === 'custom') {
+        deferHours = parseInt(customDeferHours);
+        console.log('Custom defer hours parsed:', deferHours);
+      } else {
+        deferHours = parseInt(deferOption);
+        console.log('Standard defer hours:', deferHours);
+      }
       
       if (isNaN(deferHours) || deferHours <= 0) {
+        console.error('❌ Invalid defer hours:', deferHours);
         setSnackbarMessage('请输入有效的延期时间')
         setSnackbarSeverity('error')
         setSnackbarOpen(true)
         return
       }
       
+      console.log('✅ Valid defer hours:', deferHours);
+      
       const newDueDate = new Date()
       newDueDate.setHours(newDueDate.getHours() + deferHours)
+      console.log('New due date:', newDueDate.toISOString());
       
       // Update task due date
+      console.log('🔄 Updating task due date...');
       await taskService.updateTask(currentNotification.taskId, { 
         dueDate: newDueDate.toISOString()
       })
+      console.log('✅ Task due date updated successfully');
       
       // Acknowledge notification
+      console.log('🔄 Acknowledging notification...');
       await notificationService.acknowledgeNotification(currentNotification.id)
+      console.log('✅ Notification acknowledged successfully');
       
+      // Close dialogs
       setDeferDialogOpen(false)
       setCurrentNotification(null)
       
@@ -77,10 +105,15 @@ function App() {
       setSnackbarOpen(true)
       
       // Refresh notifications
+      console.log('🔄 Refreshing notifications...');
       const userNotifications = await notificationService.getUserNotifications('user-1')
-      setNotifications(userNotifications.filter(n => n.status === 'pending'))
+      const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
+      setNotifications(pendingNotifications)
+      console.log('✅ Notifications refreshed, count:', pendingNotifications.length);
+      
     } catch (error) {
-      console.error('Failed to defer task:', error)
+      console.error('❌ Failed to defer task:', error)
+      console.error('Error details:', error.response || error.message || error);
       setSnackbarMessage('延期任务失败')
       setSnackbarSeverity('error')
       setSnackbarOpen(true)
@@ -89,18 +122,32 @@ function App() {
 
   // Handle task complete
   const handleTaskComplete = async (notification) => {
-    if (!notification || !notification.taskId) return
+    console.log('✅ Starting handleTaskComplete function');
+    console.log('Notification:', notification);
+    
+    if (!notification || !notification.taskId) {
+      console.error('❌ No valid notification or taskId');
+      setSnackbarMessage('无效的通知')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
     
     try {
+      console.log('🔄 Updating task status to completed...');
       // Update task status to completed
       await taskService.updateTask(notification.taskId, { 
         status: 'completed',
         completedAt: new Date().toISOString()
       })
+      console.log('✅ Task status updated successfully');
       
+      console.log('🔄 Acknowledging notification...');
       // Acknowledge notification
       await notificationService.acknowledgeNotification(notification.id)
+      console.log('✅ Notification acknowledged successfully');
       
+      // Close dialogs
       setSnackbarOpen(false)
       setCurrentNotification(null)
       
@@ -110,10 +157,15 @@ function App() {
       setSnackbarOpen(true)
       
       // Refresh notifications
+      console.log('🔄 Refreshing notifications...');
       const userNotifications = await notificationService.getUserNotifications('user-1')
-      setNotifications(userNotifications.filter(n => n.status === 'pending'))
+      const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
+      setNotifications(pendingNotifications)
+      console.log('✅ Notifications refreshed, count:', pendingNotifications.length);
+      
     } catch (error) {
-      console.error('Failed to complete task:', error)
+      console.error('❌ Failed to complete task:', error)
+      console.error('Error details:', error.response || error.message || error);
       setSnackbarMessage('完成任务失败')
       setSnackbarSeverity('error')
       setSnackbarOpen(true)
@@ -124,6 +176,7 @@ function App() {
   const handleTaskDefer = async (notification) => {
     if (!notification || !notification.taskId) return
     
+    console.log('⏰ Handling task defer for notification:', notification.id);
     setCurrentNotification(notification)
     setDeferDialogOpen(true)
   }
@@ -417,6 +470,7 @@ function App() {
                   if (notifications.length > 0) {
                     console.log('🔔 Showing notification:', notifications[0].id);
                     console.log('🔔 Notification message:', notifications[0].message);
+                    console.log('🔔 Notification details:', notifications[0]);
                     // 如果有未读通知，显示第一个
                     setSnackbarMessage(notifications[0].message);
                     setCurrentNotification(notifications[0]);
@@ -424,6 +478,9 @@ function App() {
                     console.log('🔔 Snackbar opened with message:', notifications[0].message);
                   } else {
                     console.log('🔔 No notifications to show');
+                    setSnackbarMessage('暂无新通知');
+                    setSnackbarSeverity('info');
+                    setSnackbarOpen(true);
                   }
                 }}
                 style={{ cursor: 'pointer' }}
@@ -505,7 +562,16 @@ function App() {
           </DialogContent>
           <DialogActions>
             <Button 
-              onClick={() => handleTaskComplete(currentNotification)}
+              onClick={async () => {
+                console.log('✅ Mark as complete button clicked');
+                console.log('Current notification:', currentNotification);
+                try {
+                  await handleTaskComplete(currentNotification);
+                  console.log('✅ Complete operation finished');
+                } catch (error) {
+                  console.error('❌ Complete operation failed:', error);
+                }
+              }}
               variant="contained"
               color="success"
               startIcon={<CheckIcon />}
@@ -513,7 +579,16 @@ function App() {
               标记为已完成
             </Button>
             <Button 
-              onClick={() => handleTaskDefer(currentNotification)}
+              onClick={async () => {
+                console.log('⏰ Defer task button clicked');
+                console.log('Current notification:', currentNotification);
+                try {
+                  await handleTaskDefer(currentNotification);
+                  console.log('⏰ Defer operation started');
+                } catch (error) {
+                  console.error('❌ Defer operation failed:', error);
+                }
+              }}
               variant="contained"
               color="warning"
               startIcon={<ScheduleIcon />}
@@ -521,7 +596,10 @@ function App() {
               延期任务
             </Button>
             <Button 
-              onClick={() => setSnackbarOpen(false)}
+              onClick={() => {
+                console.log('⏰ Snooze button clicked');
+                setSnackbarOpen(false);
+              }}
               variant="outlined"
             >
               稍后提醒
@@ -559,12 +637,36 @@ function App() {
                 value={customDeferHours}
                 onChange={(e) => setCustomDeferHours(e.target.value)}
                 inputProps={{ min: 1, step: 1 }}
+                placeholder="请输入小时数"
               />
             )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDeferDialogOpen(false)}>取消</Button>
-            <Button onClick={confirmDefer} variant="contained" color="primary">
+            <Button 
+              onClick={() => {
+                console.log('❌ Cancel button clicked');
+                setDeferDialogOpen(false);
+              }}
+            >
+              取消
+            </Button>
+            <Button 
+              onClick={async () => {
+                console.log('✅ Confirm defer button clicked');
+                console.log('Current notification:', currentNotification);
+                console.log('Defer option:', deferOption);
+                console.log('Custom hours:', customDeferHours);
+                
+                try {
+                  await confirmDefer();
+                  console.log('✅ Defer operation completed successfully');
+                } catch (error) {
+                  console.error('❌ Defer operation failed:', error);
+                }
+              }} 
+              variant="contained" 
+              color="primary"
+            >
               确认延期
             </Button>
           </DialogActions>

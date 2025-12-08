@@ -388,11 +388,18 @@ app.get('/api/services/db/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`DB Service responded with status: ${response.status}`);
       }
+      // Handle 204 No Content responses
+      if (response.status === 204) {
+        res.status(204).end();
+        return;
+      }
       return response.json();
     })
     .then(data => {
-      console.log('DB Service response data:', JSON.stringify(data, null, 2));
-      res.json(data);
+      if (data) {  // Only process data if it exists (not 204 response)
+        console.log('DB Service response data:', JSON.stringify(data, null, 2));
+        res.json(data);
+      }
     })
     .catch(error => {
       console.error('Database Service Error:', error);
@@ -400,7 +407,7 @@ app.get('/api/services/db/*', (req, res) => {
     });
 });
 
-app.post('/api/services/db/*', (req, res) => {
+app.delete('/api/services/db/*', (req, res) => {
   const path = req.originalUrl.replace('/api/services/db', '/api');
   const targetUrl = `${dbServiceUrl}${path}`;
   
@@ -602,11 +609,18 @@ app.put('/api/services/notification/*', (req, res) => {
       if (!response.status.toString().startsWith('2')) {
         throw new Error(`Notification Service responded with status: ${response.status}`);
       }
+      // Handle 204 No Content responses
+      if (response.status === 204) {
+        res.status(204).end();
+        return;
+      }
       return response.json();
     })
     .then(data => {
-      console.log('Notification Service response data:', JSON.stringify(data, null, 2));
-      res.json(data);
+      if (data) {  // Only process data if it exists (not 204 response)
+        console.log('Notification Service response data:', JSON.stringify(data, null, 2));
+        res.json(data);
+      }
     })
     .catch(error => {
       console.error('Notification Service Error:', error);

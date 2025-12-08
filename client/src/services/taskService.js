@@ -50,11 +50,18 @@ const taskService = {
   },
 
   async updateTask(id, updates) {
+    console.log('🔄 updateTask called with id:', id);
+    console.log('🔄 Updates:', updates);
+    console.log('🔄 API Base URL:', getApiBase());
+    console.log('🔄 Full URL:', `${getApiBase()}/services/db/tasks/${id}`);
+    
     try {
       const response = await axios.put(`${getApiBase()}/services/db/tasks/${id}`, updates)
+      console.log('🔄 updateTask response:', response);
       return response.data
     } catch (error) {
-      console.error('Failed to update task:', error)
+      console.error('❌ Failed to update task:', error)
+      console.error('❌ Error details:', error.response || error.message || error);
       throw error
     }
   },

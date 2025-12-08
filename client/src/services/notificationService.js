@@ -42,11 +42,17 @@ const notificationService = {
 
   // Acknowledge notification
   async acknowledgeNotification(id) {
+    console.log('🔔 acknowledgeNotification called with id:', id);
+    console.log('🔔 API Base URL:', getApiBase());
+    console.log('🔔 Full URL:', `${getApiBase()}/services/notification/notifications/${id}/acknowledge`);
+    
     try {
       const response = await axios.put(`${getApiBase()}/services/notification/notifications/${id}/acknowledge`)
+      console.log('🔔 acknowledgeNotification response:', response);
       return response.data
     } catch (error) {
-      console.error('Failed to acknowledge notification:', error)
+      console.error('❌ Failed to acknowledge notification:', error)
+      console.error('❌ Error details:', error.response || error.message || error);
       throw error
     }
   },
