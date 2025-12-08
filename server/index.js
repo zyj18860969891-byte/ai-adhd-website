@@ -832,8 +832,69 @@ app.use((req, res) => {
   });
 });
 
+// 初始化测试数据
+async function initializeTestData() {
+  try {
+    console.log('Initializing test data...');
+    
+    // 创建一个测试任务
+    const testTask = {
+      title: 'Sample Task',
+      description: 'This is a sample task to test the system',
+      priority: 'medium',
+      dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24小时后
+      status: 'pending',
+      tags: ['test', 'sample'],
+      estimatedTime: 60,
+      userId: 'user-1'
+    };
+    
+    const response = await fetch(`${dbServiceUrl}/api/tasks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(testTask)
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ Test task created successfully:', result);
+      
+      // 创建一个测试通知
+      const testNotification = {
+        userId: 'user-1',
+        title: 'Welcome to ADHD Task Manager!',
+        message: 'Your task management system is ready to use. Start by adding your first task.',
+        type: 'welcome',
+        priority: 'normal',
+        taskId: result.id
+      };
+      
+      const notifResponse = await fetch(`${notificationServiceUrl}/api/notifications`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(testNotification)
+      });
+      
+      if (notifResponse.ok) {
+        const notifResult = await notifResponse.json();
+        console.log('✅ Test notification created successfully:', notifResult);
+      } else {
+        console.log('❌ Failed to create test notification:', notifResponse.status);
+      }
+    } else {
+      console.log('❌ Failed to create test task:', response.status);
+    }
+  } catch (error) {
+    console.log('⚠️  Failed to initialize test data:', error.message);
+  }
+}
+
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`NODE_ENV: ${process.env.NODE_ENV || 'undefined'}`);
   console.log(`WebSocket enabled: ${process.env.NODE_ENV !== 'production'}`);
@@ -852,4 +913,7 @@ app.listen(PORT, () => {
   // Test service connectivity
   console.log('Testing service connectivity...');
   testServiceConnectivity();
+  
+  // 初始化测试数据
+  await initializeTestData();
 });
