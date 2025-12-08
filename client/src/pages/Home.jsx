@@ -3,7 +3,7 @@ import { Grid, Card, CardContent, Typography, Button, Chip, LinearProgress, Box,
 import { Add as AddIcon, CheckCircle as CompletedIcon, PendingActions as PendingIcon, Warning as WarningIcon } from '@mui/icons-material'
 import taskService from '../services/taskService.js'
 
-export default function Home({ taskProgress }) {
+export default function Home({ taskProgress, onTaskAction }) {
   const [stats, setStats] = useState(null)
   const [recentTasks, setRecentTasks] = useState([])
 
@@ -199,8 +199,9 @@ export default function Home({ taskProgress }) {
           ) : (
             <Grid container spacing={2}>
               {recentTasks.map((task) => (
-                <Grid item xs={12} key={task.id}>
+                <Grid item xs={12}>
                   <Box 
+                    key={task.id}
                     sx={{ 
                       p: 2, 
                       border: '1px solid', 
@@ -214,11 +215,26 @@ export default function Home({ taskProgress }) {
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                       <Typography variant="subtitle1">{task.title}</Typography>
-                      <Chip 
-                        label={task.priority} 
-                        color={getPriorityColor(task.priority)}
-                        size="small"
-                      />
+                      <Box>
+                        <Chip 
+                          label={task.priority} 
+                          color={getPriorityColor(task.priority)}
+                          size="small"
+                        />
+                        <Button 
+                          size="small" 
+                          color="success" 
+                          variant="outlined"
+                          onClick={() => {
+                            console.log('✅ Home.jsx: Complete button clicked for task:', task.id);
+                            console.log('✅ Task details:', task);
+                            onTaskAction({ taskId: task.id, title: task.title });
+                          }}
+                          sx={{ ml: 1 }}
+                        >
+                          完成
+                        </Button>
+                      </Box>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
                       {task.category && (

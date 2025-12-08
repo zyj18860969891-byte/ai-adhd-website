@@ -51,8 +51,18 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
+      '/api/services/db': {
+        target: 'http://localhost:8280',
+        changeOrigin: true,
+        secure: false
+      },
+      '/api/services/ai': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false
+      },
+      '/api/services/notification': {
+        target: 'http://localhost:3003',
         changeOrigin: true,
         secure: false
       }

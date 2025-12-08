@@ -23,7 +23,6 @@ import AddTask from './pages/AddTask.jsx'
 import EditTask from './pages/EditTask.jsx'
 import Analytics from './pages/Analytics.jsx'
 import Settings from './pages/Settings.jsx'
-import TestNotifications from './pages/TestNotifications.jsx'
 
 // Import icons (already imported above)
 
@@ -44,15 +43,34 @@ function App() {
   const [customDeferHours, setCustomDeferHours] = useState('')
 
   // Confirm defer with selected option
-  const confirmDefer = async () => {
-    console.log('⏰ Starting confirmDefer function');
-    console.log('Current notification:', currentNotification);
-    console.log('Defer option:', deferOption);
-    console.log('Custom hours:', customDeferHours);
+  const confirmDefer = () => {
+    console.log('⏰ [confirmDefer] Starting confirm defer function');
+    console.log('⏰ [confirmDefer] Current notification:', currentNotification);
+    console.log('⏰ [confirmDefer] Current notification type:', typeof currentNotification);
+    console.log('⏰ [confirmDefer] Current notification keys:', Object.keys(currentNotification || {}));
+    console.log('⏰ [confirmDefer] Defer option:', deferOption);
+    console.log('⏰ [confirmDefer] Custom hours:', customDeferHours);
     
-    if (!currentNotification || !currentNotification.taskId) {
-      console.error('❌ No valid notification or taskId');
+    if (!currentNotification) {
+      console.error('❌ [confirmDefer] No valid notification object');
       setSnackbarMessage('无效的通知')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+    
+    // If it's a task object (from Home.jsx), use taskId directly
+    const taskId = currentNotification.taskId || currentNotification.id;
+    console.log('⏰ [confirmDefer] Determined taskId:', taskId);
+    console.log('⏰ [confirmDefer] currentNotification.taskId:', currentNotification?.taskId);
+    console.log('⏰ [confirmDefer] currentNotification.id:', currentNotification?.id);
+    
+    if (!taskId) {
+      console.error('❌ [confirmDefer] No valid taskId');
+      console.error('❌ [confirmDefer] currentNotification:', currentNotification);
+      console.error('❌ [confirmDefer] currentNotification.taskId:', currentNotification?.taskId);
+      console.error('❌ [confirmDefer] currentNotification.id:', currentNotification?.id);
+      setSnackbarMessage('无效的任务ID')
       setSnackbarSeverity('error')
       setSnackbarOpen(true)
       return
@@ -63,57 +81,70 @@ function App() {
       
       if (deferOption === 'custom') {
         deferHours = parseInt(customDeferHours);
-        console.log('Custom defer hours parsed:', deferHours);
+        console.log('⏰ [confirmDefer] Custom defer hours parsed:', deferHours);
       } else {
         deferHours = parseInt(deferOption);
-        console.log('Standard defer hours:', deferHours);
+        console.log('⏰ [confirmDefer] Standard defer hours:', deferHours);
       }
       
       if (isNaN(deferHours) || deferHours <= 0) {
-        console.error('❌ Invalid defer hours:', deferHours);
+        console.error('❌ [confirmDefer] Invalid defer hours:', deferHours);
         setSnackbarMessage('请输入有效的延期时间')
         setSnackbarSeverity('error')
         setSnackbarOpen(true)
         return
       }
       
-      console.log('✅ Valid defer hours:', deferHours);
+      console.log('✅ [confirmDefer] Valid defer hours:', deferHours);
       
       const newDueDate = new Date()
       newDueDate.setHours(newDueDate.getHours() + deferHours)
-      console.log('New due date:', newDueDate.toISOString());
+      console.log('⏰ [confirmDefer] New due date:', newDueDate.toISOString());
       
       // Update task due date
-      console.log('🔄 Updating task due date...');
-      await taskService.updateTask(currentNotification.taskId, { 
+      console.log('🔄 [confirmDefer] Updating task due date...');
+      taskService.updateTask(taskId, { 
         dueDate: newDueDate.toISOString()
-      })
-      console.log('✅ Task due date updated successfully');
-      
-      // Acknowledge notification
-      console.log('🔄 Acknowledging notification...');
-      await notificationService.acknowledgeNotification(currentNotification.id)
-      console.log('✅ Notification acknowledged successfully');
-      
-      // Close dialogs
-      setDeferDialogOpen(false)
-      setCurrentNotification(null)
-      
-      // Show success message
-      setSnackbarMessage(`任务已延期 ${deferHours} 小时！`)
-      setSnackbarSeverity('success')
-      setSnackbarOpen(true)
-      
-      // Refresh notifications
-      console.log('🔄 Refreshing notifications...');
-      const userNotifications = await notificationService.getUserNotifications('user-1')
-      const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
-      setNotifications(pendingNotifications)
-      console.log('✅ Notifications refreshed, count:', pendingNotifications.length);
-      
+      }).then(async () => {
+        console.log('✅ [confirmDefer] Task due date updated successfully');
+        
+        // Acknowledge notification if it has an id (not a task object)
+        if (currentNotification.id) {
+          console.log('🔄 [confirmDefer] Acknowledging notification...');
+          await notificationService.acknowledgeNotification(currentNotification.id)
+          console.log('✅ [confirmDefer] Notification acknowledged successfully');
+        } else {
+          console.log('✅ [confirmDefer] Task object from Home.jsx, no notification to acknowledge');
+        }
+        
+        // Close dialogs
+        setDeferDialogOpen(false)
+        setCurrentNotification(null)
+        
+        // Show success message
+        setSnackbarMessage(`任务已延期 ${deferHours} 小时！`)
+        setSnackbarSeverity('success')
+        setSnackbarOpen(true)
+        
+        // Refresh notifications
+        console.log('🔄 [confirmDefer] Refreshing notifications...');
+        notificationService.getUserNotifications('user-1').then(userNotifications => {
+          const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
+          setNotifications(pendingNotifications)
+          console.log('✅ [confirmDefer] Notifications refreshed, count:', pendingNotifications.length);
+        }).catch(error => {
+          console.error('❌ [confirmDefer] Failed to refresh notifications:', error);
+        });
+      }).catch(error => {
+        console.error('❌ [confirmDefer] Failed to defer task:', error)
+        console.error('❌ [confirmDefer] Error details:', error.response || error.message || error);
+        setSnackbarMessage('延期任务失败')
+        setSnackbarSeverity('error')
+        setSnackbarOpen(true)
+      });
     } catch (error) {
-      console.error('❌ Failed to defer task:', error)
-      console.error('Error details:', error.response || error.message || error);
+      console.error('❌ [confirmDefer] Failed to defer task:', error)
+      console.error('❌ [confirmDefer] Error details:', error.response || error.message || error);
       setSnackbarMessage('延期任务失败')
       setSnackbarSeverity('error')
       setSnackbarOpen(true)
@@ -121,31 +152,97 @@ function App() {
   }
 
   // Handle task complete
-  const handleTaskComplete = async (notification) => {
-    console.log('✅ Starting handleTaskComplete function');
-    console.log('Notification:', notification);
+  const handleTaskComplete = (notification) => {
+    console.log('✅ [handleTaskComplete] Starting task complete handler');
+    console.log('✅ [handleTaskComplete] Input notification:', notification);
+    console.log('✅ [handleTaskComplete] Input notification type:', typeof notification);
+    console.log('✅ [handleTaskComplete] Input notification keys:', Object.keys(notification || {}));
     
-    if (!notification || !notification.taskId) {
-      console.error('❌ No valid notification or taskId');
+    // Check if this is a task object (from Home.jsx) or notification object (from modal)
+    if (!notification) {
+      console.error('❌ [handleTaskComplete] No notification object provided');
       setSnackbarMessage('无效的通知')
       setSnackbarSeverity('error')
       setSnackbarOpen(true)
       return
     }
     
-    try {
-      console.log('🔄 Updating task status to completed...');
+    // Handle string taskId (from button click)
+    if (typeof notification === 'string') {
+      console.log('✅ [handleTaskComplete] Handling string taskId:', notification);
+      const taskNotification = {
+        id: notification,
+        taskId: notification,
+        title: notification,
+        message: `完成任务: ${notification}`,
+        type: 'reminder',
+        status: 'pending'
+      };
+      console.log('✅ [handleTaskComplete] Created taskNotification:', taskNotification);
+      setCurrentNotification(taskNotification);
+      setCompleteDialogOpen(true);
+      return;
+    }
+    
+    // If it's a task object (has taskId property), handle it directly
+    if (notification.taskId) {
+      console.log('✅ [handleTaskComplete] Handling task completion from Home.jsx');
+      const taskId = notification.taskId;
+      const taskTitle = notification.title;
+      
       // Update task status to completed
-      await taskService.updateTask(notification.taskId, { 
+      taskService.updateTask(taskId, { 
         status: 'completed',
         completedAt: new Date().toISOString()
-      })
-      console.log('✅ Task status updated successfully');
+      }).then(async () => {
+        console.log('✅ [handleTaskComplete] Task status updated successfully');
+        
+        // Show success message
+        setSnackbarMessage(`任务 "${taskTitle}" 已完成！`)
+        setSnackbarSeverity('success')
+        setSnackbarOpen(true)
+        
+        // Refresh notifications
+        console.log('🔄 [handleTaskComplete] Refreshing notifications...');
+        notificationService.getUserNotifications('user-1').then(userNotifications => {
+          const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
+          setNotifications(pendingNotifications)
+          console.log('✅ [handleTaskComplete] Notifications refreshed, count:', pendingNotifications.length);
+        }).catch(error => {
+          console.error('❌ [handleTaskComplete] Failed to refresh notifications:', error);
+        });
+      }).catch(error => {
+        console.error('❌ [handleTaskComplete] Failed to complete task:', error)
+        console.error('❌ [handleTaskComplete] Error details:', error.response || error.message || error);
+        setSnackbarMessage('完成任务失败')
+        setSnackbarSeverity('error')
+        setSnackbarOpen(true)
+      });
+      return;
+    }
+    
+    // If it's a notification object (has id property), handle it as before
+    if (!notification.id) {
+      console.error('❌ [handleTaskComplete] No valid notification id');
+      console.error('❌ [handleTaskComplete] notification:', notification);
+      console.error('❌ [handleTaskComplete] notification.id:', notification?.id);
+      console.error('❌ [handleTaskComplete] notification.taskId:', notification?.taskId);
+      setSnackbarMessage('无效的通知')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+    
+    // Update task status to completed
+    taskService.updateTask(notification.taskId, { 
+      status: 'completed',
+      completedAt: new Date().toISOString()
+    }).then(async () => {
+      console.log('✅ [handleTaskComplete] Task status updated successfully');
       
-      console.log('🔄 Acknowledging notification...');
       // Acknowledge notification
       await notificationService.acknowledgeNotification(notification.id)
-      console.log('✅ Notification acknowledged successfully');
+      console.log('✅ [handleTaskComplete] Notification acknowledged successfully');
       
       // Close dialogs
       setSnackbarOpen(false)
@@ -157,26 +254,103 @@ function App() {
       setSnackbarOpen(true)
       
       // Refresh notifications
-      console.log('🔄 Refreshing notifications...');
-      const userNotifications = await notificationService.getUserNotifications('user-1')
-      const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
-      setNotifications(pendingNotifications)
-      console.log('✅ Notifications refreshed, count:', pendingNotifications.length);
-      
-    } catch (error) {
-      console.error('❌ Failed to complete task:', error)
-      console.error('Error details:', error.response || error.message || error);
+      console.log('🔄 [handleTaskComplete] Refreshing notifications...');
+      notificationService.getUserNotifications('user-1').then(userNotifications => {
+        const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
+        setNotifications(pendingNotifications)
+        console.log('✅ [handleTaskComplete] Notifications refreshed, count:', pendingNotifications.length);
+      }).catch(error => {
+        console.error('❌ [handleTaskComplete] Failed to refresh notifications:', error);
+      });
+    }).catch(error => {
+      console.error('❌ [handleTaskComplete] Failed to complete task:', error)
+      console.error('❌ [handleTaskComplete] Error details:', error.response || error.message || error);
       setSnackbarMessage('完成任务失败')
       setSnackbarSeverity('error')
       setSnackbarOpen(true)
-    }
+    });
   }
 
   // Handle task defer
-  const handleTaskDefer = async (notification) => {
-    if (!notification || !notification.taskId) return
+  const handleTaskDefer = (notification) => {
+    console.log('⏰ Starting handleTaskDefer function');
+    console.log('Notification:', notification);
+    console.log('Notification type:', typeof notification);
+    console.log('Notification ID:', notification?.id);
+    console.log('Notification Task ID:', notification?.taskId);
     
-    console.log('⏰ Handling task defer for notification:', notification.id);
+    if (!notification) {
+      console.error('❌ No notification object provided');
+      setSnackbarMessage('无效的通知')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+    
+    // If it's a task object (has taskId property), handle it directly
+    if (notification.taskId) {
+      console.log('✅ Handling task defer from Home.jsx');
+      // For Home.jsx, we need to create a notification object
+      const taskNotification = {
+        id: notification.taskId, // Use taskId as id for modal
+        taskId: notification.taskId,
+        title: notification.title,
+        message: `延期任务: ${notification.title}`,
+        type: 'reminder',
+        status: 'pending'
+      };
+      setCurrentNotification(taskNotification);
+      setDeferDialogOpen(true);
+      return;
+    }
+    
+    // If it's a notification object (has id property), handle it as before
+    if (!notification.id || !notification.taskId) {
+      console.error('❌ No valid notification or taskId');
+      setSnackbarMessage('无效的通知')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+    
+    console.log('⏰ [handleTaskDefer] Starting task defer handler');
+    console.log('⏰ [handleTaskDefer] Input notification:', notification);
+    console.log('⏰ [handleTaskDefer] Input notification type:', typeof notification);
+    console.log('⏰ [handleTaskDefer] Input notification keys:', Object.keys(notification || {}));
+    
+    // Handle string taskId (from button click)
+    if (typeof notification === 'string') {
+      console.log('⏰ [handleTaskDefer] Handling string taskId:', notification);
+      const taskNotification = {
+        id: notification,
+        taskId: notification,
+        title: notification,
+        message: `延期任务: ${notification}`,
+        type: 'reminder',
+        status: 'pending'
+      };
+      console.log('⏰ [handleTaskDefer] Created taskNotification:', taskNotification);
+      setCurrentNotification(taskNotification);
+      setDeferDialogOpen(true);
+      return;
+    }
+    
+    // Handle notification object
+    if (!notification || !notification.id || !notification.taskId) {
+      console.error('❌ [handleTaskDefer] No valid notification or taskId');
+      console.error('❌ [handleTaskDefer] notification:', notification);
+      console.error('❌ [handleTaskDefer] notification.id:', notification?.id);
+      console.error('❌ [handleTaskDefer] notification.taskId:', notification?.taskId);
+      setSnackbarMessage('无效的通知')
+      setSnackbarSeverity('error')
+      setSnackbarOpen(true)
+      return
+    }
+    
+    console.log('⏰ [handleTaskDefer] Valid notification object, setting current notification');
+    console.log('⏰ [handleTaskDefer] notification.id:', notification.id);
+    console.log('⏰ [handleTaskDefer] notification.taskId:', notification.taskId);
+    console.log('⏰ [handleTaskDefer] notification.title:', notification.title);
     setCurrentNotification(notification)
     setDeferDialogOpen(true)
   }
@@ -344,38 +518,7 @@ function App() {
     console.log('=== END DEBUG ===');
   }
 
-  // Test function to create a test notification
-  const createTestNotification = async () => {
-    try {
-      console.log('🧪 Creating test notification...');
-      const testNotification = {
-        userId: 'user-1',
-        type: 'reminder',
-        title: 'Test Reminder',
-        message: 'This is a test notification to verify the system works!',
-        taskId: 'test-task-1',
-        schedule: '*/1 * * * *', // Every minute
-        repeat: false
-      };
-      
-      const result = await notificationService.sendNotification(testNotification);
-      console.log('🧪 Test notification created:', result);
-      
-      // Reload notifications to see the new one
-      const userNotifications = await notificationService.getUserNotifications('user-1');
-      console.log('🧪 All notifications after test:', userNotifications);
-      
-      // Show success message
-      setSnackbarMessage('Test notification created successfully!');
-      setSnackbarSeverity('success');
-      setSnackbarOpen(true);
-    } catch (error) {
-      console.error('🧪 Failed to create test notification:', error);
-      setSnackbarMessage('Failed to create test notification');
-      setSnackbarSeverity('error');
-      setSnackbarOpen(true);
-    }
-  }
+  // Test function to create a test notification has been removed as the test page is no longer needed
 
   // Manual refresh function
   const refreshNotifications = async () => {
@@ -419,8 +562,7 @@ function App() {
     { text: '任务看板', icon: <ListIcon />, path: '/tasks' },
     { text: '添加任务', icon: <AddIcon />, path: '/add' },
     { text: '数据分析', icon: <ChartIcon />, path: '/analytics' },
-    { text: '设置', icon: <SettingsIcon />, path: '/settings' },
-    { text: '测试通知', icon: <NotificationsIcon />, path: '/test-notifications' }
+    { text: '设置', icon: <SettingsIcon />, path: '/settings' }
   ]
 
   return (
@@ -450,13 +592,6 @@ function App() {
               sx={{ mr: 1 }}
             >
               Refresh
-            </Button>
-            <Button 
-              color="inherit" 
-              onClick={createTestNotification}
-              sx={{ mr: 2 }}
-            >
-              Test Notification
             </Button>
 
             <Badge badgeContent={notifications.length} color="secondary">
@@ -562,15 +697,11 @@ function App() {
           </DialogContent>
           <DialogActions>
             <Button 
-              onClick={async () => {
+              onClick={() => {
                 console.log('✅ Mark as complete button clicked');
                 console.log('Current notification:', currentNotification);
-                try {
-                  await handleTaskComplete(currentNotification);
-                  console.log('✅ Complete operation finished');
-                } catch (error) {
-                  console.error('❌ Complete operation failed:', error);
-                }
+                handleTaskComplete(currentNotification);
+                console.log('✅ Complete operation finished');
               }}
               variant="contained"
               color="success"
@@ -579,15 +710,11 @@ function App() {
               标记为已完成
             </Button>
             <Button 
-              onClick={async () => {
+              onClick={() => {
                 console.log('⏰ Defer task button clicked');
                 console.log('Current notification:', currentNotification);
-                try {
-                  await handleTaskDefer(currentNotification);
-                  console.log('⏰ Defer operation started');
-                } catch (error) {
-                  console.error('❌ Defer operation failed:', error);
-                }
+                handleTaskDefer(currentNotification);
+                console.log('⏰ Defer operation started');
               }}
               variant="contained"
               color="warning"
@@ -651,18 +778,14 @@ function App() {
               取消
             </Button>
             <Button 
-              onClick={async () => {
+              onClick={() => {
                 console.log('✅ Confirm defer button clicked');
                 console.log('Current notification:', currentNotification);
                 console.log('Defer option:', deferOption);
                 console.log('Custom hours:', customDeferHours);
                 
-                try {
-                  await confirmDefer();
-                  console.log('✅ Defer operation completed successfully');
-                } catch (error) {
-                  console.error('❌ Defer operation failed:', error);
-                }
+                confirmDefer();
+                console.log('✅ Defer operation completed successfully');
               }} 
               variant="contained" 
               color="primary"
@@ -701,13 +824,12 @@ function App() {
         <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: 8 }}>
           <Container maxWidth="lg">
             <Routes>
-              <Route path="/" element={<Home taskProgress={taskProgress} />} />
+              <Route path="/" element={<Home taskProgress={taskProgress} onTaskAction={handleTaskComplete} />} />
               <Route path="/tasks" element={<TaskBoard />} />
               <Route path="/add" element={<AddTask />} />
               <Route path="/edit/:id" element={<EditTask />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/settings" element={<Settings />} />
-              <Route path="/test-notifications" element={<TestNotifications />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Container>

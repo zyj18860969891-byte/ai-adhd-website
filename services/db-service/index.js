@@ -259,7 +259,22 @@ app.put('/api/tasks/:id', (req, res) => {
         addHistory(id, 'status_changed', { from: row.status, to: status });
       }
 
-      res.status(204).send(); // 返回204状态码，符合REST API规范
+      res.json({
+        id,
+        title,
+        description,
+        category,
+        priority,
+        status,
+        createdAt: row.createdAt,
+        updatedAt,
+        dueDate,
+        tags: tags ? JSON.parse(tags) : [],
+        estimatedTime,
+        actualTime,
+        completedAt,
+        context: context ? JSON.parse(context) : {}
+      });
     });
 
     stmt.finalize();
