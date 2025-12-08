@@ -837,15 +837,15 @@ async function initializeTestData() {
   try {
     console.log('Initializing test data...');
     
-    // 创建一个测试任务
+    // 创建一个测试任务 - 5分钟后到期，用于测试真实通知功能
     const testTask = {
-      title: 'Sample Task',
-      description: 'This is a sample task to test the system',
-      priority: 'medium',
-      dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24小时后
+      title: 'Sample Task - 5分钟内到期',
+      description: 'This task will expire in 5 minutes to test the notification system',
+      priority: 'high',
+      dueDate: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5分钟后
       status: 'pending',
-      tags: ['test', 'sample'],
-      estimatedTime: 60,
+      tags: ['test', 'notification'],
+      estimatedTime: 30,
       userId: 'user-1'
     };
     
@@ -860,12 +860,13 @@ async function initializeTestData() {
     if (response.ok) {
       const result = await response.json();
       console.log('✅ Test task created successfully:', result);
+      console.log('⏰ This task will expire in 5 minutes and trigger a notification!');
       
       // 创建一个测试通知
       const testNotification = {
         userId: 'user-1',
         title: 'Welcome to ADHD Task Manager!',
-        message: 'Your task management system is ready to use. Start by adding your first task.',
+        message: 'Your task management system is ready to use. A test task has been created that will notify you in 5 minutes.',
         type: 'welcome',
         priority: 'normal',
         taskId: result.id
