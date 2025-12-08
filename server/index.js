@@ -37,7 +37,15 @@ async function fetchWithRetry(url, options = {}, fallbackUrls = []) {
     try {
       const response = await fetch(currentUrl, options);
       if (response.ok) {
-        return response;
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          return response;
+        } else {
+          // If not JSON, read as text and throw error
+          const text = await response.text();
+          throw new Error(`Service responded with non-JSON content: ${text.substring(0, 200)}`);
+        }
       } else {
         throw new Error(`Service responded with status: ${response.status}`);
       }
@@ -240,8 +248,8 @@ app.get('/api/services/ai/*', (req, res) => {
   fetchWithRetry(targetUrl, {
     method: 'GET'
   }, [
-    `http://ai-service:${PORT}`,           // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://ai-service:8190/api${req.originalUrl.replace('/api/services/ai', '')}`,  // Fallback 1: Direct service name with correct port
+    `http://localhost:8190/api${req.originalUrl.replace('/api/services/ai', '')}`   // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('AI Service response status:', response.status);
@@ -271,8 +279,8 @@ app.post('/api/services/ai/*', (req, res) => {
     },
     body: JSON.stringify(req.body)
   }, [
-    `http://ai-service:${PORT}`,           // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://ai-service:8190/api${req.originalUrl.replace('/api/services/ai', '')}`,  // Fallback 1: Direct service name with correct port
+    `http://localhost:8190/api${req.originalUrl.replace('/api/services/ai', '')}`   // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('AI Service response status:', response.status);
@@ -305,8 +313,8 @@ app.put('/api/services/ai/*', (req, res) => {
     },
     body: JSON.stringify(req.body)
   }, [
-    `http://ai-service:${PORT}`,           // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://ai-service:8190/api${req.originalUrl.replace('/api/services/ai', '')}`,  // Fallback 1: Direct service name with correct port
+    `http://localhost:8190/api${req.originalUrl.replace('/api/services/ai', '')}`   // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('AI Service response status:', response.status);
@@ -335,8 +343,8 @@ app.delete('/api/services/ai/*', (req, res) => {
   fetchWithRetry(targetUrl, {
     method: 'DELETE'
   }, [
-    `http://ai-service:${PORT}`,           // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://ai-service:8190/api${req.originalUrl.replace('/api/services/ai', '')}`,  // Fallback 1: Direct service name with correct port
+    `http://localhost:8190/api${req.originalUrl.replace('/api/services/ai', '')}`   // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('AI Service response status:', response.status);
@@ -366,8 +374,8 @@ app.get('/api/services/db/*', (req, res) => {
   fetchWithRetry(targetUrl, {
     method: 'GET'
   }, [
-    `http://db-service:${PORT}`,           // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://db-service:8280${path}`,       // Fallback 1: Direct service name with correct port
+    `http://localhost:8280${path}`        // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
@@ -398,8 +406,8 @@ app.post('/api/services/db/*', (req, res) => {
     },
     body: JSON.stringify(req.body)
   }, [
-    `http://db-service:${PORT}`,           // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://db-service:8280${path}`,       // Fallback 1: Direct service name with correct port
+    `http://localhost:8280${path}`        // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
@@ -433,8 +441,8 @@ app.put('/api/services/db/*', (req, res) => {
     },
     body: JSON.stringify(req.body)
   }, [
-    `http://db-service:${PORT}`,           // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://db-service:8280${path}`,       // Fallback 1: Direct service name with correct port
+    `http://localhost:8280${path}`        // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
@@ -464,8 +472,8 @@ app.delete('/api/services/db/*', (req, res) => {
   fetchWithRetry(targetUrl, {
     method: 'DELETE'
   }, [
-    `http://db-service:${PORT}`,           // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://db-service:8280${path}`,       // Fallback 1: Direct service name with correct port
+    `http://localhost:8280${path}`        // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
@@ -495,8 +503,8 @@ app.get('/api/services/notification/*', (req, res) => {
   fetchWithRetry(targetUrl, {
     method: 'GET'
   }, [
-    `http://notification-service:${PORT}`,  // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://notification-service:8380${path}`,  // Fallback 1: Direct service name with correct port
+    `http://localhost:8380${path}`            // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
@@ -530,8 +538,8 @@ app.post('/api/services/notification/*', (req, res) => {
     },
     body: JSON.stringify(req.body)
   }, [
-    `http://notification-service:${PORT}`,  // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://notification-service:8380${path}`,  // Fallback 1: Direct service name with correct port
+    `http://localhost:8380${path}`            // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
@@ -565,8 +573,8 @@ app.put('/api/services/notification/*', (req, res) => {
     },
     body: JSON.stringify(req.body)
   }, [
-    `http://notification-service:${PORT}`,  // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://notification-service:8380${path}`,  // Fallback 1: Direct service name with correct port
+    `http://localhost:8380${path}`            // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
@@ -596,8 +604,8 @@ app.delete('/api/services/notification/*', (req, res) => {
   fetchWithRetry(targetUrl, {
     method: 'DELETE'
   }, [
-    `http://notification-service:${PORT}`,  // Fallback 1: Direct service name
-    `http://localhost:${PORT}`            // Fallback 2: Localhost
+    `http://notification-service:8380${path}`,  // Fallback 1: Direct service name with correct port
+    `http://localhost:8380${path}`            // Fallback 2: Localhost with correct port
   ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
