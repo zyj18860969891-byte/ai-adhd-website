@@ -87,31 +87,16 @@ function getServiceUrl(serviceName, defaultPort) {
   const isRailway = process.env.RAILWAY_SERVICE_ID || process.env.RAILWAY_ENVIRONMENT;
   
   if (isRailway) {
-    // For Railway, try multiple approaches for service discovery
-    const railwayServiceName = process.env.RAILWAY_SERVICE_NAME;
+    // In Railway with concurrently, all services run in same container on localhost
+    // Use localhost with different ports
+    const attempts = [
+      `http://localhost:${defaultPort}`,                      // Localhost (same container)
+      `http://${serviceName}:${defaultPort}`,                  // Direct service name
+      `http://${serviceName}.railway.internal:${defaultPort}`, // Railway internal DNS
+    ];
     
-    if (railwayServiceName) {
-      // Try different service discovery methods
-      const attempts = [
-        `http://${serviceName}.railway.internal:${defaultPort}`,  // Railway internal DNS
-        `http://${serviceName}:${defaultPort}`,                  // Direct service name
-        `http://localhost:${defaultPort}`,                      // Local fallback
-      ];
-      
-      console.log(`Railway service discovery for ${serviceName}:`, attempts);
-      return attempts[0]; // Start with Railway internal DNS
-    }
-    
-    // Fallback: use environment variables if available
-    const envServiceUrl = process.env[`${serviceName.toUpperCase()}_SERVICE_URL`];
-    if (envServiceUrl) {
-      console.log(`Using environment variable for ${serviceName}:`, envServiceUrl);
-      return envServiceUrl;
-    }
-    
-    // Last resort: use localhost
-    console.log(`Using localhost fallback for ${serviceName}`);
-    return `http://localhost:${defaultPort}`;
+    console.log(`Railway service discovery for ${serviceName}:`, attempts);
+    return attempts[0]; // Start with localhost
   }
   
   // For local development or other environments, use the provided URL or default
