@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const cron = require('node-cron');
 const WebSocket = require('ws');
+const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -47,7 +48,15 @@ async function fetchWithRetry(url, options = {}, fallbackUrls = []) {
           throw new Error(`Service responded with non-JSON content: ${text.substring(0, 200)}`);
         }
       } else {
-        throw new Error(`Service responded with status: ${response.status}`);
+        // For non-2xx responses, try fallback URLs first
+        if (i < urls.length - 1) {
+          console.log(`Service responded with status ${response.status}, trying fallback...`);
+          await new Promise(resolve => setTimeout(resolve, 100));
+          continue;
+        } else {
+          // Last attempt failed, throw error
+          throw new Error(`Service responded with status: ${response.status}`);
+        }
       }
     } catch (error) {
       console.log(`Attempt ${i + 1}/${urls.length} failed for ${currentUrl}:`, error.message);
@@ -379,6 +388,9 @@ app.get('/api/services/db/*', (req, res) => {
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
+      if (!response.status.toString().startsWith('2')) {
+        throw new Error(`DB Service responded with status: ${response.status}`);
+      }
       return response.json();
     })
     .then(data => {
@@ -457,7 +469,19 @@ app.put('/api/services/db/*', (req, res) => {
     })
     .catch(error => {
       console.error('Database Service Error:', error);
-      res.status(503).json({ error: 'Database Service unavailable', details: error.message });
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        url: targetUrl,
+        method: 'PUT',
+        body: req.body
+      });
+      res.status(503).json({ 
+        error: 'Database Service unavailable', 
+        details: error.message,
+        url: targetUrl,
+        method: 'PUT'
+      });
     });
 });
 
@@ -720,34 +744,6 @@ async function testServiceConnectivity() {
   }
 }
 
-// Test service connectivity
-async function testServiceConnectivity() {
-  console.log('Testing service connectivity...');
-  
-  const services = [
-    { name: 'AI Service', url: aiServiceUrl },
-    { name: 'Database Service', url: dbServiceUrl },
-    { name: 'Notification Service', url: notificationServiceUrl }
-  ];
-  
-  for (const service of services) {
-    try {
-      console.log(`Testing ${service.name} at ${service.url}`);
-      const response = await fetch(`${service.url}/api/health`, { 
-        timeout: 5000 
-      });
-      
-      if (response.ok) {
-        console.log(`✓ ${service.name} is reachable`);
-      } else {
-        console.log(`✗ ${service.name} returned status ${response.status}`);
-      }
-    } catch (error) {
-      console.log(`✗ ${service.name} is not reachable: ${error.message}`);
-    }
-  }
-}
-
 // Health check endpoint for Railway
 app.get('/health', (req, res) => {
   res.json({ 
@@ -758,33 +754,6 @@ app.get('/health', (req, res) => {
 });
 
 // Health check for all services
-app.get('/api/services/health', async (req, res) => {
-  const services = ['ai', 'db', 'notification'];
-  const results = {};
-  
-  for (const service of services) {
-    const serviceUrl = service === 'ai' ? aiServiceUrl :
-                     service === 'db' ? dbServiceUrl :
-                     notificationServiceUrl;
-    
-    try {
-      const response = await fetch(`${serviceUrl}/api/health`, { timeout: 5000 });
-      results[service] = {
-        status: response.ok ? 'healthy' : 'unhealthy',
-        statusCode: response.status,
-        url: serviceUrl
-      };
-    } catch (error) {
-      results[service] = {
-        status: 'error',
-        error: error.message,
-        url: serviceUrl
-      };
-    }
-  }
-  
-  res.json(results);
-});
 app.get('/api/services/health', async (req, res) => {
   const services = ['ai', 'db', 'notification'];
   const results = {};
@@ -837,48 +806,56 @@ async function initializeTestData() {
   try {
     console.log('Initializing test data...');
     
-    // 创建一个测试任务 - 5分钟后到期，用于测试真实通知功能
+    // 创建一个测试任务 - 2分钟后到期，用于测试真实通知功能
     const testTask = {
-      title: 'Sample Task - 5分钟内到期',
-      description: 'This task will expire in 5 minutes to test the notification system',
-      priority: 'high',
-      dueDate: new Date(Date.now() + 5 * 60 * 1000).toISOString(), // 5分钟后
+      title: '测试任务 - 2分钟到期',
+      description: 'This task will expire in 2 minutes to test the notification system',
+      category: 'test',
+      priority: '高优先级',
+      dueDate: new Date(Date.now() + 2 * 60 * 1000).toISOString(), // 2分钟后
       status: 'pending',
       tags: ['test', 'notification'],
       estimatedTime: 30,
-      userId: 'user-1'
+      context: {}
     };
     
-    const response = await fetch(`${dbServiceUrl}/api/tasks`, {
+    const response = await fetchWithRetry(`${dbServiceUrl}/api/tasks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(testTask)
-    });
+    }, [
+      `http://db-service:8280/api/tasks`,
+      `http://localhost:8280/api/tasks`
+    ]);
     
     if (response.ok) {
       const result = await response.json();
       console.log('✅ Test task created successfully:', result);
-      console.log('⏰ This task will expire in 5 minutes and trigger a notification!');
+      console.log('⏰ This task will expire in 2 minutes and trigger a notification!');
       
       // 创建一个测试通知
       const testNotification = {
         userId: 'user-1',
-        title: 'Welcome to ADHD Task Manager!',
-        message: 'Your task management system is ready to use. A test task has been created that will notify you in 5 minutes.',
-        type: 'welcome',
-        priority: 'normal',
-        taskId: result.id
+        title: '系统测试通知',
+        message: '您的任务管理系统已准备就绪。一个测试任务将在2分钟后到期并触发通知。',
+        type: 'reminder',
+        priority: 'high',
+        taskId: result.id,
+        status: 'pending'
       };
       
-      const notifResponse = await fetch(`${notificationServiceUrl}/api/notifications`, {
+      const notifResponse = await fetchWithRetry(`${notificationServiceUrl}/api/notifications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(testNotification)
-      });
+      }, [
+        `http://notification-service:8380/api/notifications`,
+        `http://localhost:8380/api/notifications`
+      ]);
       
       if (notifResponse.ok) {
         const notifResult = await notifResponse.json();
