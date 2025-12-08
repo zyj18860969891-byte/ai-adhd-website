@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const cron = require('node-cron');
 const WebSocket = require('ws');
-const { default: fetch } = require('node-fetch');
+const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
