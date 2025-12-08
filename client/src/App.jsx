@@ -45,7 +45,7 @@ function App() {
 
   // Confirm defer with selected option
   const confirmDefer = async () => {
-    if (!currentNotification) return
+    if (!currentNotification || !currentNotification.taskId) return
     
     try {
       const deferHours = deferOption === 'custom' ? parseInt(customDeferHours) : parseInt(deferOption)
@@ -529,47 +529,6 @@ function App() {
           </DialogActions>
         </Dialog>
 
-        {/* Drawer */}
-        <Drawer
-          variant="temporary"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 }
-          }}
-        >
-          <Toolbar />
-          <List>
-            {menuItems.map((item) => (
-              <ListItem button key={item.text} component="a" href={item.path}>
-                <ListItemIcon>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-
-        {/* Main content */}
-        <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: 8 }}>
-          <Container maxWidth="lg">
-            <Routes>
-              <Route path="/" element={<Home taskProgress={taskProgress} />} />
-              <Route path="/tasks" element={<TaskBoard />} />
-              <Route path="/add" element={<AddTask />} />
-              <Route path="/edit/:id" element={<EditTask />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/test-notifications" element={<TestNotifications />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Container>
-        </Box>
-
         {/* Defer Dialog */}
         <Dialog
           open={deferDialogOpen}
@@ -610,115 +569,50 @@ function App() {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Drawer */}
+        <Drawer
+          variant="temporary"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: 240 }
+          }}
+        >
+          <Toolbar />
+          <List>
+            {menuItems.map((item) => (
+              <ListItem button key={item.text} component="a" href={item.path}>
+                <ListItemIcon>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ))}
+          </List>
+        </Drawer>
+
+        {/* Main content */}
+        <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: 8 }}>
+          <Container maxWidth="lg">
+            <Routes>
+              <Route path="/" element={<Home taskProgress={taskProgress} />} />
+              <Route path="/tasks" element={<TaskBoard />} />
+              <Route path="/add" element={<AddTask />} />
+              <Route path="/edit/:id" element={<EditTask />} />
+              <Route path="/analytics" element={<Analytics />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/test-notifications" element={<TestNotifications />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Container>
+        </Box>
       </div>
     </ThemeProvider>
   )
-
-
-
-
-
-  // Load notifications
-  useEffect(() => {
-    let isMounted = true; // 防止组件卸载后更新状态
-    
-    const loadNotifications = async () => {
-      try {
-        console.log('📥 Loading notifications...');
-        const userNotifications = await notificationService.getUserNotifications('user-1')
-        console.log('📥 All notifications from server:', userNotifications);
-        console.log('📥 Server response type:', typeof userNotifications);
-        console.log('📥 Server response length:', Array.isArray(userNotifications) ? userNotifications.length : 'Not an array');
-        
-        // Check if response is valid
-        if (!userNotifications || !Array.isArray(userNotifications)) {
-          console.log('📥 Invalid notifications response, using empty array');
-          if (isMounted) setNotifications([]);
-          return;
-        }
-        
-        const pendingNotifications = userNotifications.filter(n => n.status === 'pending')
-        console.log('📥 Pending notifications count:', pendingNotifications.length);
-        console.log('📥 Pending notifications:', pendingNotifications);
-        
-        // Check for new notifications
-        const newNotifications = pendingNotifications.filter(n => 
-          !notifications.find(existing => existing.id === n.id)
-        )
-        console.log('📥 New notifications count:', newNotifications.length);
-        console.log('📥 New notifications:', newNotifications);
-        
-        // Only update if there are changes
-        if (JSON.stringify(pendingNotifications) !== JSON.stringify(notifications)) {
-          console.log('📥 Updating notifications state - changes detected');
-          if (isMounted) setNotifications(pendingNotifications)
-        } else {
-          console.log('📥 No notification changes detected');
-        }
-        
-        // Show modal for new reminders
-        if (newNotifications.length > 0) {
-          console.log('🔔 Found', newNotifications.length, 'new notifications');
-          // 使用 requestAnimationFrame 优化性能
-          if (isMounted) {
-            requestAnimationFrame(() => {
-              newNotifications.forEach(notification => {
-                if (notification.type === 'reminder') {
-                  console.log('🔔 New reminder detected:', notification.message);
-                  setSnackbarMessage(notification.message)
-                  setCurrentNotification(notification)
-                  setSnackbarOpen(true)
-                  console.log('🔔 Modal opened for new reminder');
-                }
-              })
-            });
-          }
-        } else {
-          console.log('🔔 No new notifications found');
-        }
-        
-        // Show browser notification for new reminders
-        newNotifications.forEach(notification => {
-          if (notification.type === 'reminder' && 
-              'Notification' in window && 
-              Notification.permission === 'granted') {
-            console.log('🌐 Showing browser notification:', notification.title);
-            new Notification(notification.title, {
-              body: notification.message,
-              icon: '/icons/icon-72x72.png'
-            })
-          }
-        })
-        
-        // Debug the current state
-        debugNotificationState();
-      } catch (error) {
-        if (isMounted) {
-          console.error('Failed to load notifications:', error)
-          console.error('Error details:', error.response || error.message || error);
-        }
-      }
-    }
-
-    // Request notification permission
-    if ('Notification' in window && Notification.permission === 'default') {
-      console.log('🌐 Requesting notification permission...');
-      Notification.requestPermission()
-    }
-
-    loadNotifications()
-    // 优化轮询频率，避免性能问题
-    const interval = setInterval(async () => {
-      if (isMounted) {
-        await loadNotifications();
-      }
-    }, 5000) // 减少到5秒一次
-    
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    }
-  }, [])
 }
 
 export default App
