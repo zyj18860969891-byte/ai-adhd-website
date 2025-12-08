@@ -7,7 +7,16 @@ const path = require('path');
 const fs = require('fs');
 const cron = require('node-cron');
 const WebSocket = require('ws');
-const fetch = require('node-fetch');
+
+// Use dynamic import for node-fetch (ES Module)
+let fetch;
+async function loadFetch() {
+  if (!fetch) {
+    const fetchModule = await import('node-fetch');
+    fetch = fetchModule.default || fetchModule;
+  }
+  return fetch;
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +41,9 @@ console.log('  NOTIFICATION_SERVICE_URL:', process.env.NOTIFICATION_SERVICE_URL 
 // Enhanced fetch with retry and fallback support
 async function fetchWithRetry(url, options = {}, fallbackUrls = []) {
   const urls = [url, ...fallbackUrls];
+  
+  // Load fetch dynamically
+  const fetch = await loadFetch();
   
   for (let i = 0; i < urls.length; i++) {
     const currentUrl = urls[i];
@@ -720,6 +732,9 @@ app.get('/', (req, res) => {
 async function testServiceConnectivity() {
   console.log('Testing service connectivity...');
   
+  // Load fetch dynamically
+  const fetch = await loadFetch();
+  
   const services = [
     { name: 'AI Service', url: aiServiceUrl },
     { name: 'Database Service', url: dbServiceUrl },
@@ -806,6 +821,9 @@ async function initializeTestData() {
   try {
     console.log('Initializing test data...');
     
+    // 加载 fetch
+    const fetch = await loadFetch();
+    
     // 创建一个测试任务 - 2分钟后到期，用于测试真实通知功能
     const testTask = {
       title: '测试任务 - 2分钟到期',
@@ -819,16 +837,13 @@ async function initializeTestData() {
       context: {}
     };
     
-    const response = await fetchWithRetry(`${dbServiceUrl}/api/tasks`, {
+    const response = await fetch(`${dbServiceUrl}/api/tasks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(testTask)
-    }, [
-      `http://db-service:8280/api/tasks`,
-      `http://localhost:8280/api/tasks`
-    ]);
+    });
     
     if (response.ok) {
       const result = await response.json();
@@ -846,16 +861,13 @@ async function initializeTestData() {
         status: 'pending'
       };
       
-      const notifResponse = await fetchWithRetry(`${notificationServiceUrl}/api/notifications`, {
+      const notifResponse = await fetch(`${notificationServiceUrl}/api/notifications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(testNotification)
-      }, [
-        `http://notification-service:8380/api/notifications`,
-        `http://localhost:8380/api/notifications`
-      ]);
+      });
       
       if (notifResponse.ok) {
         const notifResult = await notifResponse.json();
