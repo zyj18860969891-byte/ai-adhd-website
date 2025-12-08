@@ -7,7 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const cron = require('node-cron');
 const WebSocket = require('ws');
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,19 +36,20 @@ async function fetchWithRetry(url, options = {}, fallbackUrls = []) {
   for (let i = 0; i < urls.length; i++) {
     const currentUrl = urls[i];
     try {
-      const response = await fetch(currentUrl, options);
-      if (response.ok) {
-        // Check if response is JSON
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          return response;
-        } else {
-          // If not JSON, read as text and throw error
-          const text = await response.text();
-          throw new Error(`Service responded with non-JSON content: ${text.substring(0, 200)}`);
-        }
+      const response = await axios({
+        url: currentUrl,
+        method: options.method || 'GET',
+        headers: options.headers || {},
+        data: options.body || undefined,
+        timeout: 30000
+      });
+      
+      // Check if response is JSON
+      const contentType = response.headers['content-type'];
+      if (contentType && contentType.includes('application/json')) {
+        return response;
       } else {
-        throw new Error(`Service responded with status: ${response.status}`);
+        throw new Error(`Service responded with non-JSON content: ${JSON.stringify(response.data).substring(0, 200)}`);
       }
     } catch (error) {
       console.log(`Attempt ${i + 1}/${urls.length} failed for ${currentUrl}:`, error.message);
@@ -254,7 +255,7 @@ app.get('/api/services/ai/*', (req, res) => {
   ])
     .then(response => {
       console.log('AI Service response status:', response.status);
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('AI Service response data:', JSON.stringify(data, null, 2));
@@ -285,10 +286,10 @@ app.post('/api/services/ai/*', (req, res) => {
   ])
     .then(response => {
       console.log('AI Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`AI Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('AI Service response data:', JSON.stringify(data, null, 2));
@@ -319,10 +320,10 @@ app.put('/api/services/ai/*', (req, res) => {
   ])
     .then(response => {
       console.log('AI Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`AI Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('AI Service response data:', JSON.stringify(data, null, 2));
@@ -349,10 +350,10 @@ app.delete('/api/services/ai/*', (req, res) => {
   ])
     .then(response => {
       console.log('AI Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`AI Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('AI Service response data:', JSON.stringify(data, null, 2));
@@ -380,7 +381,7 @@ app.get('/api/services/db/*', (req, res) => {
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('DB Service response data:', JSON.stringify(data, null, 2));
@@ -412,10 +413,10 @@ app.post('/api/services/db/*', (req, res) => {
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`DB Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('DB Service response data:', JSON.stringify(data, null, 2));
@@ -447,10 +448,10 @@ app.put('/api/services/db/*', (req, res) => {
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`DB Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('DB Service response data:', JSON.stringify(data, null, 2));
@@ -478,10 +479,10 @@ app.delete('/api/services/db/*', (req, res) => {
   ])
     .then(response => {
       console.log('DB Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`DB Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('DB Service response data:', JSON.stringify(data, null, 2));
@@ -509,10 +510,10 @@ app.get('/api/services/notification/*', (req, res) => {
   ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`Notification Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('Notification Service response data:', JSON.stringify(data, null, 2));
@@ -544,10 +545,10 @@ app.post('/api/services/notification/*', (req, res) => {
   ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`Notification Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('Notification Service response data:', JSON.stringify(data, null, 2));
@@ -579,10 +580,10 @@ app.put('/api/services/notification/*', (req, res) => {
   ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`Notification Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('Notification Service response data:', JSON.stringify(data, null, 2));
@@ -610,10 +611,10 @@ app.delete('/api/services/notification/*', (req, res) => {
   ])
     .then(response => {
       console.log('Notification Service response status:', response.status);
-      if (!response.ok) {
+      if (!response.status.toString().startsWith('2')) {
         throw new Error(`Notification Service responded with status: ${response.status}`);
       }
-      return response.json();
+      return response.data;
     })
     .then(data => {
       console.log('Notification Service response data:', JSON.stringify(data, null, 2));
