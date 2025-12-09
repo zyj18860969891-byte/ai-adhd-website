@@ -382,7 +382,7 @@ function App() {
         console.log('📥 Pending notifications count:', pendingNotifications.length);
         console.log('📥 Pending notifications:', pendingNotifications);
         
-        // Check for new notifications
+        // Check for new notifications by comparing with previous state
         const newNotifications = pendingNotifications.filter(n => 
           !notifications.find(existing => existing.id === n.id)
         )
@@ -481,7 +481,7 @@ function App() {
   // Auto-show modal when notifications change (for cross-page reminders)
   useEffect(() => {
     // 防止重复触发和性能问题
-    if (!notifications || notifications.length === 0 || snackbarOpen) {
+    if (!notifications || notifications.length === 0) {
       return;
     }
     
@@ -491,8 +491,10 @@ function App() {
     // 只处理最新的通知
     const latestNotification = notifications[notifications.length - 1];
     console.log('🔄 Latest notification:', latestNotification?.id);
+    console.log('🔄 Latest notification type:', latestNotification?.type);
+    console.log('🔄 Latest notification status:', latestNotification?.status);
     
-    if (latestNotification && latestNotification.type === 'reminder') {
+    if (latestNotification && latestNotification.type === 'reminder' && latestNotification.status === 'pending') {
       console.log('🔄 Auto-showing reminder modal for:', latestNotification.message);
       console.log('🔄 Setting snackbar message:', latestNotification.message);
       
@@ -504,9 +506,10 @@ function App() {
         console.log('🔄 Modal opened successfully');
       });
     } else {
-      console.log('🔄 Latest notification is not a reminder or is null');
+      console.log('🔄 Latest notification is not a reminder or is null or not pending');
       if (latestNotification) {
         console.log('🔄 Notification type is:', latestNotification.type);
+        console.log('🔄 Notification status is:', latestNotification.status);
       }
     }
   }, [notifications, snackbarOpen])
