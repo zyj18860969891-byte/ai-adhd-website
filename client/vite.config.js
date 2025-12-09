@@ -52,17 +52,17 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api/services/db': {
-        target: 'http://localhost:8280',
+        target: 'http://db-service:8280',
         changeOrigin: true,
         secure: false
       },
       '/api/services/ai': {
-        target: 'http://localhost:8190',
+        target: 'http://ai-service:8190',
         changeOrigin: true,
         secure: false
       },
       '/api/services/notification': {
-        target: 'http://localhost:8380',
+        target: 'http://notification-service:8380',
         changeOrigin: true,
         secure: false
       }
