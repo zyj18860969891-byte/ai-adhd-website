@@ -362,6 +362,7 @@ function App() {
   // Load notifications
   useEffect(() => {
     let isMounted = true;
+    let shownNotificationIds = new Set(); // Track shown notifications
     
     const loadNotifications = async () => {
       try {
@@ -401,7 +402,7 @@ function App() {
           console.log('📥 New notifications:', pendingNotifications);
         }
         
-        // Show modal for new reminders
+        // Show modal for new reminders (only once per notification)
         if (newNotifications.length > 0) {
           console.log('🔔 Found', newNotifications.length, 'new notifications');
           console.log('🔔 New notifications details:', newNotifications);
@@ -411,14 +412,22 @@ function App() {
               newNotifications.forEach(notification => {
                 console.log('🔔 Processing notification:', notification.id, 'type:', notification.type);
                 if (notification.type === 'reminder') {
-                  console.log('🔔 New reminder detected:', notification.message);
-                  console.log('🔔 Setting snackbar message:', notification.message);
-                  setSnackbarMessage(notification.message)
-                  console.log('🔔 Setting current notification:', notification.id);
-                  setCurrentNotification(notification)
-                  console.log('🔔 Opening snackbar modal');
-                  setSnackbarOpen(true)
-                  console.log('🔔 Modal opened for new reminder');
+                  // Only show notification if we haven't shown it before
+                  if (!shownNotificationIds.has(notification.id)) {
+                    console.log('🔔 New reminder detected:', notification.message);
+                    console.log('🔔 Setting snackbar message:', notification.message);
+                    setSnackbarMessage(notification.message)
+                    console.log('🔔 Setting current notification:', notification.id);
+                    setCurrentNotification(notification)
+                    console.log('🔔 Opening snackbar modal');
+                    setSnackbarOpen(true)
+                    console.log('🔔 Modal opened for new reminder');
+                    
+                    // Mark this notification as shown
+                    shownNotificationIds.add(notification.id);
+                  } else {
+                    console.log('🔔 Reminder already shown, skipping:', notification.id);
+                  }
                 } else {
                   console.log('🔔 Notification is not a reminder, skipping');
                 }
@@ -432,9 +441,54 @@ function App() {
           console.log('🔔 Notifications comparison:', JSON.stringify(pendingNotifications) === JSON.stringify(notifications));
         }
         
-        // Show browser notification for new reminders
+        // Show browser notification for new reminders (only once per notification)
         newNotifications.forEach(notification => {
           if (notification.type === 'reminder' && 
+              'Notification' in window && 
+              Notification.permission === 'granted') {
+            // Only show browser notification if we haven't shown it before
+            if (!shownNotificationIds.has(notification.id)) {
+              console.log('🌐 Showing browser notification:', notification.title);
+              new Notification(notification.title, {
+                body: notification.message,
+                icon: '/icons/icon-72x72.png'
+              })
+            }
+          } else if (notification.type === 'reminder') {
+            console.log('🌐 Browser notification not shown - permission:', 
+              'Notification' in window ? Notification.permission : 'Not supported');
+          }
+        })
+        
+        // Debug the current state
+        debugNotificationState();
+      } catch (error) {
+        if (isMounted) {
+          console.error('Failed to load notifications:', error)
+          console.error('Error details:', error.response || error.message || error);
+        }
+      }
+    }
+
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      console.log('🌐 Requesting notification permission...');
+      Notification.requestPermission()
+    }
+
+    loadNotifications()
+    // 优化轮询频率，避免性能问题
+    const interval = setInterval(async () => {
+      if (isMounted) {
+        await loadNotifications();
+      }
+    }, 10000) // 增加到10秒一次，减少频率
+    
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    }
+  }, []) 
               'Notification' in window && 
               Notification.permission === 'granted') {
             console.log('🌐 Showing browser notification:', notification.title);

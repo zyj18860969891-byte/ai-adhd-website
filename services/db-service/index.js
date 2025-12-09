@@ -275,7 +275,6 @@ app.put('/api/tasks/:id', (req, res) => {
         completedAt,
         context: context ? JSON.parse(context) : {}
       });
-    });
 
     stmt.finalize();
   });
