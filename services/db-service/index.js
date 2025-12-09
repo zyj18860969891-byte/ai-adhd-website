@@ -611,3 +611,77 @@ app.listen(PORT, () => {
     console.log(`WebSocket running on port ${parseInt(PORT, 10) + 200}`);
   }
 });
+
+// Schedule overdue task check
+cron.schedule('*/5 * * * *', () => {
+  console.log('Checking overdue tasks...');
+  const stmt = db.prepare('SELECT * FROM tasks WHERE status != "completed" AND status != "overdue" AND dueDate < ?');
+  stmt.all([new Date().toISOString()], (err, tasks) => {
+    if (err) {
+      console.error('Error fetching overdue tasks:', err);
+      return;
+    }
+    
+    tasks.forEach(task => {
+      console.log('Task is overdue:', task.id, task.title);
+      
+      // Update task status to overdue
+      const stmt = db.prepare('UPDATE tasks SET status = "overdue", updatedAt = ? WHERE id = ?');
+      stmt.run([new Date().toISOString(), task.id]);
+      stmt.finalize();
+      
+      // Add to history
+      addHistory(task.id, 'status_changed', { from: task.status, to: 'overdue' });
+      
+      // Create overdue notification
+      const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+      const notificationData = {
+        userId: 'user-1',
+        title: `任务已过期: ${task.title}`,
+        message: `任务 "${task.title}" 已经过期！`,
+        type: 'reminder',
+        priority: 'high',
+        taskId: task.id
+      };
+      
+      // Use fetch with proper error handling
+      fetch(`${notificationServiceUrl}/api/notifications`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(notificationData)
+      }).then(response => {
+        if (!response.ok) {
+          throw new Error(`Notification service responded with status: ${response.status}`);
+        }
+        return response.json();
+      }).then(result => {
+        console.log('Overdue notification created successfully:', result);
+      }).catch(err => {
+        console.error('Failed to create overdue notification:', err);
+      });
+    });
+  });
+});
+
+// Add a simple health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+});
+
+// Add a simple stats endpoint
+app.get('/api/stats', (req, res) => {
+  const stmt = db.prepare('SELECT COUNT(*) as total, COUNT(CASE WHEN status = "completed" THEN 1 END) as completed, COUNT(CASE WHEN status = "pending" THEN 1 END) as pending, COUNT(CASE WHEN status = "overdue" THEN 1 END) as overdue FROM tasks');
+  stmt.get((err, row) => {
+    if (err) {
+      console.error('Error fetching stats:', err);
+      return res.status(500).json({ error: 'Failed to fetch stats' });
+    }
+    res.json(row);
+  });
+});
+
+// Export the database for use in other modules if needed
+module.exports = { db, app };
+
