@@ -228,7 +228,7 @@ export default function Home({ taskProgress, onTaskAction }) {
                           onClick={() => {
                             console.log('✅ Home.jsx: Complete button clicked for task:', task.id);
                             console.log('✅ Task details:', task);
-                            onTaskAction({ taskId: task.id, title: task.title });
+                            onTaskAction(task);
                           }}
                           sx={{ ml: 1 }}
                         >

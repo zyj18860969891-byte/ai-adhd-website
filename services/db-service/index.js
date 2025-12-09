@@ -270,8 +270,8 @@ app.put('/api/tasks/:id', (req, res) => {
         updatedAt,
         dueDate,
         tags: tags ? JSON.parse(tags) : [],
-        estimatedTime,
-        actualTime,
+        estimatedTime: estimatedTime || null,
+        actualTime: actualTime || null,
         completedAt,
         context: context ? JSON.parse(context) : {}
       });
