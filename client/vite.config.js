@@ -57,12 +57,12 @@ export default defineConfig({
         secure: false
       },
       '/api/services/ai': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:8190',
         changeOrigin: true,
         secure: false
       },
       '/api/services/notification': {
-        target: 'http://localhost:3003',
+        target: 'http://localhost:8380',
         changeOrigin: true,
         secure: false
       }
