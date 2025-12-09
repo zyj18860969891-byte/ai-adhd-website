@@ -714,7 +714,7 @@ function App() {
               startIcon={<CheckIcon />}
             >
               标记为已完成
-          <DialogActions>
+            </Button>
             <Button 
               onClick={() => {
                 console.log('⏰ Defer task button clicked');
@@ -740,6 +740,30 @@ function App() {
               稍后提醒
             </Button>
           </DialogActions>
+            <Button 
+              onClick={() => {
+                console.log('⏰ Defer task button clicked');
+                console.log('Current notification:', currentNotification);
+                console.log('Current notification type:', typeof currentNotification);
+                console.log('Current notification keys:', Object.keys(currentNotification || {}));
+                handleTaskDefer(currentNotification);
+                console.log('⏰ Defer operation started');
+              }}
+              variant="contained"
+              color="warning"
+              startIcon={<ScheduleIcon />}
+            >
+              延期任务
+            </Button>
+            <Button 
+              onClick={() => {
+                console.log('⏰ Snooze button clicked');
+                setSnackbarOpen(false);
+              }}
+              variant="outlined"
+            >
+              稍后提醒
+            </Button>
         </Dialog>
 
         {/* Defer Dialog */}

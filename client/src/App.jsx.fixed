@@ -738,14 +738,3 @@ function App() {
               variant="outlined"
             >
               稍后提醒
-<DialogActions>
-          </DialogActions>
-        </Dialog>
-
-        {/* Defer Dialog */}
-        <Dialog
-          open={deferDialogOpen}
-          onClose={() => setDeferDialogOpen(false)}
-        >
-          <DialogTitle>延期任务</DialogTitle>
-          <DialogContent>
