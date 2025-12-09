@@ -817,69 +817,7 @@ app.use((req, res) => {
 
 // 初始化测试数据
 async function initializeTestData() {
-  try {
-    console.log('Initializing test data...');
-    
-    // 加载 fetch
-    const fetch = await loadFetch();
-    
-    // 创建一个测试任务 - 2分钟后到期，用于测试真实通知功能
-    const testTask = {
-      title: '测试任务 - 2分钟到期',
-      description: 'This task will expire in 2 minutes to test the notification system',
-      category: 'test',
-      priority: '高优先级',
-      dueDate: new Date(Date.now() + 2 * 60 * 1000).toISOString(), // 2分钟后
-      status: 'pending',
-      tags: ['test', 'notification'],
-      estimatedTime: 30,
-      context: {}
-    };
-    
-    const response = await fetch(`${dbServiceUrl}/api/tasks`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(testTask)
-    });
-    
-    if (response.ok) {
-      const result = await response.json();
-      console.log('✅ Test task created successfully:', result);
-      console.log('⏰ This task will expire in 2 minutes and trigger a notification!');
-      
-      // 创建一个测试通知
-      const testNotification = {
-        userId: 'user-1',
-        title: '系统测试通知',
-        message: '您的任务管理系统已准备就绪。一个测试任务将在2分钟后到期并触发通知。',
-        type: 'reminder',
-        priority: 'high',
-        taskId: result.id,
-        status: 'pending'
-      };
-      
-      const notifResponse = await fetch(`${notificationServiceUrl}/api/notifications`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(testNotification)
-      });
-      
-      if (notifResponse.ok) {
-        const notifResult = await notifResponse.json();
-        console.log('✅ Test notification created successfully:', notifResult);
-      } else {
-        console.log('❌ Failed to create test notification:', notifResponse.status);
-      }
-    } else {
-      console.log('❌ Failed to create test task:', response.status);
-    }
-  } catch (error) {
-    console.log('⚠️  Failed to initialize test data:', error.message);
-  }
+  console.log('Skipping test data initialization in production');
 }
 
 // Start server
@@ -902,7 +840,4 @@ app.listen(PORT, async () => {
   // Test service connectivity
   console.log('Testing service connectivity...');
   testServiceConnectivity();
-  
-  // 初始化测试数据
-  await initializeTestData();
 });
