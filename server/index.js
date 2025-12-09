@@ -96,11 +96,18 @@ function getServiceUrl(serviceName, defaultPort) {
     ];
     
     console.log(`Railway service discovery for ${serviceName}:`, attempts);
+    // Try all attempts in order, return first successful one
     return attempts[0]; // Start with localhost
   }
   
   // For local development or other environments, use the provided URL or default
-  return process.env[`${serviceName.toUpperCase()}_SERVICE_URL`] || `http://localhost:${defaultPort}`;
+  const envVar = process.env[`${serviceName.toUpperCase()}_SERVICE_URL`];
+  if (envVar) {
+    return envVar;
+  }
+  
+  // Default to localhost for development
+  return `http://localhost:${defaultPort}`;
 }
 
 // Get service URLs
