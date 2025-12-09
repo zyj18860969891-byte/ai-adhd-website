@@ -488,48 +488,6 @@ function App() {
       isMounted = false;
       clearInterval(interval);
     }
-  }, []) 
-              'Notification' in window && 
-              Notification.permission === 'granted') {
-            console.log('🌐 Showing browser notification:', notification.title);
-            new Notification(notification.title, {
-              body: notification.message,
-              icon: '/icons/icon-72x72.png'
-            })
-          } else if (notification.type === 'reminder') {
-            console.log('🌐 Browser notification not shown - permission:', 
-              'Notification' in window ? Notification.permission : 'Not supported');
-          }
-        })
-        
-        // Debug the current state
-        debugNotificationState();
-      } catch (error) {
-        if (isMounted) {
-          console.error('Failed to load notifications:', error)
-          console.error('Error details:', error.response || error.message || error);
-        }
-      }
-    }
-
-    // Request notification permission
-    if ('Notification' in window && Notification.permission === 'default') {
-      console.log('🌐 Requesting notification permission...');
-      Notification.requestPermission()
-    }
-
-    loadNotifications()
-    // 优化轮询频率，避免性能问题
-    const interval = setInterval(async () => {
-      if (isMounted) {
-        await loadNotifications();
-      }
-    }, 5000) // 减少到5秒一次
-    
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
-    }
   }, [])
 
   // Auto-show modal when notifications change (for cross-page reminders)
