@@ -188,7 +188,7 @@ function App() {
     if (notification.taskId) {
       console.log('✅ [handleTaskComplete] Handling task completion from Home.jsx');
       const taskId = notification.taskId;
-      const taskTitle = notification.title;
+      const taskTitle = notification.title || notification.id; // Fallback to id if title is not provided
       
       // Update task status to completed
       taskService.updateTask(taskId, { 
@@ -294,8 +294,8 @@ function App() {
       const taskNotification = {
         id: notification.taskId, // Use taskId as id for modal
         taskId: notification.taskId,
-        title: notification.title,
-        message: `延期任务: ${notification.title}`,
+        title: notification.title || notification.id, // Fallback to id if title is not provided
+        message: `延期任务: ${notification.title || notification.id}`,
         type: 'reminder',
         status: 'pending'
       };
@@ -317,6 +317,9 @@ function App() {
     console.log('⏰ [handleTaskDefer] Input notification:', notification);
     console.log('⏰ [handleTaskDefer] Input notification type:', typeof notification);
     console.log('⏰ [handleTaskDefer] Input notification keys:', Object.keys(notification || {}));
+    console.log('⏰ [handleTaskDefer] Input notification id:', notification?.id);
+    console.log('⏰ [handleTaskDefer] Input notification taskId:', notification?.taskId);
+    console.log('⏰ [handleTaskDefer] Input notification title:', notification?.title);
     
     // Handle string taskId (from button click)
     if (typeof notification === 'string') {
@@ -334,6 +337,7 @@ function App() {
       setDeferDialogOpen(true);
       return;
     }
+
     
     // Handle notification object
     if (!notification || !notification.id || !notification.taskId) {
@@ -700,6 +704,8 @@ function App() {
               onClick={() => {
                 console.log('✅ Mark as complete button clicked');
                 console.log('Current notification:', currentNotification);
+                console.log('Current notification type:', typeof currentNotification);
+                console.log('Current notification keys:', Object.keys(currentNotification || {}));
                 handleTaskComplete(currentNotification);
                 console.log('✅ Complete operation finished');
               }}
@@ -708,11 +714,13 @@ function App() {
               startIcon={<CheckIcon />}
             >
               标记为已完成
-            </Button>
+          <DialogActions>
             <Button 
               onClick={() => {
                 console.log('⏰ Defer task button clicked');
                 console.log('Current notification:', currentNotification);
+                console.log('Current notification type:', typeof currentNotification);
+                console.log('Current notification keys:', Object.keys(currentNotification || {}));
                 handleTaskDefer(currentNotification);
                 console.log('⏰ Defer operation started');
               }}

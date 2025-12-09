@@ -474,12 +474,21 @@ function createTaskReminder(task) {
           reminderTime: reminderTime.toISOString(),
           now: now.toISOString()
         });
+        
+        // Use fetch with proper error handling
         fetch(`${notificationServiceUrl}/api/reminders`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(reminderData)
+        }).then(response => {
+          if (!response.ok) {
+            throw new Error(`Notification service responded with status: ${response.status}`);
+          }
+          return response.json();
+        }).then(result => {
+          console.log('Reminder created successfully:', result);
         }).catch(err => {
           console.error('Failed to create reminder:', err);
         });
@@ -497,6 +506,7 @@ function createTaskReminder(task) {
       };
       
       const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:8380';
+      // Use fetch with proper error handling
       fetch(`${notificationServiceUrl}/api/reminders`, {
         method: 'POST',
         headers: {
@@ -559,12 +569,20 @@ cron.schedule('* * * * *', () => {
           taskId: task.id
         };
         
+        // Use fetch with proper error handling
         fetch(`${notificationServiceUrl}/api/notifications`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(notificationData)
+        }).then(response => {
+          if (!response.ok) {
+            throw new Error(`Notification service responded with status: ${response.status}`);
+          }
+          return response.json();
+        }).then(result => {
+          console.log('Overdue notification created successfully:', result);
         }).catch(err => {
           console.error('Failed to create overdue notification:', err);
         });
