@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { getResearchModePrompt } from "../../prompts/index.js";
 import { getMemoryDir } from "../../utils/paths.js";
+import { getAIInferenceEngine } from "../../core/AIInferenceEngine.js";
 
 // 研究模式工具
 // Research mode tool
@@ -50,22 +51,42 @@ export async function researchMode({
   const PROJECT_ROOT = path.resolve(__dirname, "../../..");
   const MEMORY_DIR = await getMemoryDir();
 
-  // 使用prompt生成器獲取最終prompt
-  // Use prompt generator to get final prompt
-  const prompt = await getResearchModePrompt({
-    topic,
-    previousState,
-    currentState,
-    nextSteps,
-    memoryDir: MEMORY_DIR,
-  });
+  try {
+    // Try to use AI inference if available
+    const aiEngine = getAIInferenceEngine();
+    const aiResearch = await aiEngine.generateResearch(
+      topic,
+      currentState,
+      nextSteps
+    );
 
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: prompt,
-      },
-    ],
-  };
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: aiResearch,
+        },
+      ],
+    };
+  } catch (error) {
+    // Fallback to prompt-based research if AI fails
+    console.warn("AI research generation failed, falling back to template:", error);
+
+    const prompt = await getResearchModePrompt({
+      topic,
+      previousState,
+      currentState,
+      nextSteps,
+      memoryDir: MEMORY_DIR,
+    });
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: prompt,
+        },
+      ],
+    };
+  }
 }

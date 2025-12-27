@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getAnalyzeTaskPrompt } from "../../prompts/index.js";
+import { getAIInferenceEngine } from "../../core/AIInferenceEngine.js";
 
 // 分析問題工具
 // Task analysis tool
@@ -37,20 +38,43 @@ export async function analyzeTask({
   initialConcept,
   previousAnalysis,
 }: z.infer<typeof analyzeTaskSchema>) {
-  // 使用prompt生成器獲取最終prompt
-  // Use prompt generator to get the final prompt
-  const prompt = await getAnalyzeTaskPrompt({
-    summary,
-    initialConcept,
-    previousAnalysis,
-  });
+  try {
+    // Try to use AI inference if available
+    const aiEngine = getAIInferenceEngine();
+    const context = previousAnalysis
+      ? `Previous Analysis: ${previousAnalysis}`
+      : undefined;
 
-  return {
-    content: [
-      {
-        type: "text" as const,
-        text: prompt,
-      },
-    ],
-  };
+    const aiAnalysis = await aiEngine.analyzeTask(
+      `${summary}\n\nInitial Concept: ${initialConcept}`,
+      context
+    );
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: aiAnalysis,
+        },
+      ],
+    };
+  } catch (error) {
+    // Fallback to prompt-based analysis if AI fails
+    console.warn("AI analysis failed, falling back to template:", error);
+
+    const prompt = await getAnalyzeTaskPrompt({
+      summary,
+      initialConcept,
+      previousAnalysis,
+    });
+
+    return {
+      content: [
+        {
+          type: "text" as const,
+          text: prompt,
+        },
+      ],
+    };
+  }
 }

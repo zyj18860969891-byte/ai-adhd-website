@@ -41,6 +41,8 @@ import {
   queryTaskSchema,
   getTaskDetail,
   getTaskDetailSchema,
+  intelligentTaskAnalysis,
+  intelligentTaskAnalysisSchema,
   processThought,
   processThoughtSchema,
   initProjectRules,
@@ -101,6 +103,11 @@ async function main() {
               "toolsDescription/analyzeTask.md"
             ),
             inputSchema: zodToJsonSchema(analyzeTaskSchema),
+          },
+          {
+            name: "intelligent_task_analysis",
+            description: "智能任务分析和工作流建议工具，基于用户上下文提供个性化的任务分类、时间安排和工作流优化建议",
+            inputSchema: zodToJsonSchema(intelligentTaskAnalysisSchema),
           },
           {
             name: "reflect_task",

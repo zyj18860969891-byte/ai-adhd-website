@@ -7,6 +7,9 @@ export { planTask, planTaskSchema } from "./planTask.js";
 // analyzeTask
 export { analyzeTask, analyzeTaskSchema } from "./analyzeTask.js";
 
+// intelligentTaskAnalysis
+export { intelligentTaskAnalysis, intelligentTaskAnalysisSchema } from "./intelligentAnalysis.js";
+
 // reflectTask
 export { reflectTask, reflectTaskSchema } from "./reflectTask.js";
 

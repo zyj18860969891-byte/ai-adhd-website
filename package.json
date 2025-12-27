@@ -25,7 +25,8 @@
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "check-config": "node check-config.js",
-    "start-proxy": "node start-with-proxy.js"
+    "start-proxy": "node start-with-proxy.js",
+    "railway": "npm run build:mcp && npm start"
   },
   "keywords": [
     "mcp",
