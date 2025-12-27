@@ -4,7 +4,7 @@ import {
   getTaskById,
   updateTaskContent as modelUpdateTaskContent,
 } from "../../models/taskModel.js";
-import { RelatedFileType } from "../../types/index.js";
+import { RelatedFileType, RelatedFile } from "../../types/index.js";
 import { getUpdateTaskContentPrompt } from "../../prompts/index.js";
 
 // 更新任務內容工具
@@ -62,6 +62,9 @@ export const updateTaskContentSchema = z.object({
           // Ending line of the related code block (optional)
       })
     )
+    .refine((files) => files ? files.every(file => file.path && file.type) : true, {
+      message: "relatedFiles中的每個文件都必須包含path和type字段"
+    })
     .optional()
     .describe(
       "與任務相關的文件列表，用於記錄與任務相關的代碼文件、參考資料、要建立的檔案等（選填）"
@@ -178,15 +181,31 @@ export async function updateTaskContent({
 
   // 執行更新操作
   // Execute update operation
-  const result = await modelUpdateTaskContent(taskId, {
-    name,
-    description,
-    notes,
-    relatedFiles,
-    dependencies,
-    implementationGuide,
-    verificationCriteria,
-  });
+  const updateData: {
+    name?: string;
+    description?: string;
+    notes?: string;
+    relatedFiles?: RelatedFile[];
+    dependencies?: string[];
+    implementationGuide?: string;
+    verificationCriteria?: string;
+  } = {};
+  
+  if (name) updateData.name = name;
+  if (description) updateData.description = description;
+  if (notes) updateData.notes = notes;
+  if (relatedFiles && relatedFiles.length > 0) {
+    // 验证relatedFiles中的每个对象都有必需的path和type字段
+    const validFiles = relatedFiles.filter(file => file.path && file.type);
+    if (validFiles.length > 0) {
+      updateData.relatedFiles = validFiles as RelatedFile[];
+    }
+  }
+  if (dependencies && dependencies.length > 0) updateData.dependencies = dependencies;
+  if (implementationGuide) updateData.implementationGuide = implementationGuide;
+  if (verificationCriteria) updateData.verificationCriteria = verificationCriteria;
+
+  const result = await modelUpdateTaskContent(taskId, updateData);
 
   return {
     content: [
